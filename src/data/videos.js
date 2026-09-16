@@ -16,3 +16,7 @@ export const introVideoB = {
   webm: '/videos/22_webm.webm',
   poster: '/videos/22_poster.0000000.jpg',
 }
+
+// Static backdrop behind the Systems menu (a frame from the hero video).
+// Swap for any image in public/images to change it.
+export const systemsBackdrop = '/images/systems-backdrop.jpg'

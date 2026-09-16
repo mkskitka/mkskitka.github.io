@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import HeroBackdrop from './HeroBackdrop.jsx'
 import { projects } from '../data/projects.js'
+import { systemsBackdrop } from '../data/videos.js'
 import { gsap, ScrollTrigger } from '../lib/animations.js'
 
 /**
@@ -23,6 +24,7 @@ const TILT = 35 // degrees an entry tilts as it leaves/enters (0 for none)
 const SHRINK = 0.6 // how small an entry gets when fully out (0.6 = 40% size)
 const FADE = 1 // how transparent it gets when fully out (1 = invisible)
 const ROLL = 0.75 // share of the pinned scroll spent rolling; the rest is a still hold at the end
+const EXTRA_ROLL = 0 // extra travel past "last entry fully in", in entry heights (0.5 = half an entry)
 const EASE = gsap.parseEase('power2.inOut')
 
 export default function SystemsMenu({ hold = 0.75 }) {
@@ -53,15 +55,15 @@ export default function SystemsMenu({ hold = 0.75 }) {
     mm.add('(min-width: 768px) and (prefers-reduced-motion: no-preference)', () => {
       let travel = 0 // how far the list moves, in px
 
-      // Size the window so the last entry is hidden just below it at the start,
-      // and roll far enough that the last entry ends up clear of the bottom edge
-      // (half an entry of breathing room). The section stays pinned for the usual
-      // hold distance plus the travel.
+      // Size the window so the last entry is hidden just below it at the start, then
+      // roll exactly far enough that it is fully in and the first entry is fully out.
+      // (Raise EXTRA_ROLL, in entry heights, to roll further and push more entries out.)
+      // The section stays pinned for the usual hold distance plus the travel.
       const measure = () => {
         const first = items[0]
         const last = items[items.length - 1]
         if (!first || !last) return Math.round(window.innerHeight * hold)
-        const room = Math.round(last.offsetHeight * 0.5)
+        const room = Math.round(last.offsetHeight * EXTRA_ROLL)
         const contentH = last.offsetTop + last.offsetHeight + room
         win.style.maxHeight = `${last.offsetTop}px` // window ends where the last entry begins
         travel = Math.max(0, contentH - win.clientHeight)
@@ -127,7 +129,7 @@ export default function SystemsMenu({ hold = 0.75 }) {
           </div>
         </div>
       </div>
-      <HeroBackdrop nodeId="w-node-db868551-bfd6-d373-7992-34d064deac51-d8033e09" />
+      <HeroBackdrop nodeId="w-node-db868551-bfd6-d373-7992-34d064deac51-d8033e09" still={systemsBackdrop} />
     </header>
   )
 }

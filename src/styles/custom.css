@@ -8,6 +8,13 @@ a:hover,
   text-decoration: none;
 }
 
+/* Hero menu panel: only as tall as its links. The Webflow rule sets height: 100%,
+   which stretches to the section bottom once the section is pinned (explicit height). */
+.section.is-full-screen > .header.margin-bottom_none {
+  height: auto;
+  align-self: flex-start;
+}
+
 /* Card-link hover (was a Webflow interaction): slight fade + image zoom. */
 .card-link img.image_cover {
   transition: transform 0.2s ease-out, opacity 0.2s ease-out;
