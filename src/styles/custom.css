@@ -1,6 +1,13 @@
 /* Styles added during the Webflow -> React conversion. Put your own tweaks here
    rather than in site.css (the untouched Webflow export). */
 
+/* No underlines on any text or link (site.css underlines every <a> by default). */
+a,
+a:hover,
+.w-richtext a {
+  text-decoration: none;
+}
+
 /* Card-link hover (was a Webflow interaction): slight fade + image zoom. */
 .card-link img.image_cover {
   transition: transform 0.2s ease-out, opacity 0.2s ease-out;
@@ -197,9 +204,6 @@
   font-size: var(--_typography---h2-heading--h2-size);
   line-height: 1;
   font-weight: var(--_typography---base-typography--base-font-weight, 300);
-  text-decoration: underline;
-  text-decoration-thickness: 2px;
-  text-underline-offset: 0.12em;
 }
 .contact_handle {
   font-size: 1rem;
@@ -226,16 +230,15 @@
 }
 
 /* ---------------------------------------------------------------------------
-   Systems project wheel (components/SystemsMenu.jsx). The list gets whatever
-   height is left under the heading; if it is taller than that, it rolls like a
-   wheel while the section is pinned.
+   Systems project wheel (components/SystemsMenu.jsx). While the section is
+   pinned, the list rolls up inside .project_wheel: the first project shrinks
+   out through the top, the last grows in from the bottom.
    --------------------------------------------------------------------------- */
 .project_wheel_list {
   height: auto;
-  padding-bottom: var(--_sizes---spacing--4x); /* breathing room under the last project */
 }
 @media (min-width: 768px) and (prefers-reduced-motion: no-preference) {
-  .home .section.systems_menu {
+  .section.systems_menu {
     height: 100vh;
     height: 100dvh;
   }
@@ -251,10 +254,6 @@
     min-height: 0;
     overflow: hidden;
     perspective: 900px;
-  }
-  .project_wheel.is-overflowing {
-    -webkit-mask-image: linear-gradient(to bottom, transparent, #000 12%, #000 85%, transparent);
-    mask-image: linear-gradient(to bottom, transparent, #000 12%, #000 85%, transparent);
   }
   .project_wheel_list {
     transform-style: preserve-3d;

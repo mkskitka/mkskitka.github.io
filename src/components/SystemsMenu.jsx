@@ -7,20 +7,23 @@ import { gsap, ScrollTrigger } from '../lib/animations.js'
 /**
  * The "Systems" project menu on the home page.
  *
- * The section pins to the viewport like the others (it owns its own pin, hence
- * `data-pin="self"`), but if the project list is taller than the space under the
- * heading, scrolling while pinned turns the list into a wheel: it rolls through
- * the projects, with the ones near the middle upright and the ones at the edges
- * tilted away and faded. Once the wheel reaches the end, the section holds for
- * `hold` (a fraction of the viewport height, same as the other sections) and
- * then releases.
+ * The section pins to the viewport (it owns its pin, hence `data-pin="self"` so
+ * pinSections in Home.jsx leaves it alone). When it arrives, the list window is
+ * sized so the last project (Evidence 71) is hidden just below it. Scrolling while
+ * pinned rolls the list up: the first entry tilts back, shrinks and fades out
+ * through the top while the last one grows into view from the bottom. Entries in
+ * the middle stay full size. When the wheel reaches the end, the section holds
+ * for `hold` (fraction of the viewport, same beat as the other sections), then
+ * releases.
  *
- * If the whole list fits, it is a plain static list. Phones and reduced-motion
- * users always get the plain list.
+ * Tune the feel with the constants below. Phones and reduced-motion users get the
+ * plain static list.
  */
-const TILT = 42 // degrees of rotation at the top/bottom edge of the wheel
-const SHRINK = 0.3 // how much items scale down at the edge
-const FADE = 0.7 // how much items fade at the edge
+const TILT = 35 // degrees an entry tilts as it leaves/enters (0 for none)
+const SHRINK = 0.6 // how small an entry gets when fully out (0.6 = 40% size)
+const FADE = 1 // how transparent it gets when fully out (1 = invisible)
+const ROLL = 0.75 // share of the pinned scroll spent rolling; the rest is a still hold at the end
+const EASE = gsap.parseEase('power2.inOut')
 
 export default function SystemsMenu({ hold = 0.75 }) {
   const root = useRef(null)
@@ -34,32 +37,37 @@ export default function SystemsMenu({ hold = 0.75 }) {
     const mm = gsap.matchMedia()
 
     mm.add('(min-width: 768px) and (prefers-reduced-motion: no-preference)', () => {
-      let overflow = 0
-      let wheelPart = 0 // fraction of the pin during which the wheel rolls
+      let travel = 0 // how far the list moves, in px
 
-      // Total pinned scroll distance = wheel travel + hold beat. Re-run on every refresh.
+      // Size the window so the last entry is hidden just below it at the start,
+      // and roll far enough that the last entry ends up clear of the bottom edge
+      // (half an entry of breathing room). The section stays pinned for the usual
+      // hold distance plus the travel.
       const measure = () => {
-        overflow = Math.max(0, list.scrollHeight - win.clientHeight)
-        const holdPx = Math.round(window.innerHeight * hold)
-        wheelPart = overflow / (holdPx + overflow) || 0
-        win.classList.toggle('is-overflowing', overflow > 0)
-        return holdPx + overflow
+        const first = items[0]
+        const last = items[items.length - 1]
+        if (!first || !last) return Math.round(window.innerHeight * hold)
+        const room = Math.round(last.offsetHeight * 0.5)
+        const contentH = last.offsetTop + last.offsetHeight + room
+        win.style.maxHeight = `${last.offsetTop}px` // window ends where the last entry begins
+        travel = Math.max(0, contentH - win.clientHeight)
+        return Math.round(window.innerHeight * hold) + travel
       }
 
+      // d = 0 while an entry is fully inside the window; -1 when it has fully left
+      // through the top; +1 while it is still fully below the bottom edge.
       const render = (progress) => {
-        if (!overflow) {
-          gsap.set(list, { y: 0 })
-          gsap.set(items, { clearProps: 'transform,opacity' })
-          return
-        }
-        const p = gsap.utils.clamp(0, 1, progress / wheelPart)
-        const y = -overflow * p
+        const p = gsap.utils.clamp(0, 1, progress / ROLL)
+        const y = -travel * EASE(p)
         gsap.set(list, { y })
 
-        const half = win.clientHeight / 2
+        const H = win.clientHeight
         items.forEach((item) => {
-          const center = list.offsetTop + y + item.offsetTop + item.offsetHeight / 2
-          const d = gsap.utils.clamp(-1, 1, (center - half) / half) // -1 top edge, 0 middle, 1 bottom edge
+          const top = item.offsetTop + y
+          const bottom = top + item.offsetHeight
+          let d = 0
+          if (top < 0) d = -gsap.utils.clamp(0, 1, -top / item.offsetHeight)
+          else if (bottom > H) d = gsap.utils.clamp(0, 1, (bottom - H) / item.offsetHeight)
           const a = Math.abs(d)
           gsap.set(item, {
             rotationX: -d * TILT,

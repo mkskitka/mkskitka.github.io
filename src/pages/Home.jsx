@@ -61,7 +61,7 @@ export default function Home() {
         </div>
       </header>
 
-      {/* Systems project menu (pins itself and rolls the list as a wheel) */}
+      {/* Systems project menu (pins itself and rolls the list like a wheel) */}
       <SystemsMenu hold={HOLD} />
 
       {/* Contact */}
