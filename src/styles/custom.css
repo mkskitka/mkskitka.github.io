@@ -220,12 +220,19 @@ a:hover,
    Home page: each section fills the screen and is pinned there for a beat while
    you keep scrolling before the next one arrives (lib/animations.js
    `pinSections`; the hold length is set in pages/Home.jsx).
-   Heights use svh (the viewport with the phone address bar shown) so the pinned
-   size doesn't change as the bar hides and shows while scrolling.
+   Heights use lvh (the viewport with the phone address bar hidden) so a pinned
+   section always covers the screen; with the bar shown its bottom edge is just
+   off-screen.
    --------------------------------------------------------------------------- */
 .home .section {
   min-height: 100vh;
-  min-height: 100svh;
+  min-height: 100lvh; /* large viewport: still covers the screen once the address bar collapses */
+}
+/* Pinning gives a section an explicit pixel height. Webflow's rule makes these
+   heading blocks height: 100%, which then stretches them to fill the section and
+   pushes whatever follows (e.g. the Contact icons) out of view. */
+.home .section .header.margin-bottom_none {
+  height: auto;
 }
 .home .section:not(.is-full-screen) {
   display: flex;
