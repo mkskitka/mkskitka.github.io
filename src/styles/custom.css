@@ -224,3 +224,43 @@
   flex-direction: column;
   justify-content: center;
 }
+
+/* ---------------------------------------------------------------------------
+   Systems project wheel (components/SystemsMenu.jsx). The list gets whatever
+   height is left under the heading; if it is taller than that, it rolls like a
+   wheel while the section is pinned.
+   --------------------------------------------------------------------------- */
+.project_wheel_list {
+  height: auto;
+  padding-bottom: var(--_sizes---spacing--4x); /* breathing room under the last project */
+}
+@media (min-width: 768px) and (prefers-reduced-motion: no-preference) {
+  .home .section.systems_menu {
+    height: 100vh;
+    height: 100dvh;
+  }
+  .section.systems_menu .container.hero_menu {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+  }
+  .project_wheel {
+    position: relative;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+    perspective: 900px;
+  }
+  .project_wheel.is-overflowing {
+    -webkit-mask-image: linear-gradient(to bottom, transparent, #000 12%, #000 85%, transparent);
+    mask-image: linear-gradient(to bottom, transparent, #000 12%, #000 85%, transparent);
+  }
+  .project_wheel_list {
+    transform-style: preserve-3d;
+  }
+  .project_wheel_list .project_list {
+    will-change: transform, opacity;
+    backface-visibility: hidden;
+  }
+}

@@ -70,7 +70,9 @@ export function revealSections(root) {
  * scrolling before letting the page continue. `hold` is how long each section
  * stays put, as a fraction of the viewport height (0.75 = keep scrolling 75% of a
  * screen before the next section starts to arrive). The last section is not
- * pinned since there is nothing after it to scroll to.
+ * pinned since there is nothing after it to scroll to, and sections marked
+ * `data-pin="self"` are skipped because they create their own pin (see
+ * components/SystemsMenu.jsx).
  *
  * Desktop only (touch devices and reduced-motion users get a normal scroll).
  * Returns a cleanup function; call it when the page unmounts.
@@ -82,6 +84,7 @@ export function pinSections(root, { hold = 0.75, selector = '.section' } = {}) {
   mm.add('(min-width: 768px) and (prefers-reduced-motion: no-preference)', () => {
     const sections = Array.from(root.querySelectorAll(selector))
     sections.slice(0, -1).forEach((section) => {
+      if (section.dataset.pin === 'self') return
       ScrollTrigger.create({
         trigger: section,
         start: 'top top',

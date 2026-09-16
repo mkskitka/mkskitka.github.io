@@ -1,17 +1,19 @@
 import { useEffect, useRef } from 'react'
-import { Link } from 'react-router-dom'
 import HeroBackdrop from '../components/HeroBackdrop.jsx'
 import BackgroundVideo from '../components/BackgroundVideo.jsx'
 import { introVideoA, introVideoB } from '../data/videos.js'
-import { projects } from '../data/projects.js'
+import SystemsMenu from '../components/SystemsMenu.jsx'
 import ContactSection from '../components/ContactSection.jsx'
 import { pinSections, revealSections } from '../lib/animations.js'
+
+// How long each section stays pinned, as a fraction of the viewport height.
+const HOLD = 0.75
 
 export default function Home() {
   const root = useRef(null)
   useEffect(() => {
     // Create the pins first so the reveal triggers measure against the pinned layout.
-    const unpin = pinSections(root.current, { hold: 0.75 })
+    const unpin = pinSections(root.current, { hold: HOLD })
     const unreveal = revealSections(root.current)
     return () => {
       unreveal()
@@ -59,25 +61,8 @@ export default function Home() {
         </div>
       </header>
 
-      {/* Systems project menu */}
-      <header id="Systems" className="section systems_menu">
-        <div className="container hero_menu">
-          <div className="header is-align-center">
-            <h2 className="heading_primary">SYSTEMS</h2>
-            <div className="subheading w-richtext">
-              <p>Visuals, computers, humans interacting in complex systems</p>
-            </div>
-          </div>
-          <div className="header margin-bottom_none">
-            {projects.map((p) => (
-              <Link key={p.slug} to={`/projects/${p.slug}`} className="heading_primary hero_menu_text_color project_list">
-                {p.title}
-              </Link>
-            ))}
-          </div>
-        </div>
-        <HeroBackdrop nodeId="w-node-db868551-bfd6-d373-7992-34d064deac51-d8033e09" />
-      </header>
+      {/* Systems project menu (pins itself and rolls the list as a wheel) */}
+      <SystemsMenu hold={HOLD} />
 
       {/* Contact */}
       <ContactSection />
