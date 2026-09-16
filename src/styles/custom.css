@@ -1,0 +1,213 @@
+/* Styles added during the Webflow -> React conversion. Put your own tweaks here
+   rather than in site.css (the untouched Webflow export). */
+
+/* Card-link hover (was a Webflow interaction): slight fade + image zoom. */
+.card-link img.image_cover {
+  transition: transform 0.2s ease-out, opacity 0.2s ease-out;
+}
+.card-link:hover {
+  opacity: 0.8;
+}
+.card-link:hover img.image_cover {
+  transform: scale(1.02);
+  opacity: 0.85;
+}
+
+/* ---------------------------------------------------------------------------
+   Showcase: scroll-driven collage on project pages (components/Showcase.jsx).
+   Tweak sizes / positions / tilt here. `--tilt` is the resting rotation and is
+   read by the JS from data-rotate, so set both if you change it.
+   --------------------------------------------------------------------------- */
+.section.showcase {
+  --showcase-scroll: 320vh; /* total scroll distance; the stage is pinned for all but 100vh of it */
+  height: var(--showcase-scroll);
+  padding: 0;
+  position: relative;
+}
+.showcase_stage {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+.showcase_eyebrow {
+  position: absolute;
+  top: 3vh;
+  left: 5vw;
+  z-index: 3;
+  font-size: 0.8rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--_colors---text-color--text-secondary, #aaa);
+}
+.showcase_eyebrow-count {
+  margin-left: 1.5em;
+  color: var(--_colors---text-color--text-primary, #fff);
+}
+
+.showcase_ghost {
+  position: absolute;
+  left: 0;
+  bottom: -0.12em;
+  z-index: 0;
+  font-size: clamp(6rem, 24vw, 30rem);
+  line-height: 1;
+  font-weight: 300;
+  white-space: nowrap;
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(255, 255, 255, 0.28);
+  pointer-events: none;
+  user-select: none;
+}
+
+.showcase_tile {
+  position: absolute;
+  margin: 0;
+  z-index: 1;
+  will-change: transform;
+}
+.showcase_tile:hover {
+  z-index: 10;
+}
+.showcase_frame {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--_sizes---card--card-radius, 6px);
+  box-shadow: 0 0 0 2px #fff, 12px 12px 0 rgba(255, 255, 255, 0.15);
+  background: #000;
+  transition: transform 0.35s ease, opacity 0.35s ease, filter 0.35s ease;
+}
+.showcase_frame img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.showcase_index {
+  position: absolute;
+  top: -1.6em;
+  left: 0;
+  font-size: 0.75rem;
+  letter-spacing: 0.15em;
+  color: var(--_colors---text-color--text-secondary, #aaa);
+}
+.showcase_caption {
+  margin-top: 0.6em;
+  font-size: 0.8rem;
+  color: var(--_colors---text-color--text-secondary, #aaa);
+}
+
+/* Hover: lift the hovered frame, dim the rest. */
+.showcase_tile:hover .showcase_frame {
+  transform: scale(1.04);
+}
+.showcase_stage:has(.showcase_tile:hover) .showcase_tile:not(:hover) .showcase_frame {
+  opacity: 0.3;
+  filter: saturate(0.4);
+}
+
+/* Size / position / aspect per tile come from inline styles set by Showcase.jsx
+   (see the `featured` lists in src/data/projects.js). Defaults if one is missing: */
+.showcase_tile {
+  width: 30vw;
+}
+.showcase_frame {
+  aspect-ratio: var(--aspect, 4 / 3);
+}
+
+/* Simple layout: phones and reduced motion. */
+@media (max-width: 767px), (prefers-reduced-motion: reduce) {
+  .section.showcase {
+    height: auto;
+    padding: 12vh 5vw;
+  }
+  .showcase_stage {
+    position: static;
+    height: auto;
+    overflow: visible;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6vw;
+    padding-top: 2.5rem;
+  }
+  .showcase_eyebrow {
+    top: 0;
+    left: 0;
+  }
+  .showcase_ghost {
+    display: none;
+  }
+  .showcase_tile {
+    position: relative !important;
+    inset: auto !important;
+    width: auto !important;
+  }
+  .showcase_tile:nth-child(3) {
+    grid-column: 1 / -1;
+  }
+  .showcase_frame {
+    aspect-ratio: 4 / 3;
+  }
+  .showcase_frame {
+    box-shadow: 0 0 0 1px #fff;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Contact section on the home page (components/ContactSection.jsx).
+   Links come from src/data/contact.js.
+   --------------------------------------------------------------------------- */
+.contact_links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: clamp(2.5rem, 7vw, 8rem);
+  margin-top: clamp(2rem, 5vh, 4rem);
+  margin-left: var(--_typography---hero_menu_margin, 0); /* line up with the heading above */
+}
+.contact_link {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.75rem;
+  color: var(--_colors---core-neutral-color--neutral-inverse, #fff);
+  text-decoration: none;
+  transition: color 0.25s ease;
+}
+.contact_link:hover,
+.contact_link:focus-visible {
+  color: var(--_colors---core-accent-color--accent-primary-hover, #fff);
+}
+.contact_icon {
+  display: block;
+  width: clamp(56px, 7vw, 96px);
+  height: clamp(56px, 7vw, 96px);
+  transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.contact_icon svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.contact_link:hover .contact_icon {
+  transform: translateY(-8px) rotate(-6deg);
+}
+.contact_label {
+  font-size: var(--_typography---h2-heading--h2-size);
+  line-height: 1;
+  font-weight: var(--_typography---base-typography--base-font-weight, 300);
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.12em;
+}
+.contact_handle {
+  font-size: 1rem;
+  color: var(--_colors---text-color--text-secondary, #aaa);
+}
+@media (max-width: 767px) {
+  .contact_links {
+    flex-direction: column;
+    gap: 2.5rem;
+  }
+}
