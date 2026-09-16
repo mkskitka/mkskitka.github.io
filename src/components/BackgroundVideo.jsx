@@ -14,8 +14,27 @@ export default function BackgroundVideo({ video, className = '', children }) {
     if (!el) return
     el.muted = true
     el.defaultMuted = true
-    const p = el.play()
-    if (p && typeof p.catch === 'function') p.catch(() => {})
+    const play = () => {
+      const p = el.play()
+      if (p && typeof p.catch === 'function') p.catch(() => {})
+    }
+    play()
+
+    // This video should never stop: it loops and has no controls. Mobile Safari
+    // still pauses it when the section gets pinned (ScrollTrigger moves the section
+    // into a spacer element) or when the tab goes to the background, so restart it.
+    const resume = () => {
+      if (el.isConnected && el.paused && !el.ended && !document.hidden) play()
+    }
+    el.addEventListener('pause', resume)
+    document.addEventListener('visibilitychange', resume)
+    // If autoplay was refused (e.g. iOS Low Power Mode), the first touch allows it.
+    window.addEventListener('touchend', resume, { passive: true })
+    return () => {
+      el.removeEventListener('pause', resume)
+      document.removeEventListener('visibilitychange', resume)
+      window.removeEventListener('touchend', resume)
+    }
   }, [])
 
   return (
