@@ -130,11 +130,11 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 6vw;
-    padding-top: 2.5rem;
   }
   .showcase_eyebrow {
-    top: 0;
-    left: 0;
+    position: static;
+    grid-column: 1 / -1;
+    margin-bottom: 0.5rem;
   }
   .showcase_ghost {
     display: none;
@@ -210,4 +210,17 @@
     flex-direction: column;
     gap: 2.5rem;
   }
+}
+
+/* ---------------------------------------------------------------------------
+   Home page: each section fills the screen and is pinned there for a beat while
+   you keep scrolling before the next one arrives (lib/animations.js
+   `pinSections`; the hold length is set in pages/Home.jsx).
+   --------------------------------------------------------------------------- */
+.home .section:not(.is-full-screen) {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }

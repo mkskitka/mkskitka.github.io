@@ -5,14 +5,22 @@ import BackgroundVideo from '../components/BackgroundVideo.jsx'
 import { introVideoA, introVideoB } from '../data/videos.js'
 import { projects } from '../data/projects.js'
 import ContactSection from '../components/ContactSection.jsx'
-import { revealSections } from '../lib/animations.js'
+import { pinSections, revealSections } from '../lib/animations.js'
 
 export default function Home() {
   const root = useRef(null)
-  useEffect(() => revealSections(root.current), [])
+  useEffect(() => {
+    // Create the pins first so the reveal triggers measure against the pinned layout.
+    const unpin = pinSections(root.current, { hold: 0.75 })
+    const unreveal = revealSections(root.current)
+    return () => {
+      unreveal()
+      unpin()
+    }
+  }, [])
 
   return (
-    <div ref={root}>
+    <div ref={root} className="home">
       {/* Full-screen hero with site menu */}
       <header className="section is-full-screen">
         <HeroBackdrop

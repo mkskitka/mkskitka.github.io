@@ -64,3 +64,37 @@ export function revealSections(root) {
 
   return () => ctx.revert()
 }
+
+/**
+ * Pin every `.section` inside `root` to the top of the viewport for a stretch of
+ * scrolling before letting the page continue. `hold` is how long each section
+ * stays put, as a fraction of the viewport height (0.75 = keep scrolling 75% of a
+ * screen before the next section starts to arrive). The last section is not
+ * pinned since there is nothing after it to scroll to.
+ *
+ * Desktop only (touch devices and reduced-motion users get a normal scroll).
+ * Returns a cleanup function; call it when the page unmounts.
+ */
+export function pinSections(root, { hold = 0.75, selector = '.section' } = {}) {
+  if (!root) return () => {}
+
+  const mm = gsap.matchMedia()
+  mm.add('(min-width: 768px) and (prefers-reduced-motion: no-preference)', () => {
+    const sections = Array.from(root.querySelectorAll(selector))
+    sections.slice(0, -1).forEach((section) => {
+      ScrollTrigger.create({
+        trigger: section,
+        start: 'top top',
+        end: () => `+=${Math.round(window.innerHeight * hold)}`,
+        pin: true,
+        pinSpacing: true,
+        anticipatePin: 1,
+        // Pins add scroll distance below them, so measure them before anything
+        // else (e.g. the reveal triggers above) works out where the sections sit.
+        refreshPriority: 1,
+      })
+    })
+  })
+
+  return () => mm.revert()
+}
