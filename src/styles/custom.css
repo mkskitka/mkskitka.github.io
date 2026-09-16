@@ -220,10 +220,14 @@ a:hover,
    Home page: each section fills the screen and is pinned there for a beat while
    you keep scrolling before the next one arrives (lib/animations.js
    `pinSections`; the hold length is set in pages/Home.jsx).
+   Heights use svh (the viewport with the phone address bar shown) so the pinned
+   size doesn't change as the bar hides and shows while scrolling.
    --------------------------------------------------------------------------- */
-.home .section:not(.is-full-screen) {
+.home .section {
   min-height: 100vh;
-  min-height: 100dvh;
+  min-height: 100svh;
+}
+.home .section:not(.is-full-screen) {
   display: flex;
   flex-direction: column;
   justify-content: center;

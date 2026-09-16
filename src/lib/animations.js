@@ -9,6 +9,10 @@ import { SplitText } from 'gsap/SplitText'
 
 gsap.registerPlugin(ScrollTrigger, SplitText)
 
+// On phones the address bar showing/hiding resizes the viewport on every scroll;
+// don't re-measure the pinned sections when that happens or they jump around.
+ScrollTrigger.config({ ignoreMobileResize: true })
+
 export { gsap, ScrollTrigger, SplitText }
 
 const TEXT_SELECTOR =
@@ -74,14 +78,14 @@ export function revealSections(root) {
  * `data-pin="self"` are skipped because they create their own pin (see
  * components/SystemsMenu.jsx).
  *
- * Desktop only (touch devices and reduced-motion users get a normal scroll).
+ * Works on phones too; reduced-motion users get a normal scroll.
  * Returns a cleanup function; call it when the page unmounts.
  */
 export function pinSections(root, { hold = 0.75, selector = '.section' } = {}) {
   if (!root) return () => {}
 
   const mm = gsap.matchMedia()
-  mm.add('(min-width: 768px) and (prefers-reduced-motion: no-preference)', () => {
+  mm.add('(prefers-reduced-motion: no-preference)', () => {
     const sections = Array.from(root.querySelectorAll(selector))
     sections.slice(0, -1).forEach((section) => {
       if (section.dataset.pin === 'self') return
