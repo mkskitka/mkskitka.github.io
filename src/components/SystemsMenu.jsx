@@ -16,8 +16,8 @@ import { gsap, ScrollTrigger } from '../lib/animations.js'
  * for `hold` (fraction of the viewport, same beat as the other sections), then
  * releases.
  *
- * Tune the feel with the constants below. Phones and reduced-motion users get the
- * plain static list.
+ * Tune the feel with the constants below. Phones get the plain static list (still
+ * pinned for the beat); reduced-motion users get a plain, unpinned list.
  */
 const TILT = 35 // degrees an entry tilts as it leaves/enters (0 for none)
 const SHRINK = 0.6 // how small an entry gets when fully out (0.6 = 40% size)
@@ -35,6 +35,20 @@ export default function SystemsMenu({ hold = 0.75 }) {
     const list = section.querySelector('.project_wheel_list')
     const items = gsap.utils.toArray('.project_list', list)
     const mm = gsap.matchMedia()
+
+    // Phones don't get the wheel, but the section still pins for the usual beat
+    // (pinSections in Home.jsx skips this section because of data-pin="self").
+    mm.add('(max-width: 767px) and (prefers-reduced-motion: no-preference)', () => {
+      ScrollTrigger.create({
+        trigger: section,
+        start: 'top top',
+        end: () => `+=${Math.round(window.innerHeight * hold)}`,
+        pin: true,
+        pinSpacing: true,
+        anticipatePin: 1,
+        refreshPriority: 1,
+      })
+    })
 
     mm.add('(min-width: 768px) and (prefers-reduced-motion: no-preference)', () => {
       let travel = 0 // how far the list moves, in px
