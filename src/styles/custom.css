@@ -95,7 +95,7 @@ a:hover,
    width so the widest word (MK SKITKA), its half-column pads and the left margin
    fit inside the screen with the panel's right edge still on a grid line. */
 .home .section.is-full-screen {
-  --hero-menu-size: clamp(1.75rem, 9vw, 4rem);
+  --hero-menu-size: clamp(1.4rem, 7vw, 4rem);
 }
 @media (min-width: 768px) {
   .home .section.is-full-screen {
