@@ -20,13 +20,18 @@ import * as THREE from 'three'
      ease           'linear' | 'out' | 'inOut'
      colors         gradient along the line, start end -> far end
 
-   The hero stays pinned while you scroll (data-hold on the hero in Home.jsx). In
-   'scroll' mode the vertical lines follow that scroll exactly and reach the bottom
-   at `scrollRange` of it, so the grid is complete and then holds for the rest of the
-   pin before the next section arrives.
+   SCROLL INPUT (scroll.mode): the page itself does not move; there are no scroll
+   bars. 'virtual' turns wheel, trackpad, touch-drag and arrow/space keys into a
+   0..1 progress over `scroll.range` screens' worth of input, and the 'scroll'-mode
+   lines (and the ink trigger) follow that. 'page' uses the real scroll position
+   within a pinned hero instead, for when the site has more sections again.
 
    SCROLL LOCK (scrollLock, off by default): alternatively hold the page still for
    `seconds` at the first scroll while the lines animate on their own.
+
+   PAINTING (ink.paint): click anywhere on the backdrop to add a drop; click and hold
+   to keep pouring ink where the pointer is, and drag to paint with it. On touch
+   screens a tap adds a drop (dragging is left to scrolling).
 
    INK: a liquid simulation. Your first scroll starts a sequence of drops at random
    spots (new every page load); they land one after another and soak outward through
@@ -75,6 +80,12 @@ const SETTINGS = {
     ease: 'linear',
   },
 
+  scroll: {
+    mode: 'virtual', // 'virtual': wheel/touch/keys drive the animation, page stays put | 'page': real scrolling
+    range: 1.5, // virtual: screens' worth of wheel/touch input from start to finish
+    keyStep: 0.08, // virtual: how far one arrow-key press moves (fraction of the range)
+  },
+
   scrollLock: {
     enabled: false, // optional: hold the page still for `seconds` at the first scroll (off: scrolling drives everything)
     seconds: 3,
@@ -108,6 +119,12 @@ const SETTINGS = {
     diffuse: 0.1, // simulation smoothing per step: softens fronts, lets ink slowly thin out (0 off, 0.15 very soft)
     seed: 7, // paper fibre pattern (and drop positions when randomPositions is false)
 
+    paint: {
+      enabled: true, // click / hold / drag on the backdrop to add ink
+      radius: 0.012, // size of the pointer's puddle, as a fraction of the page width
+      strength: 1, // how hard it pours while held (0.5 gentle, 1 full pressure)
+    },
+
     dams: true, // grid lines hold the ink back until it builds up pressure (see header)
     lineThreshold: .8, // pressure needed at a line before ink spills across (0.1 leaky, 0.6 very tight)
     lineLoss: 0.06, // pressure lost crossing a line (higher = fewer cells reached)
@@ -118,7 +135,7 @@ const PANEL_PAD_ROWS = 1 // rows of glass above and below the hero menu text (wh
 const PANEL_PAD_COLS = 0.5 // columns of glass left of the text (the right edge snaps to the next grid line)
 
 const MAX_DROPS = 16
-const SIM_SCALE = .2 // simulation resolution relative to the page (lower = cheaper, blockier edges)
+const SIM_SCALE = .1 // simulation resolution relative to the page (lower = cheaper, blockier edges)
 const SIM_STEPS = 2 // simulation steps per frame
 
 const EASES = {
@@ -171,6 +188,8 @@ const SIM_FRAG = /* glsl */ `
   uniform float uDropRadius; // in uv units of width
   uniform float uPour;
   uniform vec4 uDrops[${MAX_DROPS}]; // x, y (uv), landTime, active
+  uniform vec4 uPointer;             // x, y (uv), active, strength
+  uniform float uPointerRadius;      // in uv units of width
   // grid
   uniform vec2 uSize;        // css px
   uniform float uSpacing;    // css px
@@ -246,6 +265,11 @@ const SIM_FRAG = /* glsl */ `
       float dist = length((vUv - d.xy) * vec2(uAspect, 1.0));
       float r = uDropRadius * uAspect * (0.6 + 0.4 * min(1.0, age / 0.25));
       w = max(w, smoothstep(r, r * 0.35, dist));
+    }
+    if (uPointer.z > 0.5) {
+      float dist = length((vUv - uPointer.xy) * vec2(uAspect, 1.0));
+      float r = uPointerRadius * uAspect;
+      w = max(w, smoothstep(r, r * 0.35, dist) * uPointer.w);
     }
     gl_FragColor = vec4(w, 0.0, 0.0, 1.0);
   }
@@ -371,6 +395,8 @@ export default function GridInkBackdrop({ className = '' }) {
         uDropRadius: { value: S.ink.dropRadius },
         uPour: { value: S.ink.pour },
         uDrops: { value: drops },
+        uPointer: { value: new THREE.Vector4(0, 0, 0, 0) },
+        uPointerRadius: { value: S.ink.paint.radius },
         uSize: { value: new THREE.Vector2() },
         uSpacing: { value: 30 },
         uHx: { value: new THREE.Vector2() },
@@ -492,8 +518,34 @@ export default function GridInkBackdrop({ className = '' }) {
       for (const d of landed) d.time = clock() - 0.001
     }
 
-    // 0 at the top of the page, 1 when the hero's pinned scroll is used up.
+    // Virtual scroll: accumulate wheel / touch / key input into px, without the page moving.
+    let virtualPx = 0
+    const virtualRange = () => Math.max(1, window.innerHeight * S.scroll.range)
+    const bump = (dy) => { virtualPx = Math.min(virtualRange(), Math.max(0, virtualPx + dy)) }
+    const onWheel = (e) => { if (S.scroll.mode === 'virtual') { e.preventDefault(); bump(e.deltaY) } }
+    let touchY = null
+    const onTouchStart = (e) => { touchY = e.touches[0]?.clientY ?? null }
+    const onTouchMove = (e) => {
+      if (S.scroll.mode !== 'virtual' || touchY === null) return
+      const y = e.touches[0]?.clientY ?? touchY
+      bump((touchY - y) * 1.5)
+      touchY = y
+      e.preventDefault()
+    }
+    const keyDelta = { ArrowDown: 1, ArrowUp: -1, PageDown: 4, PageUp: -4, ' ': 4, End: 100, Home: -100 }
+    const onVirtualKey = (e) => {
+      if (S.scroll.mode !== 'virtual' || !(e.key in keyDelta) || e.target.closest('input, textarea')) return
+      e.preventDefault()
+      bump(keyDelta[e.key] * S.scroll.keyStep * virtualRange())
+    }
+    window.addEventListener('wheel', onWheel, { passive: false })
+    window.addEventListener('touchstart', onTouchStart, { passive: true })
+    window.addEventListener('touchmove', onTouchMove, { passive: false })
+    window.addEventListener('keydown', onVirtualKey)
+
+    // 0 at the start, 1 when the hero's scroll (virtual or pinned) is used up.
     const scrollProgress = () => {
+      if (S.scroll.mode === 'virtual') return clamp01(virtualPx / virtualRange())
       const section = el.closest('.section')
       const spacer = section?.parentElement
       let dist = (spacer?.offsetHeight || 0) - (section?.offsetHeight || 0)
@@ -526,6 +578,32 @@ export default function GridInkBackdrop({ className = '' }) {
     window.addEventListener('keydown', stopKeys)
     window.addEventListener('scroll', holdPosition)
     const hProgressAtLock = { value: 0 }
+
+    // Painting: pointer down adds ink at the pointer; holding keeps pouring, dragging
+    // paints. Listeners sit on the hero section so clicks on the glass count too;
+    // clicks on the menu links are left alone.
+    const pointer = { down: false, x: 0, y: 0, until: 0 }
+    const paintHost = el.closest('.section') || el
+    const toUv = (e) => {
+      const r = paintHost.getBoundingClientRect()
+      pointer.x = clamp01((e.clientX - r.left) / r.width)
+      pointer.y = 1 - clamp01((e.clientY - r.top) / r.height)
+    }
+    const onDown = (e) => {
+      if (!S.ink.paint.enabled || still || e.button > 0 || e.target.closest('a')) return
+      toUv(e)
+      if (e.pointerType === 'mouse' || e.pointerType === 'pen') {
+        pointer.down = true
+      } else {
+        pointer.until = clock() + S.ink.pour // touch: a tap pours for one drop's worth
+      }
+    }
+    const onMove = (e) => { if (pointer.down) toUv(e) }
+    const onUp = () => { pointer.down = false }
+    paintHost.addEventListener('pointerdown', onDown)
+    window.addEventListener('pointermove', onMove)
+    window.addEventListener('pointerup', onUp)
+    window.addEventListener('pointercancel', onUp)
 
     const progressFor = (cfg, seconds, raw = false) => {
       if (still) return 1
@@ -600,6 +678,10 @@ export default function GridInkBackdrop({ className = '' }) {
         for (let n = landed.length; n < MAX_DROPS; n++) drops[n].w = 0
       }
 
+      // Pointer ink
+      const painting = pointer.down || seconds < pointer.until
+      simMat.uniforms.uPointer.value.set(pointer.x, pointer.y, painting ? 1 : 0, S.ink.paint.strength)
+
       // Simulation
       if (S.ink.enabled) {
         simMat.uniforms.uDt.value = 1 / 60
@@ -649,6 +731,14 @@ export default function GridInkBackdrop({ className = '' }) {
       window.removeEventListener('touchmove', stopScroll)
       window.removeEventListener('keydown', stopKeys)
       window.removeEventListener('scroll', holdPosition)
+      window.removeEventListener('wheel', onWheel)
+      window.removeEventListener('touchstart', onTouchStart)
+      window.removeEventListener('touchmove', onTouchMove)
+      window.removeEventListener('keydown', onVirtualKey)
+      paintHost.removeEventListener('pointerdown', onDown)
+      window.removeEventListener('pointermove', onMove)
+      window.removeEventListener('pointerup', onUp)
+      window.removeEventListener('pointercancel', onUp)
       ro.disconnect()
       rtA?.dispose()
       rtB?.dispose()

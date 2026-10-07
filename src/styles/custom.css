@@ -146,6 +146,31 @@ a:hover,
   overflow: hidden;
   background: #0c0c0e;
 }
+/* Single-screen site: no scroll bars and no page movement in either direction.
+   Remove this block when the site gets more sections again. */
+html,
+body {
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+.home--fixed {
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+}
+.home--fixed .section.is-full-screen {
+  height: 100%;
+  min-height: 0;
+}
+
+/* The hero backdrop can be painted on (click / hold / drag adds ink). */
+.home .section.is-full-screen {
+  cursor: crosshair;
+}
+.home .section.is-full-screen a {
+  cursor: pointer;
+}
 .sketch_backdrop canvas {
   display: block;
   width: 100% !important;
