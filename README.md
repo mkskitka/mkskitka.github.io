@@ -31,7 +31,7 @@ git push
 | `src/data/projects.js` | **Edit this to add/rename projects, pick the 3-4 showcase images, fill in project details** |
 | `src/data/videos.js` | Paths to the background video renditions |
 | `src/data/contact.js` | Instagram / email / GitHub links for the Contact section |
-| `src/components/` | `BackgroundVideo`, `HeroBackdrop`, `Showcase` (scroll collage), `SiteFooter` (unused for now), `ScrollToTop` |
+| `src/components/` | `BackgroundVideo`, `HeroBackdrop`, `GridInkBackdrop` (three.js grid + ink simulation behind the home hero; all knobs in its `SETTINGS` block), `SystemsMenu`, `Showcase` (scroll collage), `ContactSection`, `SiteFooter` (unused for now), `ScrollToTop` |
 | `src/lib/animations.js` | GSAP re-implementation of the Webflow scroll reveals |
 | `src/styles/site.css` | The untouched Webflow stylesheet (design tokens, classes). Large; prune later if you like |
 | `src/styles/webflow.css`, `normalize.css` | Webflow's base/component CSS, kept as-is |

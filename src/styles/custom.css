@@ -14,6 +14,143 @@ a:hover,
   height: auto;
   align-self: flex-start;
 }
+/* Home hero panel layout. Desktop: the glass sits on the grid. Its top, bottom,
+   left and right edges land on grid lines, with one row of glass above and below
+   the text and half a column to its left (PANEL_PAD_ROWS / PANEL_PAD_COLS in
+   GridInkBackdrop.jsx, which measures the text and sets the --hero-panel-* values).
+   Phones: 20px left margin, content width, down to the bottom of the section. */
+@media (min-width: 768px) {
+  .home .section.is-full-screen > .header.margin-bottom_none {
+    align-self: flex-start;
+    margin-top: var(--hero-panel-top, 0px);
+    margin-left: var(--hero-panel-left, 20px);
+    margin-right: 0;
+    width: var(--hero-panel-width, max-content);
+    padding: var(--hero-panel-pad-y, 0px) var(--hero-panel-pad-x, 0px);
+    box-sizing: border-box;
+  }
+}
+@media (max-width: 767px) {
+  .home .section.is-full-screen > .header.margin-bottom_none {
+    align-self: stretch;
+    height: auto;
+  }
+}
+
+/* No rounded corners anywhere. The Webflow stylesheet draws every radius from these
+   tokens (sections, cards, images, buttons, showcase frames), so zeroing them here
+   squares everything off. Delete this block to get the Webflow defaults back. */
+:root {
+  --_sizes---card--card-radius: 0;
+  --_sizes---image--image-radius: 0;
+  --_sizes---button--button-radius: 0;
+  --_sizes---input--input-radius: 0;
+  --_sizes---tag--tag-radius: 0;
+  --_sizes---radius--sm-radius: 0;
+  --_sizes---radius--md-radius: 0;
+  --_sizes---radius--lg-radius: 0;
+  --_sizes---radius--xl-radius: 0;
+}
+.radius_xlarge,
+.ix_parallax-scale-out-hero,
+.showcase_frame,
+.card-link {
+  border-radius: 0;
+}
+
+/* Frosted-glass tint for the blurred panels (hero menu, project title, Systems menu).
+   Only a semi-transparent white backing and the blur amount; square corners, no
+   edge line. Set --glass-tint to rgba(255, 255, 255, 0) to turn the backing off. */
+:root {
+  --glass-tint: rgba(255, 255, 255, 0); /* white backing: 0 = none, 0.25 = milky (you had 0.34) */
+  --glass-blur: 4px; /* sharper glass; 20px was the original Webflow blur (you had 25px) */
+  --glass-saturate: 1.5; /* 1 = unchanged colours behind the glass (you had 1.6) */
+}
+.section.is-full-screen > .header.margin-bottom_none,
+.section.systems_menu .project_wheel {
+  background-color: var(--glass-tint);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+}
+/* The list inside the Systems panel had its own blur; one pane is enough. */
+.section.systems_menu .project_wheel_list {
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+/* Panel type: solid white, Medium weight, slightly tighter tracking, so the
+   letters read crisp against the video. Applies to the hero menu links, the
+   SYSTEMS heading and the project list. */
+:root {
+  --panel-text-weight: 500;
+  --panel-text-tracking: -0.015em;
+}
+.home .section.is-full-screen > .header.margin-bottom_none .heading_primary.hero_menu_text_color,
+.section.systems_menu .container.hero_menu h2.heading_primary,
+.section.systems_menu .project_wheel_list .heading_primary.hero_menu_text_color.project_list {
+  font-weight: var(--panel-text-weight);
+  letter-spacing: var(--panel-text-tracking);
+}
+.home .section.is-full-screen > .header.margin-bottom_none .heading_primary.hero_menu_text_color {
+  color: #fff;
+}
+/* Hero menu text on desktop sits one line per grid row. The grid takes its row
+   height from this text (rowsFromText in GridInkBackdrop.jsx: row = text size x 1.2),
+   and the sketch sets --grid-spacing and --grid-row-offset on the hero section so
+   each link takes exactly one row and the block starts on a row boundary.
+   Change --hero-menu-size and the grid follows. */
+@media (min-width: 768px) {
+  .home .section.is-full-screen {
+    --hero-menu-size: 4rem;
+  }
+  .home .section.is-full-screen > .header.margin-bottom_none .heading_primary.hero_menu_text_color {
+    font-size: var(--hero-menu-size);
+    line-height: var(--grid-spacing, 1.15em);
+    margin: 0;
+    padding: 0;
+  }
+}
+.home .section.is-full-screen > .header.margin-bottom_none .heading_primary.hero_menu_text_color:hover {
+  color: var(--_colors---core-accent-color--accent-primary-hover, #fff);
+}
+
+/* Systems section: the heading is centered on the page; only the project list sits
+   on glass (.project_wheel). The list panel hugs the list on desktop, with the same
+   20px side margins as the hero menu panel; SystemsMenu.jsx pads its right edge so
+   the enlarged selected title stays inside. */
+.section.systems_menu .container.hero_menu {
+  margin-left: var(--_typography---hero_menu_margin, 20px);
+  margin-right: var(--_typography---hero_menu_margin, 20px);
+}
+@media (min-width: 768px) {
+  .section.systems_menu .project_wheel {
+    width: max-content;
+    max-width: 100%;
+    align-self: flex-start;
+  }
+}
+
+/* Systems panel: centered heading (Webflow default), solid white, softer subheading. */
+.section.systems_menu .container.hero_menu h2.heading_primary {
+  color: #fff;
+}
+.section.systems_menu .container.hero_menu .subheading {
+  color: rgba(255, 255, 255, 0.85);
+  font-weight: 400;
+}
+
+/* Generative backdrop host (components/GridInkBackdrop.jsx): fill the hero like the video did. */
+.sketch_backdrop {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: #0c0c0e;
+}
+.sketch_backdrop canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+}
 
 /* Card-link hover (was a Webflow interaction): slight fade + image zoom. */
 .card-link img.image_cover {
@@ -29,11 +166,10 @@ a:hover,
 
 /* ---------------------------------------------------------------------------
    Showcase: scroll-driven collage on project pages (components/Showcase.jsx).
-   Tweak sizes / positions / tilt here. `--tilt` is the resting rotation and is
-   read by the JS from data-rotate, so set both if you change it.
+   Tweak sizes / positions here (per-tile values live in src/data/projects.js).
    --------------------------------------------------------------------------- */
 .section.showcase {
-  --showcase-scroll: 320vh; /* total scroll distance; the stage is pinned for all but 100vh of it */
+  --showcase-scroll: 200vh; /* total scroll distance; the stage is pinned for all but 100vh of it */
   height: var(--showcase-scroll);
   padding: 0;
   position: relative;
@@ -46,35 +182,6 @@ a:hover,
   overflow: hidden;
 }
 
-.showcase_eyebrow {
-  position: absolute;
-  top: 3vh;
-  left: 5vw;
-  z-index: 3;
-  font-size: 0.8rem;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--_colors---text-color--text-secondary, #aaa);
-}
-.showcase_eyebrow-count {
-  margin-left: 1.5em;
-  color: var(--_colors---text-color--text-primary, #fff);
-}
-
-.showcase_ghost {
-  position: absolute;
-  left: 0;
-  bottom: -0.12em;
-  z-index: 0;
-  font-size: clamp(6rem, 24vw, 30rem);
-  line-height: 1;
-  font-weight: 300;
-  white-space: nowrap;
-  color: transparent;
-  -webkit-text-stroke: 1px rgba(255, 255, 255, 0.28);
-  pointer-events: none;
-  user-select: none;
-}
 
 .showcase_tile {
   position: absolute;
@@ -89,7 +196,6 @@ a:hover,
   position: relative;
   overflow: hidden;
   border-radius: var(--_sizes---card--card-radius, 6px);
-  box-shadow: 0 0 0 2px #fff, 12px 12px 0 rgba(255, 255, 255, 0.15);
   background: #000;
   transition: transform 0.35s ease, opacity 0.35s ease, filter 0.35s ease;
 }
@@ -98,14 +204,6 @@ a:hover,
   width: 100%;
   height: 100%;
   object-fit: cover;
-}
-.showcase_index {
-  position: absolute;
-  top: -1.6em;
-  left: 0;
-  font-size: 0.75rem;
-  letter-spacing: 0.15em;
-  color: var(--_colors---text-color--text-secondary, #aaa);
 }
 .showcase_caption {
   margin-top: 0.6em;
@@ -145,14 +243,6 @@ a:hover,
     grid-template-columns: 1fr 1fr;
     gap: 6vw;
   }
-  .showcase_eyebrow {
-    position: static;
-    grid-column: 1 / -1;
-    margin-bottom: 0.5rem;
-  }
-  .showcase_ghost {
-    display: none;
-  }
   .showcase_tile {
     position: relative !important;
     inset: auto !important;
@@ -163,9 +253,6 @@ a:hover,
   }
   .showcase_frame {
     aspect-ratio: 4 / 3;
-  }
-  .showcase_frame {
-    box-shadow: 0 0 0 1px #fff;
   }
 }
 
@@ -255,7 +342,7 @@ a:hover,
 .project_wheel_list {
   height: auto;
 }
-@media (min-width: 768px) and (prefers-reduced-motion: no-preference) {
+@media (prefers-reduced-motion: no-preference) {
   .section.systems_menu {
     height: 100vh;
     height: 100dvh;
@@ -271,13 +358,59 @@ a:hover,
     flex: 1;
     min-height: 0;
     overflow: hidden;
-    perspective: 900px;
-  }
-  .project_wheel_list {
-    transform-style: preserve-3d;
   }
   .project_wheel_list .project_list {
-    will-change: transform, opacity;
-    backface-visibility: hidden;
+    will-change: opacity;
+  }
+
+  /* Selected project (the one in the top slot): accent color and larger; the others
+     dim. Styled on the inner label so it doesn't fight the roll transform on the link.
+     Hovering any project makes it the selected one and un-selects the scroll pick,
+     so there is only ever one. */
+  .project_wheel_list .project_list {
+    padding: 0.08em 0; /* room for the enlarged label */
+  }
+  .project_wheel_list .project_label {
+    display: inline-block;
+    transform-origin: left center;
+    transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.3s ease, color 0.3s ease;
+    opacity: 0.5;
+  }
+  .project_wheel_list {
+    --select-scale: 1.2; /* how much the selected title grows (phones override below) */
+  }
+  .project_wheel_list .project_list.is-selected .project_label,
+  .project_wheel_list .project_list:hover .project_label {
+    opacity: 1;
+    transform: scale(var(--select-scale));
+    color: var(--_colors---core-accent-color--accent-primary-hover, #fff);
+  }
+  .project_wheel_list:has(.project_list:hover) .project_list.is-selected:not(:hover) .project_label {
+    opacity: 0.5;
+    transform: none;
+    color: inherit;
+  }
+
+  /* Phones: bigger titles that wrap onto two lines when needed (the wheel copes
+     with rows of different heights), plus breathing room inside the glass. */
+  @media (max-width: 767px) {
+    .section.systems_menu {
+      padding-top: 8vh;
+      padding-bottom: 8vh;
+    }
+    .section.systems_menu .container.hero_menu {
+      padding-top: 1.5rem; /* space above the heading */
+    }
+    .section.systems_menu .project_wheel_list {
+      padding-right: 10%; /* room for the selected title to grow without clipping */
+    }
+    .project_wheel_list .heading_primary.hero_menu_text_color.project_list {
+      font-size: 6.4vw;
+      line-height: 1.15;
+      padding: 0.3em 0;
+    }
+    .project_wheel_list {
+      --select-scale: 1.08; /* less growth than desktop so long titles stay inside the panel */
+    }
   }
 }

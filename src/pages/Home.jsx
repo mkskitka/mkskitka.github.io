@@ -24,10 +24,13 @@ export default function Home() {
   return (
     <div ref={root} className="home">
       {/* Full-screen hero with site menu */}
-      <header className="section is-full-screen">
+      {/* data-hold: the hero stays pinned for 1.5 screens of scrolling. The grid's
+          vertical lines reach the bottom at 65% of that; the rest is a pause. */}
+      <header className="section is-full-screen" data-hold="1.5">
         <HeroBackdrop
           nodeId="w-node-cdbde5e8-8b4f-e20c-bac0-1a4bbfefe3c5-bfefe3c3"
           nodeClass="w-node-f99f2480-672f-65d5-b6b3-accc741875a0-d8033e09"
+          sketch
         />
         <div className="header margin-bottom_none">
           <a href="#Intro" className="heading_primary hero_menu_text_color">MK SKITKA</a>

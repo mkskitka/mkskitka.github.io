@@ -13,6 +13,9 @@ export default function ScrollToTop() {
       }
     }
     window.scrollTo(0, 0)
+    // Once more after layout settles (pins change the page height on mount).
+    const t = setTimeout(() => window.scrollTo(0, 0), 50)
+    return () => clearTimeout(t)
   }, [pathname, hash])
   return null
 }

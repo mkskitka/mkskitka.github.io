@@ -1,8 +1,15 @@
 // The "Systems" project list. Order matches the menu on the home page, and every
 // project gets its own page at /projects/<slug>.
 //
+// Photos and videos for each project go in src/assets/projects/<slug>/ (see the
+// README there). A file named hero.jpg / hero.mp4 becomes that project's hero
+// backdrop, or set `hero: 'file.jpg'` here to pick one by name.
+//
 // Fill in `role`, `mediums`, `description`, and swap the placeholder `featured` images
-// per project as you build them out.
+// per project as you build them out. Delete a project's `featured` list to have the
+// first four photos in its folder laid out automatically.
+
+import { folderImages, heroFor, resolveMedia } from './media.js'
 
 const img = (name) => `/images/${name}`
 
@@ -30,39 +37,60 @@ export const allImages = [
 // Showcase images. Each project page shows 3-4 images in a scroll-driven collage;
 // every image carries its own size and position, so each page can look different.
 //
-//   tile(src, { width, aspect, top|bottom, left|right, rotate, alt, caption })
+//   tile(src, { width, aspect, top|bottom, left|right, alt, caption })
 //
+//   src     - a bare filename from the project's folder ('01.jpg'), or a '/images/...'
+//             path into public/
 //   width   - e.g. '44vw' (viewport-relative so it scales with the window)
 //   aspect  - '4 / 3', '3 / 4', '1', '16 / 9', '21 / 9' ...
 //   top/bottom, left/right - position inside the 100vh x 100vw stage, e.g. top: '12vh'
-//   rotate  - resting tilt in degrees
 //
 // The stage is one screen tall. Keep top + height inside ~95vh so nothing gets cut off
 // (height = width x aspect, e.g. 44vw at 4/3 is 33vw tall). Phones ignore the layout and
 // stack the images instead.
 // ---------------------------------------------------------------------------
-const tile = (name, opts) => ({ src: img(name), alt: '', ...opts })
+const tile = (name, opts) => ({ src: name, alt: '', ...opts })
 
-// Placeholder images reused across projects until each gets its own.
-const P1 = 'Screenshot-2026-01-27-195710.png'
-const P2 = '792e4018-567c-4c81-8ff7-7bdc60260199.png'
-const P3 = '67918fcc-529e-4688-bdbe-9d3cf7d131e8.png'
-const P4 = 'Screenshot-2026-01-27-195937.png'
+// Placeholder images (public/images) reused across projects until each gets its own.
+const P1 = img('Screenshot-2026-01-27-195710.png')
+const P2 = img('792e4018-567c-4c81-8ff7-7bdc60260199.png')
+const P3 = img('67918fcc-529e-4688-bdbe-9d3cf7d131e8.png')
+const P4 = img('Screenshot-2026-01-27-195937.png')
+
+// Default layouts used when a project has no `featured` list, by photo count.
+const AUTO_LAYOUTS = {
+  1: [{ width: '72vw', aspect: '16 / 9', top: '10vh', left: '14vw' }],
+  2: [
+    { width: '46vw', aspect: '16 / 9', top: '8vh', left: '4vw' },
+    { width: '46vw', aspect: '16 / 9', top: '42vh', right: '4vw' },
+  ],
+  3: [
+    { width: '92vw', aspect: '4 / 1', top: '4vh', left: '4vw' },
+    { width: '45vw', aspect: '2 / 1', top: '52vh', left: '4vw' },
+    { width: '45vw', aspect: '2 / 1', top: '52vh', right: '4vw' },
+  ],
+  4: [
+    { width: '50vw', aspect: '16 / 9', top: '4vh', left: '4vw' },
+    { width: '50vw', aspect: '13 / 5', top: '58vh', left: '4vw' },
+    { width: '40vw', aspect: '16 / 9', top: '4vh', right: '4vw' },
+    { width: '40vw', aspect: '16 / 9', top: '50vh', right: '4vw' },
+  ],
+}
 
 const details = { role: 'Visualist, Technologist', mediums: '', description: '' }
 
-export const projects = [
+const projectList = [
   {
     slug: 'pgn-immersive-mobility-rehab',
     title: 'PGN - Immersive Mobility Rehab',
     heading: ['PGN', 'IMMERSIVE MOBILITY REHAB'],
     ...details,
-    // Big anchor on the left, portrait top right, two smaller below.
+    // Two columns: big screen + wide strip on the left, two wide frames stacked right.
     featured: [
-      tile(P1, { width: '44vw', aspect: '4 / 3', top: '12vh', left: '5vw', rotate: -2 }),
-      tile(P2, { width: '24vw', aspect: '3 / 4', top: '8vh', right: '7vw', rotate: 3 }),
-      tile(P3, { width: '17vw', aspect: '1', bottom: '8vh', right: '9vw', rotate: -3 }),
-      tile(P4, { width: '27vw', aspect: '16 / 10', bottom: '6vh', left: '35vw', rotate: 1.5 }),
+      tile(P1, { width: '50vw', aspect: '16 / 9', top: '4vh', left: '4vw' }),
+      tile(P4, { width: '50vw', aspect: '13 / 5', top: '58vh', left: '4vw' }),
+      tile(P2, { width: '40vw', aspect: '16 / 9', top: '4vh', right: '4vw' }),
+      tile(P3, { width: '40vw', aspect: '16 / 9', top: '50vh', right: '4vw' }),
     ],
   },
   {
@@ -70,11 +98,11 @@ export const projects = [
     title: 'Realtor.com Savings Simulator',
     heading: ['REALTOR.COM', 'SAVINGS SIMULATOR'],
     ...details,
-    // Two wide screens side by side, one small square tucked underneath.
+    // Full-width strip on top, two wide screens side by side below.
     featured: [
-      tile(P4, { width: '40vw', aspect: '16 / 9', top: '12vh', left: '4vw', rotate: -1.5 }),
-      tile(P1, { width: '40vw', aspect: '16 / 9', top: '30vh', right: '4vw', rotate: 2 }),
-      tile(P3, { width: '16vw', aspect: '1', bottom: '7vh', left: '28vw', rotate: -4 }),
+      tile(P4, { width: '92vw', aspect: '4 / 1', top: '4vh', left: '4vw' }),
+      tile(P1, { width: '45vw', aspect: '2 / 1', top: '52vh', left: '4vw' }),
+      tile(P3, { width: '45vw', aspect: '2 / 1', top: '52vh', right: '4vw' }),
     ],
   },
   {
@@ -82,12 +110,12 @@ export const projects = [
     title: 'Audible Popup Visualizer',
     heading: ['AUDIBLE', 'POPUP VISUALIZER'],
     ...details,
-    // Four tall portrait panels, staggered like a row of screens.
+    // Tall portrait on the left, big screen top right, two short strips under it.
     featured: [
-      tile(P2, { width: '21vw', aspect: '3 / 4', top: '10vh', left: '5vw', rotate: -3 }),
-      tile(P1, { width: '21vw', aspect: '3 / 4', top: '22vh', left: '29vw', rotate: 2 }),
-      tile(P4, { width: '21vw', aspect: '3 / 4', top: '8vh', left: '53vw', rotate: -2 }),
-      tile(P3, { width: '21vw', aspect: '3 / 4', top: '24vh', right: '4vw', rotate: 3 }),
+      tile(P2, { width: '30vw', aspect: '3 / 4', top: '4vh', left: '4vw' }),
+      tile(P1, { width: '58vw', aspect: '16 / 9', top: '6vh', right: '4vw' }),
+      tile(P4, { width: '28vw', aspect: '2 / 1', top: '69vh', left: '38vw' }),
+      tile(P3, { width: '26vw', aspect: '2 / 1', top: '69vh', right: '4vw' }),
     ],
   },
   {
@@ -95,12 +123,12 @@ export const projects = [
     title: 'INTEL - The Light Keeper',
     heading: ['INTEL x SMOOTH TECH', 'THE LIGHT KEEPER'],
     ...details,
-    // One large centered hero image with three small satellites.
+    // Big hero screen top left, tall portrait on the right, two strips along the bottom.
     featured: [
-      tile(P1, { width: '50vw', aspect: '16 / 9', top: '14vh', left: '25vw', rotate: 0 }),
-      tile(P3, { width: '15vw', aspect: '1', top: '10vh', left: '5vw', rotate: -5 }),
-      tile(P2, { width: '15vw', aspect: '4 / 5', bottom: '10vh', right: '5vw', rotate: 4 }),
-      tile(P4, { width: '20vw', aspect: '16 / 10', bottom: '6vh', left: '8vw', rotate: 2 }),
+      tile(P1, { width: '60vw', aspect: '16 / 9', top: '4vh', left: '4vw' }),
+      tile(P3, { width: '26vw', aspect: '3 / 4', top: '4vh', right: '4vw' }),
+      tile(P2, { width: '28vw', aspect: '2 / 1', top: '68vh', left: '4vw' }),
+      tile(P4, { width: '28vw', aspect: '2 / 1', top: '68vh', left: '36vw' }),
     ],
   },
   {
@@ -108,12 +136,12 @@ export const projects = [
     title: 'Blueberry Swamp Festival',
     heading: ['BLUEBERRY', 'SWAMP FESTIVAL'],
     ...details,
-    // Diagonal cascade from top left to bottom right.
+    // Two by two grid of wide frames, alternating tilt.
     featured: [
-      tile(P3, { width: '30vw', aspect: '4 / 3', top: '8vh', left: '4vw', rotate: -4 }),
-      tile(P4, { width: '26vw', aspect: '4 / 3', top: '30vh', left: '30vw', rotate: 3 }),
-      tile(P2, { width: '24vw', aspect: '4 / 3', top: '50vh', left: '54vw', rotate: -2 }),
-      tile(P1, { width: '18vw', aspect: '1', top: '10vh', right: '4vw', rotate: 5 }),
+      tile(P3, { width: '46vw', aspect: '2 / 1', top: '4vh', left: '4vw' }),
+      tile(P4, { width: '46vw', aspect: '2 / 1', top: '4vh', right: '2vw' }),
+      tile(P2, { width: '46vw', aspect: '2 / 1', top: '51vh', left: '4vw' }),
+      tile(P1, { width: '46vw', aspect: '2 / 1', top: '51vh', right: '2vw' }),
     ],
   },
   {
@@ -121,11 +149,11 @@ export const projects = [
     title: '370 BOTANIC GARDENS',
     heading: ['370', 'BOTANIC GARDENS'],
     ...details,
-    // One huge panoramic strip with two squares below.
+    // Full-width panorama with two wide strips beneath.
     featured: [
-      tile(P4, { width: '70vw', aspect: '21 / 9', top: '14vh', left: '15vw', rotate: -1 }),
-      tile(P2, { width: '18vw', aspect: '1', bottom: '8vh', left: '6vw', rotate: 4 }),
-      tile(P3, { width: '18vw', aspect: '1', bottom: '8vh', right: '6vw', rotate: -4 }),
+      tile(P4, { width: '92vw', aspect: '3 / 1', top: '4vh', left: '4vw' }),
+      tile(P2, { width: '45vw', aspect: '3 / 1', top: '63vh', left: '4vw' }),
+      tile(P3, { width: '45vw', aspect: '3 / 1', top: '63vh', right: '4vw' }),
     ],
   },
   {
@@ -133,11 +161,11 @@ export const projects = [
     title: "'24 VENICE BIENALE",
     heading: ["'24", 'VENICE BIENALE'],
     ...details,
-    // Two portraits facing each other, one wide image bridging them below.
+    // Tall portrait on the left, big screen and a strip stacked on the right.
     featured: [
-      tile(P2, { width: '26vw', aspect: '3 / 4', top: '8vh', left: '8vw', rotate: -2 }),
-      tile(P3, { width: '26vw', aspect: '3 / 4', top: '12vh', right: '8vw', rotate: 2 }),
-      tile(P1, { width: '30vw', aspect: '16 / 9', bottom: '6vh', left: '35vw', rotate: 1 }),
+      tile(P2, { width: '30vw', aspect: '3 / 4', top: '4vh', left: '4vw' }),
+      tile(P3, { width: '58vw', aspect: '16 / 9', top: '6vh', right: '4vw' }),
+      tile(P1, { width: '58vw', aspect: '4 / 1', top: '69vh', right: '4vw' }),
     ],
   },
   {
@@ -145,14 +173,30 @@ export const projects = [
     title: 'EVIDENCE 71@ The Shed',
     heading: ['EVIDENCE 71', '@ THE SHED'],
     ...details,
-    // Overlapping squares stepping down, plus one up in the corner.
+    // Offset two-column grid: tall frame + strip left, screen + strip right.
     featured: [
-      tile(P1, { width: '26vw', aspect: '1', top: '10vh', left: '6vw', rotate: -3 }),
-      tile(P4, { width: '26vw', aspect: '1', top: '24vh', left: '28vw', rotate: 2 }),
-      tile(P2, { width: '26vw', aspect: '1', top: '38vh', left: '50vw', rotate: -2 }),
-      tile(P3, { width: '20vw', aspect: '1', top: '8vh', right: '4vw', rotate: 4 }),
+      tile(P1, { width: '44vw', aspect: '4 / 3', top: '4vh', left: '4vw' }),
+      tile(P4, { width: '44vw', aspect: '16 / 9', top: '4vh', right: '4vw' }),
+      tile(P2, { width: '44vw', aspect: '3 / 1', top: '52vh', right: '4vw' }),
+      tile(P3, { width: '44vw', aspect: '3 / 1', top: '67vh', left: '4vw' }),
     ],
   },
 ]
+
+// Resolve folder files: bare tile names -> urls, hero.* -> hero backdrop, and an
+// automatic layout for projects that have photos in their folder but no `featured`.
+export const projects = projectList.map((p) => {
+  let featured = p.featured
+  if (!featured) {
+    const photos = folderImages(p.slug).slice(0, 4)
+    const layout = AUTO_LAYOUTS[photos.length]
+    featured = layout ? photos.map((src, i) => ({ src, alt: '', ...layout[i] })) : []
+  }
+  return {
+    ...p,
+    hero: heroFor(p.slug, p.hero),
+    featured: featured.map((t) => ({ ...t, src: resolveMedia(p.slug, t.src) })),
+  }
+})
 
 export const getProject = (slug) => projects.find((p) => p.slug === slug)

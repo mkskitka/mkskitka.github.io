@@ -89,10 +89,12 @@ export function pinSections(root, { hold = 0.75, selector = '.section' } = {}) {
     const sections = Array.from(root.querySelectorAll(selector))
     sections.forEach((section) => {
       if (section.dataset.pin === 'self') return
+      // A section can ask for a longer/shorter pin with data-hold="1.5" (screens).
+      const sectionHold = parseFloat(section.dataset.hold) || hold
       ScrollTrigger.create({
         trigger: section,
         start: 'top top',
-        end: () => `+=${Math.round(window.innerHeight * hold)}`,
+        end: () => `+=${Math.round(window.innerHeight * sectionHold)}`,
         pin: true,
         pinSpacing: true,
         anticipatePin: 1,

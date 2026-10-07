@@ -23,6 +23,8 @@ export default function Project() {
         <HeroBackdrop
           nodeId="w-node-cdbde5e8-8b4f-e20c-bac0-1a4bbfefe3c5-bfefe3c3"
           nodeClass="w-node-f99f2480-672f-65d5-b6b3-accc741875a0-f0e05ae0"
+          still={project.hero.still}
+          {...(project.hero.video && { video: project.hero.video })}
         />
         <div className="header margin-bottom_none">
           <Link to="/" className="heading_primary hero_menu_text_color" aria-label="Back to home">
@@ -56,7 +58,7 @@ export default function Project() {
         </div>
       </header>
 
-      <Showcase images={project.featured} title={line2 ?? line1} />
+      <Showcase images={project.featured} />
     </div>
   )
 }
