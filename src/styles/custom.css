@@ -114,6 +114,171 @@ a:hover,
   color: var(--_colors---core-accent-color--accent-primary-hover, #fff);
 }
 
+/* ---------------------------------------------------------------------------
+   Hero menu selection + Systems thumbnail grid (pages/Home.jsx and
+   components/ProjectThumbs.jsx). Clicking SYSTEMS marks the hero section
+   .has-selection and that link .is-active: the other links go translucent, the
+   selected one stays solid white, and the grid of project tiles opens to the
+   right of the panel. Clicking again, another link, or Escape closes it.
+   --------------------------------------------------------------------------- */
+:root {
+  --menu-dim: 0.3; /* opacity of the unselected menu links while one is selected */
+  --thumb-cells: 3; /* desktop tile size in backdrop grid cells: 3 = a 3x3 block, 2 = a 2x2 block */
+  --thumb-gap-cells: 1; /* whole cells between tiles, and between the menu panel and the grid */
+  --thumb-opacity: 0.8; /* tiles at rest (1 = solid); the hovered tile always goes solid */
+  --thumb-opacity-dim: 0.45; /* the other tiles while one is hovered */
+}
+/* Windows under ~1000px tall: 2x2 blocks so all the projects still fit beside the
+   menu (eight 3x3 tiles need three rows, about 11 cells tall). */
+@media (max-height: 980px) {
+  :root {
+    --thumb-cells: 2;
+  }
+}
+.home .section.is-full-screen > .header.margin-bottom_none .heading_primary.hero_menu_text_color {
+  transition: opacity 0.35s ease, color 0.2s ease;
+}
+.home .section.is-full-screen.has-selection > .header.margin-bottom_none .heading_primary.hero_menu_text_color:not(.is-active) {
+  opacity: var(--menu-dim);
+}
+.home .section.is-full-screen.has-selection > .header.margin-bottom_none .heading_primary.hero_menu_text_color:not(.is-active):hover {
+  opacity: 0.7;
+}
+.home .section.is-full-screen > .header.margin-bottom_none .heading_primary.hero_menu_text_color.is-active {
+  color: #fff;
+  opacity: 1;
+}
+
+/* The grid of tiles. Hidden until SYSTEMS is selected; tiles fade and rise in one
+   after another, and fade out together when it closes. */
+.project_thumbs {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  align-self: flex-start;
+  align-content: start;
+  visibility: hidden;
+  pointer-events: none;
+  transition: visibility 0s linear 0.25s;
+}
+.project_thumbs.is-open {
+  visibility: visible;
+  pointer-events: auto;
+  transition-delay: 0s;
+}
+.project_thumb {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  aspect-ratio: 1;
+  background: rgba(255, 255, 255, 0.04);
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+.project_thumbs.is-open .project_thumb {
+  opacity: 1;
+  transform: none;
+  transition: opacity 0.4s ease, transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+  transition-delay: calc(var(--i, 0) * 45ms);
+}
+.project_thumb_media {
+  position: absolute;
+  inset: 0;
+  display: block;
+  opacity: var(--thumb-opacity);
+  transition: opacity 0.3s ease;
+}
+.project_thumb:hover .project_thumb_media,
+.project_thumb:focus-visible .project_thumb_media {
+  opacity: 1;
+}
+.project_thumb_media img,
+.project_thumb_media video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease, opacity 0.3s ease;
+}
+.project_thumb:hover .project_thumb_media img,
+.project_thumb:hover .project_thumb_media video {
+  transform: scale(1.04);
+}
+/* Hovering one tile softens the others. */
+.project_thumbs:has(.project_thumb:hover) .project_thumb:not(:hover) .project_thumb_media {
+  opacity: var(--thumb-opacity-dim);
+}
+/* Project name: appears along the bottom of the tile on hover / focus. */
+.project_thumb_title {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 1.4em 0.7em 0.6em;
+  font-size: 0.75rem;
+  line-height: 1.2;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #fff;
+  background: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.7));
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+.project_thumb:hover .project_thumb_title,
+.project_thumb:focus-visible .project_thumb_title {
+  opacity: 1;
+}
+
+/* Desktop: the grid sits on the backdrop grid. Tiles are --thumb-cells cells square,
+   gaps are --thumb-gap-cells cells, the top lines up with the menu panel and the left
+   edge is one gap past the panel's right edge (which GridInkBackdrop.jsx already
+   snaps to a grid line), so every tile edge lands on a line. */
+@media (min-width: 768px) {
+  .home .section.is-full-screen > .project_thumbs {
+    --thumb-size: calc(var(--grid-spacing, 64px) * var(--thumb-cells));
+    --thumb-gap: calc(var(--grid-spacing, 64px) * var(--thumb-gap-cells));
+    flex: 1 1 auto;
+    min-width: 0;
+    grid-template-columns: repeat(auto-fill, var(--thumb-size));
+    grid-auto-rows: var(--thumb-size);
+    gap: var(--thumb-gap);
+    margin-top: var(--hero-panel-top, 0px);
+    margin-left: var(--thumb-gap);
+    margin-right: 0; /* tiles stop on a grid line anyway; no margin lets one more column fit */
+  }
+}
+/* Phones: the glass panel shrinks to its links and the grid drops under it as three
+   plain columns. It is out of the layout entirely while closed so the hero stays
+   one screen tall. */
+@media (max-width: 767px) {
+  .home .section.is-full-screen {
+    flex-wrap: wrap;
+  }
+  .home .section.is-full-screen.has-selection {
+    align-content: flex-start; /* while closed the panel still runs to the bottom of the screen */
+  }
+  .home .section.is-full-screen.has-selection > .header.margin-bottom_none {
+    align-self: flex-start;
+  }
+  /* Smaller menu type while a selection is open so the menu and the grid share
+     one phone screen (the full-size links are about five lines tall). */
+  .home .section.is-full-screen.has-selection > .header.margin-bottom_none .heading_primary.hero_menu_text_color {
+    font-size: 2rem;
+    line-height: 1.2;
+    margin-bottom: 0.2em;
+  }
+  .home .section.is-full-screen > .project_thumbs {
+    flex: 1 0 100%;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin: 16px var(--_typography---hero_menu_margin, 20px) 20px;
+  }
+  .home .section.is-full-screen > .project_thumbs:not(.is-open) {
+    display: none;
+  }
+}
+
 /* Systems section: the heading is centered on the page; only the project list sits
    on glass (.project_wheel). The list panel hugs the list on desktop, with the same
    20px side margins as the hero menu panel; SystemsMenu.jsx pads its right edge so

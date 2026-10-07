@@ -76,3 +76,36 @@ export function heroFor(slug, override) {
   if (imageName && f[imageName]) return { still: f[imageName] }
   return {}
 }
+
+/**
+ * The thumbnail for a project (its tile in the Systems grid on the home page).
+ *   thumb.mp4 / thumb.webm         -> { video: { mp4, webm, poster } }  (poster: thumb.jpg etc. if present)
+ *   thumb.gif / .jpg / .png / ...  -> { image: url }
+ *   nothing                        -> null (caller falls back to the first showcase image)
+ * `override` is an explicit filename from projects.js and takes precedence.
+ */
+export function thumbFor(slug, override) {
+  const f = mediaFiles(slug)
+  const names = Object.keys(f)
+  const find = (re) => names.find((n) => re.test(n))
+
+  let videoName = null
+  let imageName = null
+  if (override) {
+    if (VIDEO.test(override)) videoName = override
+    else if (IMAGE.test(override)) imageName = override
+    if (!f[override] && import.meta.env.DEV) {
+      console.warn(`[media] ${slug}: thumb "${override}" not found in src/assets/projects/${slug}/`)
+    }
+  }
+  videoName ??= find(/^thumb\.(mp4|webm)$/i)
+  imageName ??= find(/^thumb(-poster)?\.(png|jpe?g|webp|gif|avif)$/i)
+
+  if (videoName && f[videoName]) {
+    const mp4 = /\.mp4$/i.test(videoName) ? f[videoName] : f[find(/^thumb\.mp4$/i)]
+    const webm = /\.webm$/i.test(videoName) ? f[videoName] : f[find(/^thumb\.webm$/i)]
+    return { video: { mp4, webm, poster: f[imageName] } }
+  }
+  if (imageName && f[imageName]) return { image: f[imageName] }
+  return null
+}

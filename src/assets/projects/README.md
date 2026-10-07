@@ -22,6 +22,16 @@ One folder per project, named by the project's slug (the part of its URL after
 - To pick a differently named file, set `hero: 'some-file.jpg'` (or `.mp4`) on the
   project in `src/data/projects.js`.
 
+## Thumbnail (the tile in the Systems grid on the home page)
+
+- `thumb.jpg` / `thumb.png` / `thumb.webp` / `thumb.gif` -> a still or animated image.
+- `thumb.mp4` (plus `thumb.webm` if you have one) -> a looping muted video.
+  Add `thumb.jpg` or `thumb-poster.jpg` next to it as the poster frame.
+- No thumb file -> the project's first showcase image is used.
+- To pick a differently named file, set `thumb: 'some-file.gif'` on the project in
+  `src/data/projects.js`.
+- Tiles are square; the image is cropped to fit (centered), so square sources look best.
+
 ## Showcase (the scrolling collage lower on the page)
 
 - If the project has a `featured` list in `src/data/projects.js`, that list wins.
