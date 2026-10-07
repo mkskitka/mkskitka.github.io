@@ -6,26 +6,23 @@ import { systemsBackdrop } from '../data/videos.js'
 import { gsap, ScrollTrigger } from '../lib/animations.js'
 
 /**
- * The "Systems" project menu on the home page.
+ * The "Systems" project menu on the home page: a scroll-driven picker wheel.
  *
  * The section pins to the viewport (it owns its pin, hence `data-pin="self"` so
- * pinSections in Home.jsx leaves it alone). When it arrives, the list window is
- * sized so the last project (Evidence 71) is hidden just below it. Scrolling while
- * pinned rolls the list up: the first entry tilts back, shrinks and fades out
- * through the top while the last one grows into view from the bottom. Entries in
- * the middle stay full size. When the wheel reaches the end, the section holds
- * for `hold` (fraction of the viewport, same beat as the other sections), then
- * releases.
+ * pinSections in Home.jsx leaves it alone). The selection slot is the top row of
+ * the list window and never moves. While pinned, scrolling rolls the list up
+ * through the slot one project per step, settling on each row: the project in the
+ * slot is selected (accent color, a little larger), the rest sit dimmed below it.
+ * A project that leaves through the top wraps around to the bottom, so the window
+ * always shows a full list. Hovering any project makes it the selected one instead
+ * (CSS in custom.css). When the wheel arrives at the last project it holds for
+ * `hold` (fraction of the viewport, same beat as the other sections), then releases.
  *
- * Tune the feel with the constants below. Phones get the plain static list (still
- * pinned for the beat); reduced-motion users get a plain, unpinned list.
+ * Reduced-motion users get the plain static list.
  */
-const TILT = 35 // degrees an entry tilts as it leaves/enters (0 for none)
-const SHRINK = 0.6 // how small an entry gets when fully out (0.6 = 40% size)
-const FADE = 1 // how transparent it gets when fully out (1 = invisible)
-const ROLL = 0.75 // share of the pinned scroll spent rolling; the rest is a still hold at the end
-const EXTRA_ROLL = 0 // extra travel past "last entry fully in", in entry heights (0.5 = half an entry)
-const EASE = gsap.parseEase('power2.inOut')
+const SCROLL_PER_PROJECT = 0.3 // screens of scrolling per step (0.3 = 30% of the viewport height each)
+const SETTLE = gsap.parseEase('power2.inOut') // how the list moves between rows: lingers, then slides
+const FADE = 1 // how transparent a project is while crossing the top/bottom edge (1 = fully out = invisible)
 
 export default function SystemsMenu({ hold = 0.75 }) {
   const root = useRef(null)
@@ -38,59 +35,77 @@ export default function SystemsMenu({ hold = 0.75 }) {
     const items = gsap.utils.toArray('.project_list', list)
     const mm = gsap.matchMedia()
 
-    // Phones don't get the wheel, but the section still pins for the usual beat
-    // (pinSections in Home.jsx skips this section because of data-pin="self").
-    mm.add('(max-width: 767px) and (prefers-reduced-motion: no-preference)', () => {
-      ScrollTrigger.create({
-        trigger: section,
-        start: 'top top',
-        end: () => `+=${Math.round(window.innerHeight * hold)}`,
-        pin: true,
-        pinSpacing: true,
-        anticipatePin: 1,
-        refreshPriority: 1,
-      })
-    })
+    mm.add('(prefers-reduced-motion: no-preference)', () => {
+      let rollPart = 1 // share of the pinned scroll spent rolling; the rest is the hold at the end
+      let current = -1 // index of the selected project
+      const steps = Math.max(1, items.length - 1)
 
-    mm.add('(min-width: 768px) and (prefers-reduced-motion: no-preference)', () => {
-      let travel = 0 // how far the list moves, in px
-
-      // Size the window so the last entry is hidden just below it at the start, then
-      // roll exactly far enough that it is fully in and the first entry is fully out.
-      // (Raise EXTRA_ROLL, in entry heights, to roll further and push more entries out.)
-      // The section stays pinned for the usual hold distance plus the travel.
+      // Size the window to a whole number of rows: as many as fit under the heading,
+      // but at least one short of the full list so the last project starts hidden.
+      // The roll takes SCROLL_PER_PROJECT screens per step, then the section holds.
       const measure = () => {
-        const first = items[0]
-        const last = items[items.length - 1]
-        if (!first || !last) return Math.round(window.innerHeight * hold)
-        const room = Math.round(last.offsetHeight * EXTRA_ROLL)
-        const contentH = last.offsetTop + last.offsetHeight + room
-        win.style.maxHeight = `${last.offsetTop}px` // window ends where the last entry begins
-        travel = Math.max(0, contentH - win.clientHeight)
-        return Math.round(window.innerHeight * hold) + travel
+        const holdPx = Math.round(window.innerHeight * hold)
+        if (!items.length) return holdPx
+        // Desktop: the panel hugs the list, so give the list window (which clips its
+        // contents) enough right padding for the widest title at its selected size.
+        // Phones use a full-width panel instead.
+        if (window.matchMedia('(min-width: 768px)').matches) {
+          const scale = parseFloat(getComputedStyle(list).getPropertyValue('--select-scale')) || 1
+          const widest = Math.max(...items.map((i) => i.querySelector('.project_label')?.offsetWidth || 0))
+          win.style.paddingRight = `${Math.round(widest * (scale - 1) + 24)}px`
+        } else {
+          win.style.paddingRight = ''
+        }
+        win.style.height = ''
+        win.style.flex = ''
+        const available = win.clientHeight
+        // Rows can differ in height (titles wrap on phones), so walk the row tops:
+        // the window ends at the top of the first row that doesn't fit, and always
+        // hides at least the last row.
+        let end = items[items.length - 1].offsetTop
+        for (let k = 1; k < items.length; k++) {
+          if (items[k].offsetTop > available) {
+            end = Math.max(items[1].offsetTop, items[k].offsetTop)
+            break
+          }
+        }
+        win.style.height = `${end}px`
+        win.style.flex = 'none'
+        const rollPx = Math.round(steps * SCROLL_PER_PROJECT * window.innerHeight)
+        rollPart = rollPx / (rollPx + holdPx)
+        return rollPx + holdPx
       }
 
-      // d = 0 while an entry is fully inside the window; -1 when it has fully left
-      // through the top; +1 while it is still fully below the bottom edge.
       const render = (progress) => {
-        const p = gsap.utils.clamp(0, 1, progress / ROLL)
-        const y = -travel * EASE(p)
-        gsap.set(list, { y })
+        const p = gsap.utils.clamp(0, 1, progress / rollPart)
+        const t = p * steps // 0..steps, fractional position along the list
+        const i = Math.min(steps - 1, Math.floor(t))
+        const f = t - i
+        // Move the list so row i sits in the slot, settling before sliding on to row i+1.
+        const from = items[i].offsetTop
+        const to = items[i + 1] ? items[i + 1].offsetTop : from
+        const y = -(from + (to - from) * SETTLE(f))
 
+        const selected = Math.round(t)
+        if (selected !== current) {
+          items.forEach((item, idx) => item.classList.toggle('is-selected', idx === selected))
+          current = selected
+        }
+
+        // Each row moves up by y. A row that has fully left through the top wraps
+        // around by one full list length, so it reappears at the bottom and the
+        // window always shows a complete list. Rows crossing an edge fade.
+        const last = items[items.length - 1]
+        const cycle = last.offsetTop + last.offsetHeight
         const H = win.clientHeight
         items.forEach((item) => {
-          const top = item.offsetTop + y
+          let top = item.offsetTop + y
+          if (top + item.offsetHeight <= 0) top += cycle
           const bottom = top + item.offsetHeight
-          let d = 0
-          if (top < 0) d = -gsap.utils.clamp(0, 1, -top / item.offsetHeight)
-          else if (bottom > H) d = gsap.utils.clamp(0, 1, (bottom - H) / item.offsetHeight)
-          const a = Math.abs(d)
-          gsap.set(item, {
-            rotationX: -d * TILT,
-            scale: 1 - SHRINK * a,
-            opacity: 1 - FADE * a,
-            transformOrigin: 'left center',
-          })
+          let a = 0
+          if (top < 0) a = gsap.utils.clamp(0, 1, -top / item.offsetHeight)
+          else if (bottom > H) a = gsap.utils.clamp(0, 1, (bottom - H) / item.offsetHeight)
+          gsap.set(item, { y: top - item.offsetTop, opacity: 1 - FADE * a })
         })
       }
 
@@ -107,7 +122,10 @@ export default function SystemsMenu({ hold = 0.75 }) {
       })
     })
 
-    return () => mm.revert()
+    return () => {
+      mm.revert()
+      items.forEach((item) => item.classList.remove('is-selected'))
+    }
   }, [hold])
 
   return (
@@ -123,7 +141,7 @@ export default function SystemsMenu({ hold = 0.75 }) {
           <div className="header margin-bottom_none project_wheel_list">
             {projects.map((p) => (
               <Link key={p.slug} to={`/projects/${p.slug}`} className="heading_primary hero_menu_text_color project_list">
-                {p.title}
+                <span className="project_label">{p.title}</span>
               </Link>
             ))}
           </div>

@@ -28,6 +28,7 @@ export default function Home() {
         <HeroBackdrop
           nodeId="w-node-cdbde5e8-8b4f-e20c-bac0-1a4bbfefe3c5-bfefe3c3"
           nodeClass="w-node-f99f2480-672f-65d5-b6b3-accc741875a0-d8033e09"
+          sketch
         />
         <div className="header margin-bottom_none">
           <a href="#Intro" className="heading_primary hero_menu_text_color">MK SKITKA</a>

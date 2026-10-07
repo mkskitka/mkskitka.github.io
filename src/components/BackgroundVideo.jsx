@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react'
 
 /**
  * Autoplaying, muted, looping background video (Webflow's "Background Video" element).
- * `video` is { mp4, webm, poster }. `className` is applied to the wrapper.
+ * `video` is { mp4, webm, poster }; webm and poster are optional. `className` is applied to the wrapper.
  */
 export default function BackgroundVideo({ video, className = '', children }) {
   const ref = useRef(null)
@@ -46,10 +46,10 @@ export default function BackgroundVideo({ video, className = '', children }) {
         muted
         playsInline
         poster={video.poster}
-        style={{ backgroundImage: `url("${video.poster}")` }}
+        style={video.poster ? { backgroundImage: `url("${video.poster}")` } : undefined}
       >
-        <source src={video.mp4} type="video/mp4" />
-        <source src={video.webm} type="video/webm" />
+        {video.mp4 && <source src={video.mp4} type="video/mp4" />}
+        {video.webm && <source src={video.webm} type="video/webm" />}
       </video>
       {children}
     </div>
