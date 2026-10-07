@@ -357,9 +357,9 @@ a:hover,
 /* Phones: the glass panel keeps its size and its place on the grid in every state
    (the menu type never changes size; a project title wider than the screen wraps,
    one grid row per line, so the panel still ends on a line). The tiles go under the
-   panel: Systems / Visuals tiles are scattered over the grid like on desktop but as
-   bigger blocks (lib/phoneTiles.js sets --x/--y/--s per tile); Contact tiles are
-   3x3-cell blocks in a row, a whole cell apart, on the lines. */
+   panel: Systems / Visuals tiles are 2x2-cell blocks scattered over the grid like on
+   desktop, and Contact tiles are 3x3-cell blocks in a row, a cell apart, on the
+   lines (lib/phoneTiles.js sets --x/--y/--s per tile, so nothing can leave the screen). */
 @media (max-width: 767px) {
   .home .section.is-full-screen {
     flex-wrap: wrap;
@@ -376,8 +376,9 @@ a:hover,
   .home .section.is-full-screen > .project_thumbs:not(.is-open) {
     display: none;
   }
-  /* Scattered tiles (Systems, Visuals): absolute, on the grid, titles always showing
-     since there is no hover on a phone. */
+  /* Tiles placed on the grid (Systems, Visuals, Contact): absolute, on the lines.
+     No hover on a phone, so the media is solid and the project titles are left off
+     (they would cover most of a 2x2 block). */
   .home .section.is-full-screen > .project_thumbs--scatter {
     position: absolute;
     inset: 0;
@@ -395,30 +396,8 @@ a:hover,
   .project_thumbs--scatter .project_thumb_media {
     opacity: 1;
   }
-  .project_thumbs--scatter .project_thumb {
-    container-type: size;
-  }
   .project_thumbs--scatter .project_thumb_title {
-    opacity: 1;
-    font-size: 0.6rem;
-    padding: 1.2em 0.5em 0.5em;
-  }
-  /* Small phones get 2x2-cell tiles; a title would cover most of one, so it is left off. */
-  @container (max-width: 80px) {
-    .project_thumb_title {
-      display: none;
-    }
-  }
-  /* Contact tiles: one gap row under the panel, left edge on the panel's grid line. */
-  .home .section.is-full-screen > .contact_tiles {
-    --thumb-size: calc(var(--grid-spacing, 33px) * 3);
-    --thumb-gap: var(--grid-spacing, 33px);
-    flex: 1 0 auto;
-    width: calc(100% - var(--hero-panel-left, 16.5px));
-    grid-template-columns: repeat(auto-fill, var(--thumb-size));
-    grid-auto-rows: var(--thumb-size);
-    gap: var(--thumb-gap);
-    margin: var(--thumb-gap) 0 0 var(--hero-panel-left, 16.5px);
+    display: none;
   }
   .contact_tiles .contact_tile_icon {
     opacity: 1;

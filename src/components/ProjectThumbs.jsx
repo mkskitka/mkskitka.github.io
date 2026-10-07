@@ -11,7 +11,7 @@ import { phoneSpots } from '../lib/phoneTiles.js'
  * expanding away from the nearest page edge so it stays on screen; the other
  * tiles dim. Clicking opens the project (`onSelect(project, event)`).
  *
- * Phones scatter bigger tiles under the panel instead (lib/phoneTiles.js).
+ * Phones scatter 2x2-cell tiles under the panel instead (lib/phoneTiles.js).
  *
  * Thumbnails come from src/data/projects.js (`thumb`): an image, a gif, or a
  * looping muted video.
