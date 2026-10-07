@@ -8,8 +8,13 @@
 // Fill in `role`, `mediums`, `description`, and swap the placeholder `featured` images
 // per project as you build them out. Delete a project's `featured` list to have the
 // first four photos in its folder laid out automatically.
+//
+// Thumbnail (the tile in the Systems grid on the home page): a file named
+// thumb.jpg / thumb.gif / thumb.mp4 in the project's folder, or set
+// `thumb: 'file.gif'` here to pick one by name. With neither, the first showcase
+// image is used.
 
-import { folderImages, heroFor, resolveMedia } from './media.js'
+import { folderImages, heroFor, resolveMedia, thumbFor } from './media.js'
 
 const img = (name) => `/images/${name}`
 
@@ -192,10 +197,12 @@ export const projects = projectList.map((p) => {
     const layout = AUTO_LAYOUTS[photos.length]
     featured = layout ? photos.map((src, i) => ({ src, alt: '', ...layout[i] })) : []
   }
+  featured = featured.map((t) => ({ ...t, src: resolveMedia(p.slug, t.src) }))
   return {
     ...p,
     hero: heroFor(p.slug, p.hero),
-    featured: featured.map((t) => ({ ...t, src: resolveMedia(p.slug, t.src) })),
+    featured,
+    thumb: thumbFor(p.slug, p.thumb) ?? (featured[0] ? { image: featured[0].src } : null),
   }
 })
 
