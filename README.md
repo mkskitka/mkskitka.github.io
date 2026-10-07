@@ -22,6 +22,44 @@ git commit -m "describe your change"
 git push
 ```
 
+## Current state
+
+Only the hero page is live. It is a three.js grid + ink-simulation backdrop
+(`src/components/GridInkBackdrop.jsx`, all knobs in its `SETTINGS` block) with the
+menu panel aligned to the grid. The rest of the site is kept for reference:
+
+| Kept for reference | Where |
+| --- | --- |
+| Previous full home page (intro, Systems wheel, contact) | `src/pages/Home.full.jsx` |
+| Project pages and collage | `src/pages/Project.jsx`, `src/components/Showcase.jsx` |
+| Systems wheel, contact section, footer | `src/components/` |
+| Project data, contact links, media | `src/data/` |
+
+To bring a part back, re-add its route in `src/App.jsx` or its section in `Home.jsx`.
+
+## Working with multiple agents (git worktrees)
+
+Each agent (or person) works in its own worktree: a separate checkout of the repo
+on its own branch, so edits never collide. The main checkout stays the integration
+point.
+
+```bash
+scripts/worktree.sh ink-tuning        # creates ../mk-skitka-site.worktrees/ink-tuning on branch wt/ink-tuning
+cd ../mk-skitka-site.worktrees/ink-tuning
+claude                                # start an agent there
+npm run dev -- --port 5181            # its own dev server (the script prints the port)
+```
+
+When a worktree's work is done, from the main checkout:
+
+```bash
+git merge wt/ink-tuning               # bring it into main
+scripts/worktree.sh ink-tuning --remove
+```
+
+`scripts/worktree.sh --list` shows all worktrees. Commit in a worktree before
+merging; uncommitted changes stay in that worktree only.
+
 ## Where things live
 
 | Path | What |
