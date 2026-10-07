@@ -1,7 +1,8 @@
-// Visuals: generative pieces, each tile links out (Instagram post, video, etc.).
-// Shown as scattered single-cell tiles when VISUALS is selected on the home page.
-// Replace these placeholders: `image` is the thumbnail (anything in public/images
-// or an imported asset), `url` is where the tile goes, `title` shows on hover.
+// Visuals: generative pieces. Shown as scattered tiles when VISUALS is selected on
+// the home page; a tile expands its image to fill the page, like a project tile.
+// Replace these placeholders: `image` is the thumbnail and the full-page image
+// (anything in public/images or an imported asset), `title` is the panel title when
+// it is open. `url` (Instagram post, video, etc.) is kept for a future link-out.
 export const visuals = [
   { id: 'gem-vertahorizlines', title: 'gem vertahorizlines', url: 'https://www.instagram.com/rgb__tears/', image: '/images/Screenshot-2026-01-27-195710.png' },
   { id: 'visual-2', title: 'Visual 02', url: 'https://www.instagram.com/rgb__tears/', image: '/images/Screenshot-2026-01-27-195937.png' },

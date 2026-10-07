@@ -16,7 +16,8 @@ import { revealSections } from '../lib/animations.js'
 //
 // The hero menu: clicking SYSTEMS selects it (the other links go translucent) and
 // opens the grid of project thumbnails beside the panel (components/ProjectThumbs.jsx);
-// VISUALS opens the same scattered tiles with external links (src/data/visuals.js);
+// VISUALS opens the same scattered tiles for the visuals (src/data/visuals.js), and a
+// visual tile expands to fill the page exactly like a project tile does;
 // CONTACT opens the contact tiles in the same grid (components/ContactTiles.jsx);
 // MK SKITKA opens the bio write-up, and an open project shows its own (components/WriteUp.jsx).
 // Clicking a project tile expands its image from the tile to fill the page behind
@@ -24,6 +25,10 @@ import { revealSections } from '../lib/animations.js'
 // tiles back.
 // Clicking it again, clicking another link, or pressing Escape closes it.
 // /#systems opens the page with the grid already showing.
+// Visuals shaped like projects, so a tile opens with the same full-page reveal
+// (components/ProjectBackdrop.jsx) and the same title panel. `url` stays in the data.
+const VISUAL_ITEMS = visuals.map((v) => ({ ...v, slug: v.id, heading: [v.title], thumb: { image: v.image } }))
+
 const MENU = [
   { id: 'home', label: 'MK SKITKA' },
   { id: 'systems', label: 'SYSTEMS' },
@@ -75,8 +80,8 @@ export default function Home() {
   const pick = (id) => (e) => {
     e.preventDefault()
     if (project) {
-      setProject(null) // first click while a project is open: back to the tiles
-      if (id === 'systems') return
+      setProject(null) // first click while a project or visual is open: back to its tiles
+      if (id === active) return
     }
     setActive((cur) => (cur === id ? null : id))
   }
@@ -149,7 +154,7 @@ export default function Home() {
           )}
         </div>
         <ProjectThumbs open={active === 'systems' && !project} onSelect={openProject} />
-        <ProjectThumbs open={active === 'visuals'} items={visuals} label="Visuals" external />
+        <ProjectThumbs open={active === 'visuals' && !project} items={VISUAL_ITEMS} label="Visuals" onSelect={openProject} />
         <ContactTiles open={active === 'contact'} />
         {/* MK SKITKA: the bio (src/data/about.js). A project: its write-up (src/data/projects.js). */}
         <WriteUp open={active === 'home' && !project} heading={about.heading} paragraphs={about.paragraphs} />
