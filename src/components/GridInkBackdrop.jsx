@@ -49,10 +49,12 @@ import * as THREE from 'three'
    ============================================================================ */
 const SETTINGS = {
   background: [12, 12, 14],
-  spacing: 0.06, // gap between lines, as a fraction of the shorter page side (phones, or when rowsFromText is 0)
+  spacing: 0.06, // gap between lines, as a fraction of the shorter page side (only when rowsFromText is 0)
   minSpacing: 22, // px
   maxSpacing: 80, // px
-  rowsFromText: 1.2, // desktop: row height = hero menu text size x this, so one line of text fits a row (0 = use `spacing`)
+  rowsFromText: 1.2, // row height = hero menu text size x this, so one line of text fits a row, on every screen size
+  //                    (0 = use `spacing`). Phones get a smaller text size (--hero-menu-size in custom.css), so a larger
+  //                    grid than `spacing` would give, with the menu text and its glass panel on the lines.
   weight: 1.1, // line thickness in px
   scrollSmoothing: 0.1, // how smoothly the lines follow the scroll: 0.05 very floaty, 0.1 smooth, 1 instant (jumps with each wheel click)
 
@@ -128,6 +130,22 @@ const SETTINGS = {
     dams: true, // grid lines hold the ink back until it builds up pressure (see header)
     lineThreshold: .8, // pressure needed at a line before ink spills across (0.1 leaky, 0.6 very tight)
     lineLoss: 0.06, // pressure lost crossing a line (higher = fewer cells reached)
+  },
+
+  // Phones: screens narrower than `maxWidth` use these ink values instead of the ones
+  // above (same meanings). A phone page is small and tall, so the desktop amounts read
+  // as a few specks; more drops that soak further fill it like the desktop does.
+  phone: {
+    maxWidth: 767,
+    ink: {
+      drops: 12,
+      interval: 0.9,
+      dropRadius: 0.03,
+      pour: 3,
+      spread: 3,
+      lineThreshold: 0.6,
+      lineLoss: 0.04,
+    },
   },
 }
 
@@ -355,6 +373,8 @@ export default function GridInkBackdrop({ className = '' }) {
     if (!el) return
     const S = SETTINGS
     const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const phone = window.matchMedia(`(max-width: ${S.phone.maxWidth}px)`).matches
+    const INK = phone ? { ...S.ink, ...S.phone.ink } : S.ink
 
     // Remove any canvas a previous mount left behind (React StrictMode mounts twice).
     el.querySelectorAll('canvas').forEach((c) => c.remove())
@@ -388,12 +408,12 @@ export default function GridInkBackdrop({ className = '' }) {
         uLoss: { value: 0.01 },
         uRate: { value: 6 },
         uDt: { value: 1 / 60 },
-        uFibers: { value: S.ink.fibers },
-        uFiberScale: { value: S.ink.fiberScale },
-        uSeed: { value: S.ink.seed },
+        uFibers: { value: INK.fibers },
+        uFiberScale: { value: INK.fiberScale },
+        uSeed: { value: INK.seed },
         uTime: { value: 0 },
-        uDropRadius: { value: S.ink.dropRadius },
-        uPour: { value: S.ink.pour },
+        uDropRadius: { value: INK.dropRadius },
+        uPour: { value: INK.pour },
         uDrops: { value: drops },
         uPointer: { value: new THREE.Vector4(0, 0, 0, 0) },
         uPointerRadius: { value: S.ink.paint.radius },
@@ -401,10 +421,10 @@ export default function GridInkBackdrop({ className = '' }) {
         uSpacing: { value: 30 },
         uHx: { value: new THREE.Vector2() },
         uVy: { value: new THREE.Vector2() },
-        uDams: { value: S.ink.dams ? 1 : 0 },
-        uLineThreshold: { value: S.ink.lineThreshold },
-        uLineLoss: { value: S.ink.lineLoss },
-        uDiffuse: { value: S.ink.diffuse },
+        uDams: { value: INK.dams ? 1 : 0 },
+        uLineThreshold: { value: INK.lineThreshold },
+        uLineLoss: { value: INK.lineLoss },
+        uDiffuse: { value: INK.diffuse },
       },
     })
     const dispMat = new THREE.ShaderMaterial({
@@ -423,14 +443,14 @@ export default function GridInkBackdrop({ className = '' }) {
         uHTo: { value: c255(S.horizontal.colors.to) },
         uVFrom: { value: c255(S.vertical.colors.from) },
         uVTo: { value: c255(S.vertical.colors.to) },
-        uInkOn: { value: S.ink.enabled ? 1 : 0 },
-        uRim: { value: S.ink.rim },
-        uShimmer: { value: S.ink.shimmer },
-        uDrift: { value: still ? 0 : S.ink.drift },
-        uDensity: { value: S.ink.density },
-        uSoft: { value: S.ink.softness },
-        uCloud: { value: S.ink.cloudiness },
-        uWisps: { value: S.ink.wisps },
+        uInkOn: { value: INK.enabled ? 1 : 0 },
+        uRim: { value: INK.rim },
+        uShimmer: { value: INK.shimmer },
+        uDrift: { value: still ? 0 : INK.drift },
+        uDensity: { value: INK.density },
+        uSoft: { value: INK.softness },
+        uCloud: { value: INK.cloudiness },
+        uWisps: { value: INK.wisps },
       },
     })
     const gridMats = [simMat, dispMat]
@@ -459,7 +479,7 @@ export default function GridInkBackdrop({ className = '' }) {
       simMat.uniforms.uTexel.value.set(1 / sw, 1 / sh)
       simMat.uniforms.uAspect.value = sw / sh
       // spread 1 ≈ a quarter of the page width before the pressure runs out
-      simMat.uniforms.uLoss.value = 1 / Math.max(1, 0.25 * S.ink.spread * sw)
+      simMat.uniforms.uLoss.value = 1 / Math.max(1, 0.25 * INK.spread * sw)
       renderer.setRenderTarget(rtA)
       renderer.clear()
       renderer.setRenderTarget(rtB)
@@ -474,9 +494,9 @@ export default function GridInkBackdrop({ className = '' }) {
       renderer.domElement.style.width = '100%'
       renderer.domElement.style.height = '100%'
       let spacing = Math.min(S.maxSpacing, Math.max(S.minSpacing, Math.min(cssW, cssH) * S.spacing))
-      // On desktop the grid follows the hero text: one row per line of the menu.
+      // The grid follows the hero text: one row per line of the menu (all screen sizes).
       const link = el.closest('.section')?.querySelector('.hero_menu_text_color')
-      if (S.rowsFromText > 0 && link && window.matchMedia('(min-width: 768px)').matches) {
+      if (S.rowsFromText > 0 && link) {
         const fs = parseFloat(getComputedStyle(link).fontSize)
         if (fs > 0) spacing = Math.round(fs * S.rowsFromText)
       }
@@ -494,7 +514,7 @@ export default function GridInkBackdrop({ className = '' }) {
         const padTop = parseFloat(getComputedStyle(section).paddingTop) || 0
         const panel = section.querySelector('.header.margin-bottom_none')
         section.style.setProperty('--grid-spacing', `${spacing}px`)
-        if (panel && window.matchMedia('(min-width: 768px)').matches) {
+        if (panel) {
           const top = L(Math.floor((padTop - spacing / 2) / spacing)) // line at or just above the section padding
           const left = L(Math.max(0, Math.round((20 - spacing / 2) / spacing))) // line nearest the 20px margin
           // Natural text width, independent of the panel's current width.
@@ -557,8 +577,8 @@ export default function GridInkBackdrop({ className = '' }) {
     const clock = () => (performance.now() - t0) / 1000
     let scrollSmooth = 0
     let scrollRaw = 0
-    const rng = S.ink.randomPositions ? Math.random : mulberry32(S.ink.seed * 7919 + 13)
-    const dropPlan = Array.from({ length: Math.min(MAX_DROPS, S.ink.drops) }, (_, i) => ({
+    const rng = INK.randomPositions ? Math.random : mulberry32(INK.seed * 7919 + 13)
+    const dropPlan = Array.from({ length: Math.min(MAX_DROPS, INK.drops) }, (_, i) => ({
       i,
       rx: 0.08 + rng() * 0.84,
       ry: 0.08 + rng() * 0.84,
@@ -632,7 +652,7 @@ export default function GridInkBackdrop({ className = '' }) {
     }
 
     const landDrop = (plan, x1, y1, now) => {
-      const inGrid = S.ink.area === 'grid'
+      const inGrid = INK.area === 'grid'
       const x = inGrid ? (plan.rx * x1) / cssW : plan.rx
       const y = inGrid ? (plan.ry * y1) / cssH : plan.ry
       landed.push({ plan, x, y: 1 - y, time: now }) // sim uv has y up
@@ -663,15 +683,15 @@ export default function GridInkBackdrop({ className = '' }) {
 
       // Drops: the sequence starts once (on the first scroll, or on load), then the
       // drops keep landing on their own every `interval` seconds.
-      if (S.ink.enabled && S.ink.trigger !== 'none') {
+      if (INK.enabled && INK.trigger !== 'none') {
         if (startedAt < 0) {
-          const start = still || S.ink.trigger === 'time' || (S.ink.trigger === 'scroll' && (lockStart >= 0 || target >= S.ink.scrollStart))
+          const start = still || INK.trigger === 'time' || (INK.trigger === 'scroll' && (lockStart >= 0 || target >= INK.scrollStart))
           if (start) startedAt = still ? 0 : seconds
         }
         if (startedAt >= 0) {
           for (const plan of dropPlan) {
             if (landed.some((d) => d.plan === plan)) continue
-            if (still || seconds - startedAt >= plan.i * S.ink.interval) landDrop(plan, x1, y1, still ? 0 : seconds)
+            if (still || seconds - startedAt >= plan.i * INK.interval) landDrop(plan, x1, y1, still ? 0 : seconds)
           }
         }
         landed.forEach((d, n) => drops[n].set(d.x, d.y, d.time, 1))
@@ -683,10 +703,10 @@ export default function GridInkBackdrop({ className = '' }) {
       simMat.uniforms.uPointer.value.set(pointer.x, pointer.y, painting ? 1 : 0, S.ink.paint.strength)
 
       // Simulation
-      if (S.ink.enabled) {
+      if (INK.enabled) {
         simMat.uniforms.uDt.value = 1 / 60
         // Scale the rate with the simulation width so `speed` means the same thing at any resolution.
-        simMat.uniforms.uRate.value = 6 * S.ink.speed * (rtA.width / 480)
+        simMat.uniforms.uRate.value = 6 * INK.speed * (rtA.width / 480)
         quad.material = simMat
         for (let i = 0; i < SIM_STEPS; i++) {
           simMat.uniforms.uTime.value = seconds
