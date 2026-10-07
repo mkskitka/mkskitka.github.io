@@ -77,15 +77,30 @@ const SETTINGS = {
     finalLength: 1,
     growth: 'scroll',
     seconds: 3,
-    scrollRange: 0.65, // reach the bottom at 65% of the hero's pinned scroll; the remaining 35% is a pause
-    //                   with the finished grid before the next section arrives (hero pin length: data-hold in Home.jsx)
+    scrollRange: 0.65, // lines reach the bottom at 65% of the scroll range; the rest holds the full grid
+    //                     (with scroll.loop on, use 1 and let scroll.dwell make the pauses instead)
     ease: 'linear',
   },
 
   scroll: {
     mode: 'virtual', // 'virtual': wheel/touch/keys drive the animation, page stays put | 'page': real scrolling
-    range: 1.5, // virtual: screens' worth of wheel/touch input from start to finish
+    range: 1.5, // virtual: screens' worth of wheel/touch input for one half-cycle (lines growing down)
     keyStep: 0.08, // virtual: how far one arrow-key press moves (fraction of the range)
+    loop: false, // virtual: true = keep going forever. The lines follow the scroll: down over one `range`
+    //             of scrolling, back up over the next, and again, so scrolling never ends.
+    //             Scrolling up runs it backwards. false = stop at the end like a normal page.
+    dwell: 0.6, // loop: pause at each end, in ranges of scrolling (0.6 = 60% of `range` of scrolling
+    //             with the lines held fully down, and again held fully up, before they turn around)
+    finishFirst: true, // loop: once the lines start moving down (or up) they must reach the end before
+    //             the direction can change; scrolling the other way mid-travel is ignored
+    // Optional alternative: each gesture commits to one complete sweep instead of following
+    // the scroll position (set enabled: true).
+    sweep: {
+      enabled: false, // true = one full down/up sweep per scroll gesture, ignoring input mid-sweep
+      seconds: 2.2, // how long one full sweep takes
+      ease: 'inOut', // 'linear' | 'out' | 'inOut'
+      threshold: 30, // px of wheel/touch input needed to trigger the next sweep
+    },
   },
 
   scrollLock: {
@@ -305,10 +320,15 @@ const DISPLAY_FRAG = /* glsl */ `
   uniform vec2 uHx, uVy;     // horizontal x0,x1 and vertical y0,y1 in css px (y down)
   uniform vec3 uHFrom, uHTo, uVFrom, uVTo;
   uniform float uInkOn, uRim, uShimmer, uDensity, uSoft, uCloud, uWisps, uDrift;
+  uniform float uBgAlpha;    // 1 = solid dark ground, 0 = see-through (a project image sits behind the canvas)
+  uniform float uInkAlpha;   // 1 = ink visible, 0 = hidden (the project image covers the smoke; the lines stay on top)
   ${NOISE_GLSL}
   void main() {
     vec2 px = vec2(vUv.x, 1.0 - vUv.y) * uSize; // css px, y down
-    vec3 col = uBg;
+    // Premultiplied colour + coverage, so the canvas can be transparent where there is
+    // nothing but ground.
+    vec3 col = uBg * uBgAlpha;
+    float alpha = uBgAlpha;
 
     // Grid colour at this point (used by the ink and the lines).
     float hx = clamp((px.x - uHx.x) / max(1.0, uHx.y - uHx.x), 0.0, 1.0);
@@ -342,8 +362,14 @@ const DISPLAY_FRAG = /* glsl */ `
       float front = (1.0 - body) * smoothstep(0.0, 0.03, w);
       inkCol *= 0.85 + uRim * 0.6 * front;
       // Screen blend so overlapping wisps glow rather than muddy.
-      float a = dens * uDensity;
-      col = 1.0 - (1.0 - col) * (1.0 - min(inkCol, vec3(1.0)) * a);
+      float a = dens * uDensity * uInkAlpha;
+      if (uBgAlpha > 0.5) {
+        col = 1.0 - (1.0 - col) * (1.0 - min(inkCol, vec3(1.0)) * a);
+      } else {
+        // Over a see-through ground the ink is plain coverage (screen blending needs a backdrop).
+        col = col * (1.0 - a) + min(inkCol, vec3(1.0)) * a;
+        alpha = alpha * (1.0 - a) + a;
+      }
     }
 
     // Lines. Lines sit at spacing/2 + k*spacing on each axis.
@@ -355,8 +381,10 @@ const DISPLAY_FRAG = /* glsl */ `
     float dv = min(fv, 1.0 - fv) * uSpacing;
     float vLine = (1.0 - smoothstep(uWeight * 0.5 - aa, uWeight * 0.5 + aa, dv)) * step(uVy.x, px.y) * step(px.y, uVy.y);
     col = mix(col, hCol, hLine);
+    alpha = mix(alpha, 1.0, hLine);
     col = mix(col, vCol, vLine);
-    gl_FragColor = vec4(col, 1.0);
+    alpha = mix(alpha, 1.0, vLine);
+    gl_FragColor = vec4(col, alpha);
   }
 `
 
@@ -365,8 +393,55 @@ const VERT = /* glsl */ `
   void main() { vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }
 `
 
-export default function GridInkBackdrop({ className = '' }) {
+export default function GridInkBackdrop({ className = '', transparent = false, palette = null }) {
   const host = useRef(null)
+  const dispMatRef = useRef(null)
+
+  // Line colours: ease toward `palette` ({ hFrom, hTo, vFrom, vTo } as [r,g,b] 0..255,
+  // e.g. sampled from a project image) or back to the SETTINGS colours.
+  useEffect(() => {
+    const mat = dispMatRef.current
+    if (!mat) return undefined
+    const S = SETTINGS
+    const targets = {
+      uHFrom: c255(palette?.hFrom ?? S.horizontal.colors.from),
+      uHTo: c255(palette?.hTo ?? S.horizontal.colors.to),
+      uVFrom: c255(palette?.vFrom ?? S.vertical.colors.from),
+      uVTo: c255(palette?.vTo ?? S.vertical.colors.to),
+    }
+    let raf = 0
+    const tick = () => {
+      let done = true
+      for (const [name, t] of Object.entries(targets)) {
+        const v = mat.uniforms[name].value
+        v.lerp(t, 0.1)
+        if (v.distanceTo(t) > 0.002) done = false
+        else v.copy(t)
+      }
+      if (!done) raf = requestAnimationFrame(tick)
+    }
+    tick()
+    return () => cancelAnimationFrame(raf)
+  }, [palette])
+
+  // Fade the dark ground out (so whatever sits behind the canvas shows through, with
+  // the grid lines and ink drawn over it) or back in.
+  useEffect(() => {
+    const mat = dispMatRef.current
+    if (!mat) return undefined
+    const target = transparent ? 0 : 1
+    let raf = 0
+    const tick = () => {
+      const u = mat.uniforms.uBgAlpha
+      const ink = mat.uniforms.uInkAlpha
+      u.value += (target - u.value) * 0.12
+      ink.value += (target - ink.value) * 0.18 // the smoke goes a touch faster than the ground
+      if (Math.abs(u.value - target) < 0.005 && Math.abs(ink.value - target) < 0.005) { u.value = target; ink.value = target; return }
+      raf = requestAnimationFrame(tick)
+    }
+    tick()
+    return () => cancelAnimationFrame(raf)
+  }, [transparent])
 
   useEffect(() => {
     const el = host.current
@@ -383,12 +458,13 @@ export default function GridInkBackdrop({ className = '' }) {
     // ground rather than taking the page down.
     let renderer
     try {
-      renderer = new THREE.WebGLRenderer({ antialias: false, alpha: false, powerPreference: 'high-performance' })
+      renderer = new THREE.WebGLRenderer({ antialias: false, alpha: true, premultipliedAlpha: true, powerPreference: 'high-performance' })
     } catch (err) {
       console.warn('GridInkBackdrop: WebGL unavailable, showing a plain backdrop.', err)
       return undefined
     }
     renderer.setPixelRatio(Math.min(2, window.devicePixelRatio || 1))
+    renderer.setClearColor(0x000000, 0)
     renderer.domElement.style.display = 'block'
     el.appendChild(renderer.domElement)
 
@@ -451,8 +527,11 @@ export default function GridInkBackdrop({ className = '' }) {
         uSoft: { value: INK.softness },
         uCloud: { value: INK.cloudiness },
         uWisps: { value: INK.wisps },
+        uBgAlpha: { value: 1 },
+        uInkAlpha: { value: 1 },
       },
     })
+    dispMatRef.current = dispMat
     const gridMats = [simMat, dispMat]
 
     let rtA = null
@@ -519,7 +598,7 @@ export default function GridInkBackdrop({ className = '' }) {
           const left = L(Math.max(0, Math.round((20 - spacing / 2) / spacing))) // line nearest the 20px margin
           // Natural text width, independent of the panel's current width.
           let textW = 0
-          panel.querySelectorAll('a').forEach((a) => {
+          panel.querySelectorAll('.hero_menu_text_color').forEach((a) => {
             const r = document.createRange()
             r.selectNodeContents(a)
             textW = Math.max(textW, r.getBoundingClientRect().width)
@@ -538,10 +617,47 @@ export default function GridInkBackdrop({ className = '' }) {
       for (const d of landed) d.time = clock() - 0.001
     }
 
+    const t0 = performance.now()
+    const clock = () => (performance.now() - t0) / 1000
+
     // Virtual scroll: accumulate wheel / touch / key input into px, without the page moving.
     let virtualPx = 0
     const virtualRange = () => Math.max(1, window.innerHeight * S.scroll.range)
-    const bump = (dy) => { virtualPx = Math.min(virtualRange(), Math.max(0, virtualPx + dy)) }
+    // Sweeps: each gesture starts one full run of the lines, alternating down / up.
+    const sweep = { active: false, from: 0, to: 1, start: 0, at: 0, pending: 0 }
+    // Where in the loop cycle a scroll position (in ranges) sits: 'down' | 'holdBottom' | 'up' | 'holdTop'
+    const cycleLen = () => 2 + 2 * (S.scroll.dwell || 0)
+    const phaseOf = (t) => {
+      const d = S.scroll.dwell || 0
+      const c = ((t % cycleLen()) + cycleLen()) % cycleLen()
+      if (c < 1) return { seg: 'down', p: c }
+      if (c < 1 + d) return { seg: 'holdBottom', p: 1 }
+      if (c < 2 + d) return { seg: 'up', p: 1 - (c - 1 - d) }
+      return { seg: 'holdTop', p: 0 }
+    }
+    const bump = (dy) => {
+      if (S.scroll.mode === 'virtual' && S.scroll.loop && S.scroll.finishFirst && !S.scroll.sweep.enabled) {
+        // Mid-travel, only input that continues the current direction counts.
+        const { seg } = phaseOf(virtualPx / virtualRange())
+        if ((seg === 'down' || seg === 'up') && dy < 0) return
+      }
+      if (S.scroll.sweep.enabled) {
+        if (sweep.active) return // ignore input mid-sweep
+        sweep.pending += dy
+        if (Math.abs(sweep.pending) >= S.scroll.sweep.threshold) {
+          sweep.pending = 0
+          sweep.from = sweep.at
+          sweep.to = sweep.at >= 0.5 ? 0 : 1 // alternate: at the bottom -> go up, else -> go down
+          if (!S.scroll.loop && sweep.at >= 0.5) return // no loop: stay at the bottom
+          sweep.start = clock()
+          sweep.active = true
+        }
+        virtualPx += Math.abs(dy) // still counts as "has scrolled" for the triggers
+        return
+      }
+      virtualPx = Math.max(0, virtualPx + dy)
+      if (!S.scroll.loop) virtualPx = Math.min(virtualRange(), virtualPx)
+    }
     const onWheel = (e) => { if (S.scroll.mode === 'virtual') { e.preventDefault(); bump(e.deltaY) } }
     let touchY = null
     const onTouchStart = (e) => { touchY = e.touches[0]?.clientY ?? null }
@@ -563,9 +679,24 @@ export default function GridInkBackdrop({ className = '' }) {
     window.addEventListener('touchmove', onTouchMove, { passive: false })
     window.addEventListener('keydown', onVirtualKey)
 
-    // 0 at the start, 1 when the hero's scroll (virtual or pinned) is used up.
+    // 0 at the start, 1 when the hero's scroll (virtual or pinned) is used up. In loop
+    // mode the input folds into a triangle wave: 0 -> 1 over one range, 1 -> 0 over the
+    // next, forever, so the lines grow down, retract up, and repeat as you keep scrolling.
     const scrollProgress = () => {
-      if (S.scroll.mode === 'virtual') return clamp01(virtualPx / virtualRange())
+      if (S.scroll.mode === 'virtual' && S.scroll.sweep.enabled) {
+        if (sweep.active) {
+          const ease = EASES[S.scroll.sweep.ease] || EASES.inOut
+          const t = clamp01((clock() - sweep.start) / Math.max(0.05, S.scroll.sweep.seconds))
+          sweep.at = sweep.from + (sweep.to - sweep.from) * ease(t)
+          if (t >= 1) { sweep.at = sweep.to; sweep.active = false }
+        }
+        return sweep.at
+      }
+      if (S.scroll.mode === 'virtual') {
+        const t = virtualPx / virtualRange()
+        if (!S.scroll.loop) return clamp01(t)
+        return phaseOf(t).p
+      }
       const section = el.closest('.section')
       const spacer = section?.parentElement
       let dist = (spacer?.offsetHeight || 0) - (section?.offsetHeight || 0)
@@ -573,8 +704,6 @@ export default function GridInkBackdrop({ className = '' }) {
       return clamp01(window.scrollY / dist)
     }
 
-    const t0 = performance.now()
-    const clock = () => (performance.now() - t0) / 1000
     let scrollSmooth = 0
     let scrollRaw = 0
     const rng = INK.randomPositions ? Math.random : mulberry32(INK.seed * 7919 + 13)
@@ -662,9 +791,10 @@ export default function GridInkBackdrop({ className = '' }) {
       // Lines
       const target = still ? 1 : scrollProgress()
       scrollRaw = target
-      scrollSmooth += (target - scrollSmooth) * (still ? 1 : S.scrollSmoothing)
+      scrollSmooth += (target - scrollSmooth) * (still || S.scroll.sweep.enabled ? 1 : S.scrollSmoothing)
       // First scroll: start the line animation and (optionally) hold the page.
-      if (!still && lockStart < 0 && target >= S.scrollLock.scrollStart) {
+      const moved = S.scroll.mode === 'virtual' ? virtualPx / virtualRange() : target
+      if (!still && lockStart < 0 && moved >= S.scrollLock.scrollStart) {
         lockStart = seconds
         hProgressAtLock.value = progressFor(S.horizontal, seconds, true)
         if (S.scrollLock.enabled) {
@@ -685,7 +815,7 @@ export default function GridInkBackdrop({ className = '' }) {
       // drops keep landing on their own every `interval` seconds.
       if (INK.enabled && INK.trigger !== 'none') {
         if (startedAt < 0) {
-          const start = still || INK.trigger === 'time' || (INK.trigger === 'scroll' && (lockStart >= 0 || target >= INK.scrollStart))
+          const start = still || INK.trigger === 'time' || (INK.trigger === 'scroll' && (lockStart >= 0 || moved >= INK.scrollStart))
           if (start) startedAt = still ? 0 : seconds
         }
         if (startedAt >= 0) {
@@ -742,6 +872,9 @@ export default function GridInkBackdrop({ className = '' }) {
 
     const ro = new ResizeObserver(() => resize())
     ro.observe(el)
+    const panelEl = el.closest('.section')?.querySelector('.header.margin-bottom_none')
+    const mo = panelEl ? new MutationObserver(() => resize()) : null
+    if (panelEl) mo.observe(panelEl, { childList: true, subtree: true, characterData: true })
     document.fonts?.ready.then(() => resize())
 
     return () => {
@@ -760,6 +893,7 @@ export default function GridInkBackdrop({ className = '' }) {
       window.removeEventListener('pointerup', onUp)
       window.removeEventListener('pointercancel', onUp)
       ro.disconnect()
+      mo?.disconnect()
       rtA?.dispose()
       rtB?.dispose()
       simMat.dispose()

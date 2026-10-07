@@ -230,12 +230,118 @@ a:hover,
   opacity: 1;
 }
 
-/* Desktop: the grid sits on the backdrop grid. Tiles are --thumb-cells cells square,
-   gaps are --thumb-gap-cells cells, the top lines up with the menu panel and the left
-   edge is one gap past the panel's right edge (which GridInkBackdrop.jsx already
-   snaps to a grid line), so every tile edge lands on a line. */
+/* Two grids share the space beside the panel (Systems tiles, Contact tiles); only the
+   open one takes part in the layout. @starting-style gives the entrance animation its
+   starting point when the grid switches from display:none. */
+.home .section.is-full-screen > .project_thumbs:not(.is-open) {
+  display: none !important;
+}
+@starting-style {
+  .project_thumbs.is-open .project_thumb {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+
+/* Contact tiles (components/ContactTiles.jsx): 2x2-cell blocks with the icon in the
+   middle and the name + handle along the bottom. */
+.contact_tiles {
+  --thumb-cells: 2;
+}
+.contact_tile {
+  color: #fff;
+  text-decoration: none;
+  background: rgba(255, 255, 255, 0.06);
+  transition: opacity 0.4s ease, transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), background 0.25s ease;
+}
+.contact_tile:hover,
+.contact_tile:focus-visible {
+  background: rgba(255, 255, 255, 0.14);
+}
+.contact_tile_icon {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-bottom: 14%; /* leave room for the label */
+  opacity: var(--thumb-opacity);
+  transition: opacity 0.3s ease, transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.contact_tile_icon svg {
+  width: 38%;
+  height: 38%;
+}
+.contact_tile:hover .contact_tile_icon {
+  opacity: 1;
+  transform: translateY(-4%);
+}
+.project_thumbs:has(.contact_tile:hover) .contact_tile:not(:hover) .contact_tile_icon {
+  opacity: var(--thumb-opacity-dim);
+}
+.contact_tile_label {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15em;
+  padding: 0.6em 0.7em;
+  font-size: 0.75rem;
+  line-height: 1.2;
+  letter-spacing: 0.04em;
+}
+.contact_tile_name {
+  text-transform: uppercase;
+}
+.contact_tile_handle {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.7rem;
+  letter-spacing: 0.02em;
+  text-transform: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Desktop: scattered single cells (components/ProjectThumbs.jsx sets --x/--y/--s per
+   tile, and --dx/--dy = which way to grow). A tile is one backdrop cell; hovering it
+   grows it to 2x2 on the grid lines and lifts it over its neighbours. The contact
+   tiles keep the regular grid layout below. */
 @media (min-width: 768px) {
-  .home .section.is-full-screen > .project_thumbs {
+  .home .section.is-full-screen > .project_thumbs--scatter {
+    position: absolute;
+    inset: 0;
+    display: block;
+    margin: 0;
+    z-index: 2;
+  }
+  .project_thumbs--scatter .project_thumb {
+    position: absolute;
+    left: var(--x);
+    top: var(--y);
+    width: var(--s);
+    height: var(--s);
+    transition: left 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), top 0.3s cubic-bezier(0.2, 0.8, 0.2, 1),
+      width 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), height 0.3s cubic-bezier(0.2, 0.8, 0.2, 1),
+      opacity 0.4s ease, transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+  .project_thumbs--scatter .project_thumb:hover,
+  .project_thumbs--scatter .project_thumb:focus-visible {
+    left: calc(var(--x) + var(--dx));
+    top: calc(var(--y) + var(--dy));
+    width: calc(var(--s) * 2);
+    height: calc(var(--s) * 2);
+    z-index: 3;
+  }
+  .project_thumbs--scatter .project_thumb_title {
+    font-size: 0.65rem;
+    padding: 1.2em 0.5em 0.45em;
+  }
+
+  /* Contact tiles: regular grid beside the panel, on the grid lines. */
+  .home .section.is-full-screen > .project_thumbs:not(.project_thumbs--scatter) {
     --thumb-size: calc(var(--grid-spacing, 64px) * var(--thumb-cells));
     --thumb-gap: calc(var(--grid-spacing, 64px) * var(--thumb-gap-cells));
     flex: 1 1 auto;
@@ -245,7 +351,7 @@ a:hover,
     gap: var(--thumb-gap);
     margin-top: var(--hero-panel-top, 0px);
     margin-left: var(--thumb-gap);
-    margin-right: 0; /* tiles stop on a grid line anyway; no margin lets one more column fit */
+    margin-right: 0;
   }
 }
 /* Phones: the glass panel shrinks to its links and the grid drops under it as three
@@ -304,12 +410,179 @@ a:hover,
   font-weight: 400;
 }
 
-/* Generative backdrop host (components/GridInkBackdrop.jsx): fill the hero like the video did. */
+/* Generative backdrop host (components/GridInkBackdrop.jsx): fill the hero like the video did.
+   While a project is open the canvas is see-through except for the lines and ink, so
+   the host goes transparent too and the project image shows underneath. */
 .sketch_backdrop {
   position: absolute;
   inset: 0;
   overflow: hidden;
   background: #0c0c0e;
+  transition: background 0.5s ease;
+}
+.has-project .sketch_backdrop {
+  background: transparent;
+}
+
+/* Write-up panel (components/WriteUp.jsx): frosted glass like the menu panel, sitting
+   one gap column to its right with its top on the same grid line; its width is a whole
+   number of cells (--writeup-cells) so its edges land on lines. Phones: full width
+   under the menu. */
+:root {
+  --writeup-cells: 7; /* desktop width in backdrop grid cells */
+}
+.writeup {
+  position: relative;
+  z-index: 2;
+  color: #fff;
+  background-color: var(--glass-tint);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  font-size: 0.95rem;
+  line-height: 1.55;
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity 0.35s ease, transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.writeup:not(.is-open) {
+  display: none !important;
+}
+.writeup.is-open {
+  opacity: 1;
+  transform: none;
+}
+@starting-style {
+  .writeup.is-open {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+.writeup_heading {
+  margin: 0 0 0.6em;
+  font-family: var(--_typography---font--body-font, inherit);
+  font-size: 1.1rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.writeup_lines {
+  margin: 0 0 1em;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  column-gap: 1.2em;
+  row-gap: 0.25em;
+}
+.writeup_line {
+  display: contents;
+}
+.writeup_lines dt {
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding-top: 0.2em;
+}
+.writeup_lines dd {
+  margin: 0;
+}
+.writeup p {
+  margin: 0 0 0.9em;
+  color: rgba(255, 255, 255, 0.88);
+}
+.writeup p:last-child {
+  margin-bottom: 0;
+}
+@media (min-width: 768px) {
+  .home .section.is-full-screen > .writeup {
+    flex: none; /* keep the exact cell width even when the menu panel is wide */
+    align-self: flex-start;
+    margin-top: var(--hero-panel-top, 0px);
+    margin-left: var(--grid-spacing, 64px); /* one gap column after the menu panel */
+    width: calc(var(--grid-spacing, 64px) * var(--writeup-cells));
+    max-height: calc(100vh - var(--hero-panel-top, 0px) - var(--grid-spacing, 64px));
+    overflow: auto;
+    padding: calc(var(--grid-spacing, 64px) * 0.5);
+    box-sizing: border-box;
+  }
+}
+@media (max-width: 767px) {
+  .home .section.is-full-screen > .writeup {
+    flex: 1 0 100%;
+    margin: 16px var(--_typography---hero_menu_margin, 20px) 20px;
+    padding: 1rem 1.1rem;
+  }
+}
+
+/* Project view in the menu panel: back arrow + title lines. The title lines use the
+   menu styling and are not dimmed; the arrow is a link. */
+.project_title_line {
+  display: block;
+  white-space: nowrap;
+}
+.home .section.is-full-screen.has-selection > .header.margin-bottom_none .project_back {
+  opacity: 0.6;
+}
+.home .section.is-full-screen.has-selection > .header.margin-bottom_none .project_back:hover {
+  opacity: 1;
+}
+
+/* Project image behind the grid (components/ProjectBackdrop.jsx): revealed cell by
+   cell. Each .project_cell is one backdrop grid square showing its slice of the
+   image; the slice zooms and fades in inside the cell, rippling out from the clicked
+   tile (--delay per cell). Closing fades everything out together. */
+.project_backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  transition: opacity 0.45s ease;
+}
+.project_backdrop.is-closing {
+  opacity: 0;
+}
+.project_cell {
+  position: absolute;
+  overflow: hidden;
+}
+.project_cell_img {
+  position: absolute;
+  inset: 0;
+  background-repeat: no-repeat;
+  opacity: 0;
+  transform: scale(1.35);
+  filter: blur(6px) brightness(1.6);
+  animation: project-cell-in var(--cell-ms, 650ms) cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+  animation-delay: var(--delay, 0ms);
+}
+@keyframes project-cell-in {
+  to {
+    opacity: 1;
+    transform: none;
+    filter: blur(0) brightness(1);
+  }
+}
+.project_backdrop_video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  animation: project-fade-in 0.8s ease forwards;
+}
+@keyframes project-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+/* Darken the image a little so the lines, menu and smoke stay legible over it. */
+.project_backdrop::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  pointer-events: none;
+}
+/* The sketch sits above the image. */
+.has-project .sketch_backdrop {
+  z-index: 1;
 }
 /* Single-screen site: no scroll bars and no page movement in either direction.
    Remove this block when the site gets more sections again. */

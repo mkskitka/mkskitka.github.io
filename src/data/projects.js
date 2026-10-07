@@ -82,11 +82,13 @@ const AUTO_LAYOUTS = {
   ],
 }
 
+// `date` is free text shown in the write-up (e.g. '2024', 'Spring 2023', 'Oct 2022').
 const details = { role: 'Visualist, Technologist', mediums: '', description: '' }
 
 const projectList = [
   {
     slug: 'pgn-immersive-mobility-rehab',
+    date: '2025', // placeholder, update
     title: 'PGN - Immersive Mobility Rehab',
     heading: ['PGN', 'IMMERSIVE MOBILITY REHAB'],
     ...details,
@@ -100,6 +102,7 @@ const projectList = [
   },
   {
     slug: 'realtor-savings-simulator',
+    date: '2024', // placeholder, update
     title: 'Realtor.com Savings Simulator',
     heading: ['REALTOR.COM', 'SAVINGS SIMULATOR'],
     ...details,
@@ -112,6 +115,7 @@ const projectList = [
   },
   {
     slug: 'audible-popup-visualizer',
+    date: '2024', // placeholder, update
     title: 'Audible Popup Visualizer',
     heading: ['AUDIBLE', 'POPUP VISUALIZER'],
     ...details,
@@ -125,6 +129,7 @@ const projectList = [
   },
   {
     slug: 'intel-the-light-keeper',
+    date: '2023', // placeholder, update
     title: 'INTEL - The Light Keeper',
     heading: ['INTEL x SMOOTH TECH', 'THE LIGHT KEEPER'],
     ...details,
@@ -138,6 +143,7 @@ const projectList = [
   },
   {
     slug: 'blueberry-swamp-festival',
+    date: '2025', // placeholder, update
     title: 'Blueberry Swamp Festival',
     heading: ['BLUEBERRY', 'SWAMP FESTIVAL'],
     ...details,
@@ -151,6 +157,7 @@ const projectList = [
   },
   {
     slug: '370-botanic-gardens',
+    date: '2024', // placeholder, update
     title: '370 BOTANIC GARDENS',
     heading: ['370', 'BOTANIC GARDENS'],
     ...details,
@@ -163,6 +170,7 @@ const projectList = [
   },
   {
     slug: 'venice-biennale-24',
+    date: '2024', // placeholder, update
     title: "'24 VENICE BIENALE",
     heading: ["'24", 'VENICE BIENALE'],
     ...details,
@@ -175,6 +183,7 @@ const projectList = [
   },
   {
     slug: 'evidence-71-the-shed',
+    date: '2023', // placeholder, update
     title: 'EVIDENCE 71@ The Shed',
     heading: ['EVIDENCE 71', '@ THE SHED'],
     ...details,
