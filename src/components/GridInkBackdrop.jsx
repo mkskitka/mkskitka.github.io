@@ -596,15 +596,22 @@ export default function GridInkBackdrop({ className = '', transparent = false, p
         if (panel) {
           const top = L(Math.floor((padTop - spacing / 2) / spacing)) // line at or just above the section padding
           const left = L(Math.max(0, Math.round((20 - spacing / 2) / spacing))) // line nearest the 20px margin
-          // Natural text width, independent of the panel's current width.
+          // Natural text width, independent of the panel's current width (the panel is
+          // let go to its content width while measuring, so text that wraps inside the
+          // current panel is measured unwrapped).
           let textW = 0
+          const prevWidth = panel.style.width
+          panel.style.width = 'max-content'
           panel.querySelectorAll('.hero_menu_text_color').forEach((a) => {
             const r = document.createRange()
             r.selectNodeContents(a)
             textW = Math.max(textW, r.getBoundingClientRect().width)
           })
+          panel.style.width = prevWidth
           const padX = spacing * PANEL_PAD_COLS
-          const right = L(Math.ceil((left + padX + textW + padX - spacing / 2) / spacing)) // next line past the text
+          const lastLine = L(Math.floor((cssW - spacing / 2) / spacing)) // last grid line on screen
+          const right = Math.min(lastLine, L(Math.ceil((left + padX + textW + padX - spacing / 2) / spacing))) // next line past the text
+          //    (phones: a project title wider than the screen wraps inside the panel instead; custom.css)
           section.style.setProperty('--hero-panel-top', `${(top - padTop).toFixed(2)}px`)
           section.style.setProperty('--hero-panel-left', `${left.toFixed(2)}px`)
           section.style.setProperty('--hero-panel-width', `${(right - left).toFixed(2)}px`)

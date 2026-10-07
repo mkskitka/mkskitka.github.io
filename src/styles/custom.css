@@ -354,33 +354,81 @@ a:hover,
     margin-right: 0;
   }
 }
-/* Phones: the glass panel shrinks to its links and the grid drops under it as three
-   plain columns. It is out of the layout entirely while closed so the hero stays
-   one screen tall. */
+/* Phones: the glass panel keeps its size and its place on the grid in every state
+   (the menu type never changes size; a project title wider than the screen wraps,
+   one grid row per line, so the panel still ends on a line). The tiles go under the
+   panel: Systems / Visuals tiles are scattered over the grid like on desktop but as
+   bigger blocks (lib/phoneTiles.js sets --x/--y/--s per tile); Contact tiles are
+   3x3-cell blocks in a row, a whole cell apart, on the lines. */
 @media (max-width: 767px) {
   .home .section.is-full-screen {
     flex-wrap: wrap;
   }
   .home .section.is-full-screen.has-selection {
-    align-content: flex-start; /* while closed the panel still runs to the bottom of the screen */
+    align-content: flex-start;
   }
   .home .section.is-full-screen.has-selection > .header.margin-bottom_none {
     align-self: flex-start;
   }
-  /* Smaller menu type while a selection is open so the menu and the grid share
-     one phone screen (the full-size links are about five lines tall). */
-  .home .section.is-full-screen.has-selection > .header.margin-bottom_none .heading_primary.hero_menu_text_color {
-    font-size: 2rem;
-    line-height: 1.2;
-    margin-bottom: 0.2em;
-  }
-  .home .section.is-full-screen > .project_thumbs {
-    flex: 1 0 100%;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
-    margin: 16px var(--_typography---hero_menu_margin, 20px) 20px;
+  .home .section.is-full-screen > .header.margin-bottom_none .heading_primary.hero_menu_text_color.project_title_line {
+    white-space: normal;
   }
   .home .section.is-full-screen > .project_thumbs:not(.is-open) {
+    display: none;
+  }
+  /* Scattered tiles (Systems, Visuals): absolute, on the grid, titles always showing
+     since there is no hover on a phone. */
+  .home .section.is-full-screen > .project_thumbs--scatter {
+    position: absolute;
+    inset: 0;
+    display: block;
+    margin: 0;
+    z-index: 2;
+  }
+  .project_thumbs--scatter .project_thumb {
+    position: absolute;
+    left: var(--x);
+    top: var(--y);
+    width: var(--s);
+    height: var(--s);
+  }
+  .project_thumbs--scatter .project_thumb_media {
+    opacity: 1;
+  }
+  .project_thumbs--scatter .project_thumb {
+    container-type: size;
+  }
+  .project_thumbs--scatter .project_thumb_title {
+    opacity: 1;
+    font-size: 0.6rem;
+    padding: 1.2em 0.5em 0.5em;
+  }
+  /* Small phones get 2x2-cell tiles; a title would cover most of one, so it is left off. */
+  @container (max-width: 80px) {
+    .project_thumb_title {
+      display: none;
+    }
+  }
+  /* Contact tiles: one gap row under the panel, left edge on the panel's grid line. */
+  .home .section.is-full-screen > .contact_tiles {
+    --thumb-size: calc(var(--grid-spacing, 33px) * 3);
+    --thumb-gap: var(--grid-spacing, 33px);
+    flex: 1 0 auto;
+    width: calc(100% - var(--hero-panel-left, 16.5px));
+    grid-template-columns: repeat(auto-fill, var(--thumb-size));
+    grid-auto-rows: var(--thumb-size);
+    gap: var(--thumb-gap);
+    margin: var(--thumb-gap) 0 0 var(--hero-panel-left, 16.5px);
+  }
+  .contact_tiles .contact_tile_icon {
+    opacity: 1;
+  }
+  /* Name only; the handle does not fit a 3x3 block without breaking mid-word. */
+  .contact_tiles .contact_tile_label {
+    font-size: 0.75rem;
+    padding: 0.5em 0.6em;
+  }
+  .contact_tiles .contact_tile_handle {
     display: none;
   }
 }

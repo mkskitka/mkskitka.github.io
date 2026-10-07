@@ -1,5 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { projects } from '../data/projects.js'
+import { phoneSpots } from '../lib/phoneTiles.js'
 
 /**
  * Scattered tiles, used for Systems (projects; click opens the project view) and
@@ -10,7 +11,7 @@ import { projects } from '../data/projects.js'
  * expanding away from the nearest page edge so it stays on screen; the other
  * tiles dim. Clicking opens the project (`onSelect(project, event)`).
  *
- * Phones get a plain three-column grid instead (CSS).
+ * Phones scatter bigger tiles under the panel instead (lib/phoneTiles.js).
  *
  * Thumbnails come from src/data/projects.js (`thumb`): an image, a gif, or a
  * looping muted video.
@@ -38,7 +39,10 @@ export default function ProjectThumbs({ open = false, onSelect, items = projects
 
     const layout = () => {
       if (!window.matchMedia('(min-width: 768px)').matches) {
-        setSpots(null)
+        const s = parseFloat(getComputedStyle(section).getPropertyValue('--grid-spacing')) || 33
+        const panel = section.querySelector('.header.margin-bottom_none')?.getBoundingClientRect()
+        const panelBottom = panel ? panel.bottom - section.getBoundingClientRect().top : 0
+        setSpots(phoneSpots({ count: items.length, spacing: s, width: section.clientWidth, height: section.clientHeight, panelBottom, rnd: mulberry32(seed.current) }))
         return
       }
       const s = parseFloat(getComputedStyle(section).getPropertyValue('--grid-spacing')) || 64
@@ -75,6 +79,9 @@ export default function ProjectThumbs({ open = false, onSelect, items = projects
     layout()
     const ro = new ResizeObserver(layout)
     ro.observe(section)
+    // Phones: the tiles sit under the panel, so re-lay them out when the panel's size changes.
+    const panelEl = section.querySelector('.header.margin-bottom_none')
+    if (panelEl) ro.observe(panelEl)
     const mo = new MutationObserver(layout) // --grid-spacing is set as an inline style by the backdrop
     mo.observe(section, { attributes: true, attributeFilter: ['style'] })
     return () => {
