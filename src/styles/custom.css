@@ -14,27 +14,20 @@ a:hover,
   height: auto;
   align-self: flex-start;
 }
-/* Home hero panel layout. Desktop: the glass sits on the grid. Its top, bottom,
-   left and right edges land on grid lines, with one row of glass above and below
-   the text and half a column to its left (PANEL_PAD_ROWS / PANEL_PAD_COLS in
+/* Home hero panel layout (all screen sizes): the glass sits on the grid. Its top,
+   bottom, left and right edges land on grid lines, with one row of glass above and
+   below the text and half a column either side (PANEL_PAD_ROWS / PANEL_PAD_COLS in
    GridInkBackdrop.jsx, which measures the text and sets the --hero-panel-* values).
-   Phones: 20px left margin, content width, down to the bottom of the section. */
-@media (min-width: 768px) {
-  .home .section.is-full-screen > .header.margin-bottom_none {
-    align-self: flex-start;
-    margin-top: var(--hero-panel-top, 0px);
-    margin-left: var(--hero-panel-left, 20px);
-    margin-right: 0;
-    width: var(--hero-panel-width, max-content);
-    padding: var(--hero-panel-pad-y, 0px) var(--hero-panel-pad-x, 0px);
-    box-sizing: border-box;
-  }
-}
-@media (max-width: 767px) {
-  .home .section.is-full-screen > .header.margin-bottom_none {
-    align-self: stretch;
-    height: auto;
-  }
+   On phones the text is smaller (--hero-menu-size below), so the grid is too. */
+.home .section.is-full-screen > .header.margin-bottom_none {
+  align-self: flex-start;
+  margin-top: var(--hero-panel-top, 0px);
+  margin-left: var(--hero-panel-left, 20px);
+  margin-right: 0;
+  width: var(--hero-panel-width, max-content);
+  max-width: calc(100% - var(--hero-panel-left, 20px));
+  padding: var(--hero-panel-pad-y, 0px) var(--hero-panel-pad-x, 0px);
+  box-sizing: border-box;
 }
 
 /* No rounded corners anywhere. The Webflow stylesheet draws every radius from these
@@ -94,21 +87,28 @@ a:hover,
 .home .section.is-full-screen > .header.margin-bottom_none .heading_primary.hero_menu_text_color {
   color: #fff;
 }
-/* Hero menu text on desktop sits one line per grid row. The grid takes its row
-   height from this text (rowsFromText in GridInkBackdrop.jsx: row = text size x 1.2),
-   and the sketch sets --grid-spacing and --grid-row-offset on the hero section so
-   each link takes exactly one row and the block starts on a row boundary.
-   Change --hero-menu-size and the grid follows. */
+/* Hero menu text sits one line per grid row, on every screen size. The grid takes
+   its row height from this text (rowsFromText in GridInkBackdrop.jsx: row = text
+   size x 1.2), and the sketch sets --grid-spacing on the hero section so each link
+   takes exactly one row and the block starts on a row boundary.
+   Change --hero-menu-size and the grid follows. Phones scale it with the screen
+   width so the widest word (MK SKITKA), its half-column pads and the left margin
+   fit inside the screen with the panel's right edge still on a grid line. */
+.home .section.is-full-screen {
+  --hero-menu-size: clamp(1.75rem, 9vw, 4rem);
+}
 @media (min-width: 768px) {
   .home .section.is-full-screen {
     --hero-menu-size: 4rem;
   }
-  .home .section.is-full-screen > .header.margin-bottom_none .heading_primary.hero_menu_text_color {
-    font-size: var(--hero-menu-size);
-    line-height: var(--grid-spacing, 1.15em);
-    margin: 0;
-    padding: 0;
-  }
+}
+.home .section.is-full-screen > .header.margin-bottom_none .heading_primary.hero_menu_text_color {
+  font-size: var(--hero-menu-size);
+  line-height: var(--grid-spacing, 1.15em);
+  margin: 0;
+  padding: 0;
+  max-width: none;
+  white-space: nowrap; /* the panel width is measured from the unwrapped text */
 }
 .home .section.is-full-screen > .header.margin-bottom_none .heading_primary.hero_menu_text_color:hover {
   color: var(--_colors---core-accent-color--accent-primary-hover, #fff);

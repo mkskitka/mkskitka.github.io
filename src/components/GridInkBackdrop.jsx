@@ -44,10 +44,12 @@ import * as THREE from 'three'
    ============================================================================ */
 const SETTINGS = {
   background: [12, 12, 14],
-  spacing: 0.06, // gap between lines, as a fraction of the shorter page side (phones, or when rowsFromText is 0)
+  spacing: 0.06, // gap between lines, as a fraction of the shorter page side (only when rowsFromText is 0)
   minSpacing: 22, // px
   maxSpacing: 80, // px
-  rowsFromText: 1.2, // desktop: row height = hero menu text size x this, so one line of text fits a row (0 = use `spacing`)
+  rowsFromText: 1.2, // row height = hero menu text size x this, so one line of text fits a row, on every screen size
+  //                    (0 = use `spacing`). Phones get a smaller text size (--hero-menu-size in custom.css), so a larger
+  //                    grid than `spacing` would give, with the menu text and its glass panel on the lines.
   weight: 1.1, // line thickness in px
   scrollSmoothing: 0.1, // how smoothly the lines follow the scroll: 0.05 very floaty, 0.1 smooth, 1 instant (jumps with each wheel click)
 
@@ -448,9 +450,9 @@ export default function GridInkBackdrop({ className = '' }) {
       renderer.domElement.style.width = '100%'
       renderer.domElement.style.height = '100%'
       let spacing = Math.min(S.maxSpacing, Math.max(S.minSpacing, Math.min(cssW, cssH) * S.spacing))
-      // On desktop the grid follows the hero text: one row per line of the menu.
+      // The grid follows the hero text: one row per line of the menu (all screen sizes).
       const link = el.closest('.section')?.querySelector('.hero_menu_text_color')
-      if (S.rowsFromText > 0 && link && window.matchMedia('(min-width: 768px)').matches) {
+      if (S.rowsFromText > 0 && link) {
         const fs = parseFloat(getComputedStyle(link).fontSize)
         if (fs > 0) spacing = Math.round(fs * S.rowsFromText)
       }
@@ -468,7 +470,7 @@ export default function GridInkBackdrop({ className = '' }) {
         const padTop = parseFloat(getComputedStyle(section).paddingTop) || 0
         const panel = section.querySelector('.header.margin-bottom_none')
         section.style.setProperty('--grid-spacing', `${spacing}px`)
-        if (panel && window.matchMedia('(min-width: 768px)').matches) {
+        if (panel) {
           const top = L(Math.floor((padTop - spacing / 2) / spacing)) // line at or just above the section padding
           const left = L(Math.max(0, Math.round((20 - spacing / 2) / spacing))) // line nearest the 20px margin
           // Natural text width, independent of the panel's current width.
