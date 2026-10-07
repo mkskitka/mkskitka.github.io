@@ -152,6 +152,8 @@ const SETTINGS = {
   // as a few specks; more drops that soak further fill it like the desktop does.
   phone: {
     maxWidth: 767,
+    pixelRatio: 1.5, // canvas density cap on phones (desktop: 2). Phone screens are 2-3x; the noise shader
+    //                  runs per pixel every frame, so 1.5 cuts that work by half or more without visibly softening the lines
     ink: {
       drops: 12,
       interval: 0.9,
@@ -463,7 +465,7 @@ export default function GridInkBackdrop({ className = '', transparent = false, p
       console.warn('GridInkBackdrop: WebGL unavailable, showing a plain backdrop.', err)
       return undefined
     }
-    renderer.setPixelRatio(Math.min(2, window.devicePixelRatio || 1))
+    renderer.setPixelRatio(Math.min(phone ? S.phone.pixelRatio : 2, window.devicePixelRatio || 1))
     renderer.setClearColor(0x000000, 0)
     renderer.domElement.style.display = 'block'
     el.appendChild(renderer.domElement)

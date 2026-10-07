@@ -11,6 +11,11 @@ import { useEffect, useLayoutEffect, useMemo, useState } from 'react'
  */
 const RIPPLE_MS = 38 // delay per cell of distance from the clicked tile
 const CELL_MS = 650 // how long each cell's own animation takes
+// Phones: each animated piece is this many backdrop cells square (still on the grid
+// lines). One cell per piece is ~350 animated layers on a phone, which stutters;
+// 2x2 is ~90. Desktop keeps one cell per piece.
+const PHONE_PIECE_CELLS = 2
+const isPhone = () => window.matchMedia('(max-width: 767px)').matches
 
 export default function ProjectBackdrop({ project, from, onClosed, host }) {
   const [closing, setClosing] = useState(false)
@@ -43,7 +48,13 @@ export default function ProjectBackdrop({ project, from, onClosed, host }) {
     }
     let alive = true
     const im = new Image()
-    im.onload = () => alive && setImg({ url, w: im.naturalWidth, h: im.naturalHeight })
+    // Decode fully before the cells mount, so the first frames of the reveal are not
+    // spent decoding the image on the main thread.
+    im.onload = () => {
+      const done = () => alive && setImg({ url, w: im.naturalWidth, h: im.naturalHeight })
+      if (im.decode) im.decode().then(done, done)
+      else done()
+    }
     im.src = url
     return () => {
       alive = false
@@ -72,24 +83,25 @@ export default function ProjectBackdrop({ project, from, onClosed, host }) {
     const bh = img.h * scale
     const ox = (w - bw) / 2
     const oy = (h - bh) / 2
-    const cols = Math.ceil((w + s / 2) / s)
-    const rows = Math.ceil((h + s / 2) / s)
+    const p = s * (isPhone() ? PHONE_PIECE_CELLS : 1) // piece size; pieces start on the line at -s/2 so their edges stay on lines
+    const cols = Math.ceil((w + s / 2) / p)
+    const rows = Math.ceil((h + s / 2) / p)
     const origin = from
       ? { x: from.left + from.width / 2, y: from.top + from.height / 2 }
       : { x: w / 2, y: h / 2 }
     const out = []
     for (let j = 0; j < rows; j++) {
       for (let i = 0; i < cols; i++) {
-        const x = -s / 2 + i * s
-        const y = -s / 2 + j * s
-        const dist = Math.hypot(x + s / 2 - origin.x, y + s / 2 - origin.y) / s
+        const x = -s / 2 + i * p
+        const y = -s / 2 + j * p
+        const dist = Math.hypot(x + p / 2 - origin.x, y + p / 2 - origin.y) / s
         out.push({
           key: `${i}-${j}`,
           style: {
             left: x,
             top: y,
-            width: s,
-            height: s,
+            width: p,
+            height: p,
             '--delay': `${Math.round(dist * RIPPLE_MS)}ms`,
           },
           inner: {
