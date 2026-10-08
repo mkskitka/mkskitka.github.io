@@ -83,6 +83,10 @@ const AUTO_LAYOUTS = {
 }
 
 // `date` is free text shown in the write-up (e.g. '2024', 'Spring 2023', 'Oct 2022').
+// `gallery` (optional) is the list of photos for the Gallery row in the write-up:
+//   gallery: [{ src: 'photo1.jpg' }, { src: 'photo2.jpg', alt: 'Caption' }]
+// Bare file names resolve from the project's folder in src/assets/projects/<slug>/,
+// or use a full path like '/images/x.png'. Without it, the showcase images are used.
 const details = { role: 'Visualist, Technologist', mediums: '', description: '' }
 
 const projectList = [
@@ -207,10 +211,12 @@ export const projects = projectList.map((p) => {
     featured = layout ? photos.map((src, i) => ({ src, alt: '', ...layout[i] })) : []
   }
   featured = featured.map((t) => ({ ...t, src: resolveMedia(p.slug, t.src) }))
+  const gallery = p.gallery ? p.gallery.map((g) => ({ ...g, src: resolveMedia(p.slug, g.src) })) : undefined
   return {
     ...p,
     hero: heroFor(p.slug, p.hero),
     featured,
+    gallery,
     thumb: thumbFor(p.slug, p.thumb) ?? (featured[0] ? { image: featured[0].src } : null),
   }
 })

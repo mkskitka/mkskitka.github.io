@@ -13,7 +13,7 @@ import { useLayoutEffect, useRef, useState } from 'react'
  */
 const MIN_CELLS = 4
 
-export default function WriteUp({ open = false, heading, lines = [], paragraphs = [] }) {
+export default function WriteUp({ open = false, heading, lines = [], paragraphs = [], children }) {
   const ref = useRef(null)
   const [place, setPlace] = useState(null) // { cells, below } or null (phones / not measured)
 
@@ -80,6 +80,7 @@ export default function WriteUp({ open = false, heading, lines = [], paragraphs 
       {paragraphs.map((p, i) => (
         <p key={i}>{p}</p>
       ))}
+      {children}
     </aside>
   )
 }

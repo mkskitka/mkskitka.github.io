@@ -5,6 +5,7 @@ import ContactTiles from '../components/ContactTiles.jsx'
 import { visuals } from '../data/visuals.js'
 import { about } from '../data/about.js'
 import WriteUp from '../components/WriteUp.jsx'
+import ProjectGallery from '../components/ProjectGallery.jsx'
 import ProjectBackdrop from '../components/ProjectBackdrop.jsx'
 import { sampleGridPalette } from '../lib/imagePalette.js'
 import { revealSections } from '../lib/animations.js'
@@ -167,7 +168,9 @@ export default function Home() {
             { label: 'Mediums', value: project?.mediums },
           ]}
           paragraphs={project?.description ? [].concat(project.description) : ['Project write-up coming soon. Add it as `description` in src/data/projects.js (a string or a list of paragraphs).']}
-        />
+        >
+          {project && <ProjectGallery images={project.gallery ?? project.featured ?? []} />}
+        </WriteUp>
       </header>
     </div>
   )
