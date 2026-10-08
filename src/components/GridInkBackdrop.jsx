@@ -48,7 +48,7 @@ import * as THREE from 'three'
    So the stain grows cell by cell, but every cell fills like liquid.
    ============================================================================ */
 const SETTINGS = {
-  background: [8, 10, 14],
+  background: [9, 9, 16],
   spacing: 0.06, // gap between lines, as a fraction of the shorter page side (only when rowsFromText is 0)
   minSpacing: 22, // px
   maxSpacing: 80, // px
@@ -59,7 +59,7 @@ const SETTINGS = {
   scrollSmoothing: 0.1, // how smoothly the lines follow the scroll: 0.05 very floaty, 0.1 smooth, 1 instant (jumps with each wheel click)
 
   horizontal: {
-    colors: { from: [0, 200, 230], to: [220, 245, 250] }, // cyan -> white
+    colors: { from: [60, 110, 255], to: [150, 90, 255] }, // electric blue -> violet
     start: 0,
     initialLength: 0.2,
     finalLength: 1,
@@ -71,7 +71,7 @@ const SETTINGS = {
   },
 
   vertical: {
-    colors: { from: [0, 170, 220], to: [30, 60, 160] }, // cyan -> deep blue
+    colors: { from: [120, 80, 240], to: [240, 70, 170] }, // violet -> magenta
     start: 0,
     initialLength: 0,
     finalLength: 1,
