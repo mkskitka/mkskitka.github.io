@@ -10,6 +10,7 @@ const files = import.meta.glob('../assets/projects/*/*.{png,jpg,jpeg,webp,gif,av
 const IMAGE = /\.(png|jpe?g|webp|gif|avif)$/i
 const VIDEO = /\.(mp4|webm)$/i
 const HERO = /^hero(-poster)?\./i
+const THUMB = /^thumb(-poster)?\./i
 
 // { slug: { 'file.jpg': '/assets/file-abc123.jpg', ... } }
 const bySlug = {}
@@ -39,7 +40,7 @@ export function resolveMedia(slug, name) {
 export function folderImages(slug) {
   const f = mediaFiles(slug)
   return Object.keys(f)
-    .filter((n) => IMAGE.test(n) && !HERO.test(n))
+    .filter((n) => IMAGE.test(n) && !HERO.test(n) && !THUMB.test(n))
     .sort(byName)
     .map((n) => f[n])
 }

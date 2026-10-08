@@ -48,7 +48,7 @@ import * as THREE from 'three'
    So the stain grows cell by cell, but every cell fills like liquid.
    ============================================================================ */
 const SETTINGS = {
-  background: [12, 12, 14],
+  background: [8, 10, 14],
   spacing: 0.06, // gap between lines, as a fraction of the shorter page side (only when rowsFromText is 0)
   minSpacing: 22, // px
   maxSpacing: 80, // px
@@ -59,7 +59,7 @@ const SETTINGS = {
   scrollSmoothing: 0.1, // how smoothly the lines follow the scroll: 0.05 very floaty, 0.1 smooth, 1 instant (jumps with each wheel click)
 
   horizontal: {
-    colors: { from: [235, 70, 55], to: [45, 215, 205] }, // red -> teal
+    colors: { from: [0, 200, 230], to: [220, 245, 250] }, // cyan -> white
     start: 0,
     initialLength: 0.2,
     finalLength: 1,
@@ -71,7 +71,7 @@ const SETTINGS = {
   },
 
   vertical: {
-    colors: { from: [50, 90, 235], to: [240, 75, 130] }, // blue -> pink
+    colors: { from: [0, 170, 220], to: [30, 60, 160] }, // cyan -> deep blue
     start: 0,
     initialLength: 0,
     finalLength: 1,
@@ -127,7 +127,7 @@ const SETTINGS = {
     rim: 0.35, // brighter, more saturated ring at the wet front (0 = none)
 
     // Gaseous look: the ink reads as smoke / cloud rather than a solid stain.
-    density: 1, // how opaque the thickest part gets (0..1)
+    density: .5, // how opaque the thickest part gets (0..1)
     softness: 0.7, // width of the soft gradient from clear to full (0.2 crisp stain, 0.9 very hazy)
     cloudiness: 0.75, // how much the interior varies in density, like cloud (0 flat, 1 very patchy)
     wisps: 0.7, // how much fine noise eats thin ink into tendrils (0 smooth, 1 ragged smoke)
@@ -155,11 +155,11 @@ const SETTINGS = {
     pixelRatio: 1.5, // canvas density cap on phones (desktop: 2). Phone screens are 2-3x; the noise shader
     //                  runs per pixel every frame, so 1.5 cuts that work by half or more without visibly softening the lines
     ink: {
-      drops: 12,
+      drops: 2,
       interval: 0.9,
       dropRadius: 0.03,
-      pour: 3,
-      spread: 3,
+      pour: 1,
+      spread: 2,
       lineThreshold: 0.6,
       lineLoss: 0.04,
     },
@@ -534,6 +534,17 @@ export default function GridInkBackdrop({ className = '', transparent = false, p
       },
     })
     dispMatRef.current = dispMat
+    // Dev only: try a palette live from the console, e.g.
+    //   __setGridColors({ hFrom:[r,g,b], hTo:[..], vFrom:[..], vTo:[..], bg:[..] })
+    if (import.meta.env.DEV) {
+      window.__setGridColors = (c = {}) => {
+        if (c.hFrom) dispMat.uniforms.uHFrom.value.copy(c255(c.hFrom))
+        if (c.hTo) dispMat.uniforms.uHTo.value.copy(c255(c.hTo))
+        if (c.vFrom) dispMat.uniforms.uVFrom.value.copy(c255(c.vFrom))
+        if (c.vTo) dispMat.uniforms.uVTo.value.copy(c255(c.vTo))
+        if (c.bg) dispMat.uniforms.uBg.value.copy(c255(c.bg))
+      }
+    }
     const gridMats = [simMat, dispMat]
 
     let rtA = null
@@ -568,6 +579,8 @@ export default function GridInkBackdrop({ className = '', transparent = false, p
       renderer.setRenderTarget(null)
     }
 
+    let simW = -1
+    let simH = -1
     const resize = () => {
       cssW = Math.max(1, el.clientWidth)
       cssH = Math.max(1, el.clientHeight)
@@ -621,9 +634,16 @@ export default function GridInkBackdrop({ className = '', transparent = false, p
           section.style.setProperty('--hero-panel-pad-y', `${(spacing * PANEL_PAD_ROWS).toFixed(2)}px`)
         }
       }
-      makeTargets()
-      // Drops that already landed re-land so the stain rebuilds at the new size.
-      for (const d of landed) d.time = clock() - 0.001
+      // Only rebuild the simulation when the canvas size actually changed. Panel
+      // content changes (menu <-> project title) re-run this for the grid/panel
+      // measurements above but must not reset the smoke.
+      if (cssW !== simW || cssH !== simH) {
+        simW = cssW
+        simH = cssH
+        makeTargets()
+        // Drops that already landed re-land so the stain rebuilds at the new size.
+        for (const d of landed) d.time = clock() - 0.001
+      }
     }
 
     const t0 = performance.now()

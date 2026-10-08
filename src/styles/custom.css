@@ -125,7 +125,7 @@ a:hover,
   --menu-dim: 0.3; /* opacity of the unselected menu links while one is selected */
   --thumb-cells: 3; /* desktop tile size in backdrop grid cells: 3 = a 3x3 block, 2 = a 2x2 block */
   --thumb-gap-cells: 1; /* whole cells between tiles, and between the menu panel and the grid */
-  --thumb-opacity: 0.8; /* tiles at rest (1 = solid); the hovered tile always goes solid */
+  --thumb-opacity: 1; /* tiles at rest (1 = solid); the hovered tile always goes solid */
   --thumb-opacity-dim: 0.45; /* the other tiles while one is hovered */
 }
 /* Windows under ~1000px tall: 2x2 blocks so all the projects still fit beside the

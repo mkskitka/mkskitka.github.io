@@ -86,8 +86,13 @@ const AUTO_LAYOUTS = {
 // `gallery` (optional) is the list of photos for the Gallery row in the write-up:
 //   gallery: [{ src: 'photo1.jpg' }, { src: 'photo2.jpg', alt: 'Caption' }]
 // Bare file names resolve from the project's folder in src/assets/projects/<slug>/,
-// or use a full path like '/images/x.png'. Without it, the showcase images are used.
+// or use a full path like '/images/x.png'. Without it, the first four photos in the
+// folder are used (any names, sorted; hero.* and thumb.* skipped), else the showcase images.
 const details = { role: 'Visualist, Technologist', mediums: '', description: '' }
+
+// To take a project off the site until it is ready, add `hidden: true` to its entry
+// below. Everything about it (folder, images, text) stays in place; it just is not
+// listed or reachable. Remove the flag to bring it back.
 
 const projectList = [
   {
@@ -147,6 +152,7 @@ const projectList = [
   },
   {
     slug: 'blueberry-swamp-festival',
+    hidden: 'true',
     date: '2025', // placeholder, update
     title: 'Blueberry Swamp Festival',
     heading: ['BLUEBERRY', 'SWAMP FESTIVAL'],
@@ -203,7 +209,7 @@ const projectList = [
 
 // Resolve folder files: bare tile names -> urls, hero.* -> hero backdrop, and an
 // automatic layout for projects that have photos in their folder but no `featured`.
-export const projects = projectList.map((p) => {
+export const projects = projectList.filter((p) => !p.hidden).map((p) => {
   let featured = p.featured
   if (!featured) {
     const photos = folderImages(p.slug).slice(0, 4)
@@ -211,7 +217,14 @@ export const projects = projectList.map((p) => {
     featured = layout ? photos.map((src, i) => ({ src, alt: '', ...layout[i] })) : []
   }
   featured = featured.map((t) => ({ ...t, src: resolveMedia(p.slug, t.src) }))
-  const gallery = p.gallery ? p.gallery.map((g) => ({ ...g, src: resolveMedia(p.slug, g.src) })) : undefined
+  // Gallery: an explicit `gallery` list wins; otherwise the first four photos in the
+  // project's folder (hero.* and thumb.* excluded, sorted by name); otherwise the showcase images.
+  const folder = folderImages(p.slug)
+  const gallery = p.gallery
+    ? p.gallery.map((g) => ({ ...g, src: resolveMedia(p.slug, g.src) }))
+    : folder.length
+      ? folder.slice(0, 4).map((src) => ({ src, alt: '' }))
+      : undefined
   return {
     ...p,
     hero: heroFor(p.slug, p.hero),
