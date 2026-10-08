@@ -47,8 +47,36 @@ import * as THREE from 'three'
    the next region (losing `lineLoss`) and soaks there until it meets the next line.
    So the stain grows cell by cell, but every cell fills like liquid.
    ============================================================================ */
+/* Grid colour palettes. `PALETTE` picks the active one; the rest are kept so you can
+   switch back any time (change the name, save, done). Each has the horizontal line
+   gradient (left -> right), the vertical one (top -> bottom), and the ground colour. */
+const PALETTES = {
+  'mk-original': {
+    horizontal: { from: [235, 70, 55], to: [45, 215, 205] }, // red -> teal
+    vertical: { from: [50, 90, 235], to: [240, 75, 130] }, // blue -> pink
+    background: [12, 12, 14],
+  },
+  cyan: {
+    horizontal: { from: [0, 200, 230], to: [220, 245, 250] }, // cyan -> white
+    vertical: { from: [0, 170, 220], to: [30, 60, 160] }, // cyan -> deep blue
+    background: [8, 10, 14],
+  },
+  signal: {
+    horizontal: { from: [60, 110, 255], to: [150, 90, 255] }, // electric blue -> violet
+    vertical: { from: [120, 80, 240], to: [240, 70, 170] }, // violet -> magenta
+    background: [9, 9, 16],
+  },
+  neon: {
+    horizontal: { from: [255, 60, 150], to: [255, 150, 60] }, // hot pink -> orange
+    vertical: { from: [0, 220, 255], to: [60, 90, 255] }, // cyan -> blue
+    background: [8, 8, 14],
+  },
+}
+const PALETTE = 'cyan' // <- active palette: 'mk-original' | 'cyan' | 'signal' | 'neon'
+const ACTIVE = PALETTES[PALETTE] ?? PALETTES['mk-original']
+
 const SETTINGS = {
-  background: [8, 8, 14],
+  background: ACTIVE.background,
   spacing: 0.06, // gap between lines, as a fraction of the shorter page side (only when rowsFromText is 0)
   minSpacing: 22, // px
   maxSpacing: 80, // px
@@ -59,7 +87,7 @@ const SETTINGS = {
   scrollSmoothing: 0.1, // how smoothly the lines follow the scroll: 0.05 very floaty, 0.1 smooth, 1 instant (jumps with each wheel click)
 
   horizontal: {
-    colors: { from: [255, 60, 150], to: [255, 150, 60] }, // hot pink -> orange
+    colors: ACTIVE.horizontal,
     start: 0,
     initialLength: 0.2,
     finalLength: 1,
@@ -71,7 +99,7 @@ const SETTINGS = {
   },
 
   vertical: {
-    colors: { from: [0, 220, 255], to: [60, 90, 255] }, // cyan -> blue
+    colors: ACTIVE.vertical,
     start: 0,
     initialLength: 0,
     finalLength: 1,
