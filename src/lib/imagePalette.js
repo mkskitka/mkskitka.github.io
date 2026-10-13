@@ -1,16 +1,16 @@
 /**
- * Sample a project image for the grid's line colours.
- *
- * The horizontal lines run left -> right, so their gradient takes the average colour
- * of the image's left and right bands; the vertical lines run top -> bottom and take
- * the top and bottom bands. Colours are pushed toward vivid and light so the thin
- * lines still read over the image itself.
+ * Pick the grid's line colour for an open project: plain black or plain white,
+ * whichever contrasts with the image. A bright image gets black lines, a dark one
+ * gets white. Both line sets and both ends of their gradients use the same colour,
+ * so the grid reads as a single flat lattice over the photo.
  *
  * Returns { hFrom, hTo, vFrom, vTo } as [r, g, b] 0..255, or null if the image
- * cannot be read.
+ * cannot be read (the caller then keeps the site palette).
  */
-const BAND = 0.3 // fraction of the width/height each band covers
 const SAMPLE = 48 // the image is drawn this many px wide for sampling
+const LIGHT = [245, 245, 248] // "white" lines, over a dark image
+const DARK = [10, 10, 12] // "black" lines, over a bright image
+const THRESHOLD = 0.45 // mean luminance (0..1) above which the image counts as bright
 
 export async function sampleGridPalette(url) {
   if (!url) return null
@@ -29,32 +29,16 @@ export async function sampleGridPalette(url) {
   } catch {
     return null // cross-origin image without CORS headers
   }
-  const avg = (x0, x1, y0, y1) => {
-    let r = 0, g = 0, b = 0, n = 0
-    for (let y = y0; y < y1; y++) {
-      for (let x = x0; x < x1; x++) {
-        const i = (y * w + x) * 4
-        r += data[i]; g += data[i + 1]; b += data[i + 2]; n++
-      }
-    }
-    return vivid([r / n, g / n, b / n])
+  let sum = 0
+  let n = 0
+  for (let i = 0; i < data.length; i += 4) {
+    // Rec. 709 luminance, so the result follows how bright the image looks.
+    sum += (0.2126 * data[i] + 0.7152 * data[i + 1] + 0.0722 * data[i + 2]) / 255
+    n++
   }
-  const bw = Math.max(1, Math.round(w * BAND))
-  const bh = Math.max(1, Math.round(h * BAND))
-  return {
-    hFrom: avg(0, bw, 0, h),
-    hTo: avg(w - bw, w, 0, h),
-    vFrom: avg(0, w, 0, bh),
-    vTo: avg(0, w, h - bh, h),
-  }
-}
-
-// Lift saturation and lightness so a muted or dark average still makes a visible line.
-function vivid([r, g, b]) {
-  let [h, s, l] = rgbToHsl(r, g, b)
-  s = Math.max(0.55, Math.min(1, s * 1.6))
-  l = Math.max(0.55, Math.min(0.8, l * 1.3))
-  return hslToRgb(h, s, l)
+  const mean = n ? sum / n : 0
+  const line = mean > THRESHOLD ? DARK : LIGHT
+  return { hFrom: line, hTo: line, vFrom: line, vTo: line, mean }
 }
 
 function load(url) {
@@ -65,28 +49,4 @@ function load(url) {
     img.onerror = reject
     img.src = url
   })
-}
-
-function rgbToHsl(r, g, b) {
-  r /= 255; g /= 255; b /= 255
-  const max = Math.max(r, g, b), min = Math.min(r, g, b)
-  let h = 0, s = 0
-  const l = (max + min) / 2
-  if (max !== min) {
-    const d = max - min
-    s = l > 0.5 ? d / (2 - max - min) : d / (max + min)
-    if (max === r) h = (g - b) / d + (g < b ? 6 : 0)
-    else if (max === g) h = (b - r) / d + 2
-    else h = (r - g) / d + 4
-    h /= 6
-  }
-  return [h, s, l]
-}
-function hslToRgb(h, s, l) {
-  const f = (n) => {
-    const k = (n + h * 12) % 12
-    const a = s * Math.min(l, 1 - l)
-    return Math.round(255 * (l - a * Math.max(-1, Math.min(k - 3, 9 - k, 1))))
-  }
-  return [f(0), f(8), f(4)]
 }

@@ -13,7 +13,8 @@ import { usePhoneSpots } from '../lib/phoneTiles.js'
  */
 export default function ContactTiles({ open = false }) {
   const nav = useRef(null)
-  const spots = usePhoneSpots(nav, contactLinks.length, { cells: 3, scatter: false, shuffle: false })
+  // Phones: one row of tiles, on the grid rows but centred across the page.
+  const spots = usePhoneSpots(nav, contactLinks.length, { cells: 3, scatter: false, shuffle: false, centerX: true })
   const scatter = Array.isArray(spots)
   return (
     <nav
@@ -31,7 +32,17 @@ export default function ContactTiles({ open = false }) {
             key={c.id}
             href={c.url}
             className="project_thumb contact_tile"
-            style={spot ? { '--i': i, '--x': `${spot.x}px`, '--y': `${spot.y}px`, '--s': `${spot.s}px` } : { '--i': i }}
+            style={
+              spot
+                ? {
+                    '--i': i,
+                    '--x': `${spot.x}px`,
+                    '--y': `${spot.y}px`,
+                    '--s': `${spot.s}px`,
+                    '--sh': `${spot.sh ?? spot.s}px`,
+                  }
+                : { '--i': i }
+            }
             tabIndex={open ? 0 : -1}
             target={external ? '_blank' : undefined}
             rel={external ? 'noreferrer' : undefined}

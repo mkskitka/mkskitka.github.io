@@ -1,7 +1,9 @@
 // Per-project photos and videos. Drop files into src/assets/projects/<slug>/ and
 // they are picked up here at build time (see src/assets/projects/README.md).
 
-const files = import.meta.glob('../assets/projects/*/*.{png,jpg,jpeg,webp,gif,avif,mp4,webm}', {
+// Upper-case extensions are listed too: the match is case sensitive and cameras
+// and screenshots often save as .PNG / .JPG / .MP4.
+const files = import.meta.glob('../assets/projects/*/*.{png,jpg,jpeg,webp,gif,avif,mp4,webm,PNG,JPG,JPEG,WEBP,GIF,AVIF,MP4,WEBM}', {
   eager: true,
   query: '?url',
   import: 'default',
@@ -34,6 +36,18 @@ export function resolveMedia(slug, name) {
     console.warn(`[media] ${slug}: no file "${name}" in src/assets/projects/${slug}/`)
   }
   return url ?? name
+}
+
+/** True for a video file name or url (mp4 / webm). */
+export const isVideo = (name) => VIDEO.test(String(name ?? '').split(/[?#]/)[0])
+
+/** Photos, gifs and videos in the folder, in name order, with hero and thumb files left out. */
+export function folderMedia(slug) {
+  const f = mediaFiles(slug)
+  return Object.keys(f)
+    .filter((n) => (IMAGE.test(n) || VIDEO.test(n)) && !HERO.test(n) && !THUMB.test(n))
+    .sort(byName)
+    .map((n) => ({ src: f[n], video: VIDEO.test(n) }))
 }
 
 /** Photos in the folder, in name order, with hero files left out. */

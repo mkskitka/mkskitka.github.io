@@ -34,8 +34,10 @@ One folder per project, named by the project's slug (the part of its URL after
 
 ## Gallery (the photo row in the project write-up; click for full screen)
 
-- Any other images in the folder become the gallery, up to four, sorted by name
-  (so `01.jpg`, `02.jpg` ... controls the order). `hero.*` and `thumb.*` are skipped.
+- Any other images, gifs and videos (`.mp4` / `.webm`) in the folder become the
+  gallery, up to four, sorted by name (so `01.jpg`, `02.mp4` ... controls the
+  order). `hero.*` and `thumb.*` are skipped. Videos loop muted in the row and
+  play with sound and controls when opened.
 - For a different set or order, add `gallery: [{ src: 'a.jpg' }, { src: 'b.jpg' }]`
   to the project in `src/data/projects.js`.
 - Browsers can't show HEIC or MOV files; convert to JPEG / MP4 first (Finder:

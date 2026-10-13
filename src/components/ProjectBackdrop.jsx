@@ -1,7 +1,7 @@
 import { useEffect, useLayoutEffect, useMemo, useState } from 'react'
 
 /**
- * A project's image filling the hero behind the grid lines, revealed square by
+ * A project's image behind the grid lines, revealed square by
  * square: the page is cut into the backdrop's grid cells and each cell shows its
  * own portion of the image, animating in within its bounds (a soft zoom-and-fade)
  * in a ripple that spreads out from the clicked tile. Closing fades the whole thing.
@@ -11,13 +11,22 @@ import { useEffect, useLayoutEffect, useMemo, useState } from 'react'
  */
 const RIPPLE_MS = 38 // delay per cell of distance from the clicked tile
 const CELL_MS = 650 // how long each cell's own animation takes
+
+// Depth: shade the edges of every cell so each grid square reads as a bevelled tile
+// (the look the reveal's blur produced by accident). 0 = flat image.
+export const DEPTH = {
+  enabled: false,
+  strength: 0, // how dark the edge shading gets (0..1)
+  width: 0.58, // how far the shading reaches into the cell, as a fraction of the cell
+  highlight: 0, // light catch on the top/left edges (0 = none)
+}
 // Phones: each animated piece is this many backdrop cells square (still on the grid
 // lines). One cell per piece is ~350 animated layers on a phone, which stutters;
 // 2x2 is ~90. Desktop keeps one cell per piece.
 const PHONE_PIECE_CELLS = 2
 const isPhone = () => window.matchMedia('(max-width: 767px)').matches
 
-export default function ProjectBackdrop({ project, from, onClosed, host }) {
+export default function ProjectBackdrop({ project, from, onClosed, host, fit = 'cover' }) {
   const [closing, setClosing] = useState(false)
   const [img, setImg] = useState(null) // { url, w, h }
   const [box, setBox] = useState({ w: 1, h: 1, s: 64 })
@@ -66,8 +75,12 @@ export default function ProjectBackdrop({ project, from, onClosed, host }) {
     const measure = () => {
       const el = host?.current
       if (!el) return
-      const s = parseFloat(getComputedStyle(el).getPropertyValue('--grid-spacing')) || 64
-      setBox({ w: el.clientWidth, h: el.clientHeight, s })
+      const cs = getComputedStyle(el)
+      const s = parseFloat(cs.getPropertyValue('--grid-spacing')) || 64
+      const sy = parseFloat(cs.getPropertyValue('--grid-spacing-y')) || s
+      const ox = parseFloat(cs.getPropertyValue('--grid-origin-x')) || 0
+      const oy = parseFloat(cs.getPropertyValue('--grid-origin-y')) || 0
+      setBox({ w: el.clientWidth, h: el.clientHeight, s, sy, ox, oy })
     }
     measure()
     window.addEventListener('resize', measure)
@@ -78,30 +91,38 @@ export default function ProjectBackdrop({ project, from, onClosed, host }) {
   const cells = useMemo(() => {
     if (!img) return []
     const { w, h, s } = box
-    const scale = Math.max(w / img.w, h / img.h) // object-fit: cover
+    const sy = box.sy ?? s
+    // 'cover' fills the page and crops; 'contain' shows the whole image as large as it fits.
+    const scale = fit === 'contain' ? Math.min(w / img.w, h / img.h) : Math.max(w / img.w, h / img.h)
     const bw = img.w * scale
     const bh = img.h * scale
     const ox = (w - bw) / 2
     const oy = (h - bh) / 2
-    const p = s * (isPhone() ? PHONE_PIECE_CELLS : 1) // piece size; pieces start on the line at -s/2 so their edges stay on lines
-    const cols = Math.ceil((w + s / 2) / p)
-    const rows = Math.ceil((h + s / 2) / p)
+    // Piece size: one cell, or a block of cells on phones. Pieces start on a grid line
+    // (at or before the page edge) so every edge stays on a line.
+    const n = isPhone() ? PHONE_PIECE_CELLS : 1
+    const px = s * n
+    const py = sy * n
+    const startX = (box.ox ?? 0) - Math.ceil((box.ox ?? 0) / px) * px
+    const startY = (box.oy ?? 0) - Math.ceil((box.oy ?? 0) / py) * py
+    const cols = Math.ceil((w - startX) / px)
+    const rows = Math.ceil((h - startY) / py)
     const origin = from
       ? { x: from.left + from.width / 2, y: from.top + from.height / 2 }
       : { x: w / 2, y: h / 2 }
     const out = []
     for (let j = 0; j < rows; j++) {
       for (let i = 0; i < cols; i++) {
-        const x = -s / 2 + i * p
-        const y = -s / 2 + j * p
-        const dist = Math.hypot(x + p / 2 - origin.x, y + p / 2 - origin.y) / s
+        const x = startX + i * px
+        const y = startY + j * py
+        const dist = Math.hypot(x + px / 2 - origin.x, y + py / 2 - origin.y) / s
         out.push({
           key: `${i}-${j}`,
           style: {
             left: x,
             top: y,
-            width: p,
-            height: p,
+            width: px,
+            height: py,
             '--delay': `${Math.round(dist * RIPPLE_MS)}ms`,
           },
           inner: {
@@ -113,12 +134,17 @@ export default function ProjectBackdrop({ project, from, onClosed, host }) {
       }
     }
     return out
-  }, [img, box, from])
+  }, [img, box, from, fit])
 
   return (
     <div
-      className={`project_backdrop${closing ? ' is-closing' : ''}`}
-      style={{ '--cell-ms': `${CELL_MS}ms` }}
+      className={`project_backdrop${closing ? ' is-closing' : ''}${DEPTH.enabled ? ' has-depth' : ''}${fit === 'contain' ? ' is-contain' : ''}`}
+      style={{
+        '--cell-ms': `${CELL_MS}ms`,
+        '--depth': DEPTH.strength,
+        '--depth-w': `${Math.round(DEPTH.width * 100)}%`,
+        '--depth-hi': DEPTH.highlight,
+      }}
       aria-hidden="true"
     >
       {media?.video ? (
@@ -130,6 +156,7 @@ export default function ProjectBackdrop({ project, from, onClosed, host }) {
         cells.map((c) => (
           <div key={c.key} className="project_cell" style={c.style}>
             <div className="project_cell_img" style={c.inner} />
+            {DEPTH.enabled && <div className="project_cell_shade" />}
           </div>
         ))
       )}

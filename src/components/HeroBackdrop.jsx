@@ -10,7 +10,7 @@ import { heroVideo } from '../data/videos.js'
  * ink, and `behind` renders under it (used for the project image backdrop).
  * `nodeId` preserves the Webflow grid-placement id that site.css targets.
  */
-export default function HeroBackdrop({ nodeId, nodeClass = '', still, sketch = false, transparent = false, behind = null, palette = null }) {
+export default function HeroBackdrop({ nodeId, nodeClass = '', still, sketch = false, transparent = false, behind = null, palette = null, lineOpacity = 1, glow = 0, pour = 0, bounce = false, trace = false }) {
   return (
     <div className="ix_parallax-scale-out-hero radius_xlarge">
       <div className="w-layout-grid hero-overlay height_100percent">
@@ -18,7 +18,7 @@ export default function HeroBackdrop({ nodeId, nodeClass = '', still, sketch = f
           <div className="text-color_on-overlay"></div>
           {behind}
           {sketch ? (
-            <GridInkBackdrop className="image_cover ix_para position_absolute" transparent={transparent} palette={palette} />
+            <GridInkBackdrop className="image_cover ix_para position_absolute" transparent={transparent} palette={palette} lineOpacity={lineOpacity} glow={glow} pour={pour} bounce={bounce} trace={trace} />
           ) : still ? (
             <img src={still} alt="" className="image_cover ix_para position_absolute" />
           ) : (

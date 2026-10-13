@@ -17,3 +17,6 @@ src/assets/projects/**/*.mov
 src/assets/projects/**/*.HEIC
 src/assets/projects/**/*.heic
 src/assets/projects/**/*.source.*
+
+# site assets (images, video)
+src/assets/
