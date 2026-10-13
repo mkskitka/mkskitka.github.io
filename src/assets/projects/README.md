@@ -32,6 +32,15 @@ One folder per project, named by the project's slug (the part of its URL after
   `src/data/projects.js`.
 - Tiles are square; the image is cropped to fit (centered), so square sources look best.
 
+## Gallery (the photo row in the project write-up; click for full screen)
+
+- Any other images in the folder become the gallery, up to four, sorted by name
+  (so `01.jpg`, `02.jpg` ... controls the order). `hero.*` and `thumb.*` are skipped.
+- For a different set or order, add `gallery: [{ src: 'a.jpg' }, { src: 'b.jpg' }]`
+  to the project in `src/data/projects.js`.
+- Browsers can't show HEIC or MOV files; convert to JPEG / MP4 first (Finder:
+  right-click, Quick Actions, Convert Image).
+
 ## Showcase (the scrolling collage lower on the page)
 
 - If the project has a `featured` list in `src/data/projects.js`, that list wins.

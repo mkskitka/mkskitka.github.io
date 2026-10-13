@@ -1,5 +1,5 @@
-// Visuals: generative pieces, each tile links out (Instagram post, video, etc.).
-// Shown as scattered single-cell tiles when VISUALS is selected on the home page.
+// Visuals: generative pieces. Shown as scattered tiles when VISUALS is selected on
+// the home page; a tile expands its image to fill the page, like a project tile.
 //
 // The tiles come from Instagram automatically: scripts/instagram-sync.mjs (run
 // daily by .github/workflows/instagram-sync.yml) fetches the newest posts, crops
@@ -7,7 +7,9 @@
 // archive on Instagram and the site follows within a day. See README
 // "Instagram visuals" for the one-time setup.
 //
-// Until the first sync has run, the placeholders below are shown instead.
+// Each entry: `image` is the thumbnail and the full-page image, `title` is the
+// panel title when it is open, `url` (the Instagram post) is kept for a future
+// link-out. Until the first sync has run, the placeholders below are shown instead.
 import instagram from './instagram.json'
 
 const placeholders = [

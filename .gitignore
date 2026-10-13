@@ -9,3 +9,11 @@ dist
 
 # Claude Code worktrees (each is its own checkout; see README "Working with multiple agents")
 .claude/worktrees/
+
+# Camera originals in project folders: not used by the site (browsers can't play them),
+# and too big for GitHub. Convert to jpeg / mp4 next to them instead.
+src/assets/projects/**/*.MOV
+src/assets/projects/**/*.mov
+src/assets/projects/**/*.HEIC
+src/assets/projects/**/*.heic
+src/assets/projects/**/*.source.*
