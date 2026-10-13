@@ -90,7 +90,7 @@ controls → Linked accounts → Facebook).
    the "Deploy to GitHub Pages" run that it kicks off finishes.
 
 Run it locally to check: `INSTAGRAM_ACCESS_TOKEN=... node scripts/instagram-sync.mjs`
-(`INSTAGRAM_MAX=12` sets how many posts to keep).
+(`INSTAGRAM_MAX=24` sets how many posts to keep).
 
 ## Where things live
 

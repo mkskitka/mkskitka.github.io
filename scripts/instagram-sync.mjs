@@ -18,7 +18,7 @@
 //   INSTAGRAM_ACCESS_TOKEN=<user token> node scripts/instagram-sync.mjs --page-token
 //
 // Options (environment):
-//   INSTAGRAM_MAX    how many posts to keep (default 12; the scattered layout
+//   INSTAGRAM_MAX    how many posts to keep (default 24; the scattered layout
 //                    only has room for roughly 15-25 tiles on a laptop screen)
 //   INSTAGRAM_SIZE   square size in px (default 800)
 //
@@ -36,7 +36,7 @@ const OUT_FILE = path.join(ROOT, 'src/data/instagram.json')
 const API = 'https://graph.facebook.com/v22.0'
 const FIELDS = 'id,caption,media_type,media_url,thumbnail_url,permalink,timestamp,children{id,media_type,media_url,thumbnail_url}'
 
-const MAX = Number(process.env.INSTAGRAM_MAX) || 12
+const MAX = Number(process.env.INSTAGRAM_MAX) || 24
 const SIZE = Number(process.env.INSTAGRAM_SIZE) || 800
 
 async function api(path, params) {
