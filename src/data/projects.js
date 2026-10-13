@@ -108,7 +108,7 @@ const projectList = [
     title: 'PGN - Immersive Mobility Rehab',
     heading: ['PGN', 'IMMERSIVE MOBILITY REHAB'],
     role: 'Visualist, Technologist',
-    mediums: 'Touch Designer, Orbbec, Mediapipe, Bodytracking, Eyetracking, LED walls, projection, lidar',
+    mediums: 'TouchDesigner, Orbbec, MediaPipe, body tracking, eye tracking, LED walls, projection, lidar',
     // One string per paragraph: description: ['First paragraph.', 'Second paragraph.']
     description: [
       'PGN is a multi-room interactive therapy system for physical, cognitive and vision rehabilitation, built for personalized health care and installed at multiple locations. Each site combines an interactive LED hallway, a full-body projection motion room and an ambient multi-sensory recharge room.',
@@ -131,9 +131,9 @@ const projectList = [
     date: '2026', // placeholder, update
     title: 'Realtor.com Savings Simulator',
     heading: ['REALTOR.COM', 'SAVINGS SIMULATOR'],
-    role: 'Visualist, Technologist', 
-    mediums: 'unity, gemini, chat-gpt, claude, midjourney, image and video generation', 
-    description: 'Worked with graphic designer to produce 16-bit style game graphics for a arcade saving simulator game for SXSW (South by South West)',
+    role: 'Visualist, Technologist',
+    mediums: 'Unity, Gemini, ChatGPT, Claude, Midjourney, image and video generation',
+    description: 'I worked with a graphic designer to produce 16-bit style game graphics for an arcade savings simulator game at SXSW (South by Southwest).',
     // Full-width strip on top, two wide screens side by side below.
     featured: [
       tile(P4, { width: '92vw', aspect: '4 / 1', top: '4vh', left: '4vw' }),
@@ -147,7 +147,7 @@ const projectList = [
     title: 'Audible Story House',
     heading: ['AUDIBLE', 'STORY HOUSE VISUALIZER'],
     role: 'Visualist, Technologist',
-    mediums: 'Touch Designer, Audio Reactive, Projection',
+    mediums: 'TouchDesigner, Audio Reactive, Projection',
     // One string per paragraph: description: ['First paragraph.', 'Second paragraph.']
     description: [
       'Audible Story House was a month-long pop-up where visitors could listen to audiobooks, with a dedicated listening room in the back. I built the audio-reactive visualizer that played in that room for the length of the pop-up.',
@@ -167,9 +167,9 @@ const projectList = [
     title: 'INTEL - The Light Keeper',
     heading: ['INTEL x SMOOTH TECH', 'THE LIGHT KEEPER'],
     role: 'Visualist, Technologist',
-    mediums: 'LED wall, Touch Designer, Body Tracking',
+    mediums: 'LED wall, TouchDesigner, Body Tracking',
     // One string per paragraph: description: ['First paragraph.', 'Second paragraph.']
-    description: ["built a rea-time performance that reacted to dancers body movement at Intel's pop up in times square."],
+    description: ["I built a real-time performance that reacted to dancers' body movement at Intel's pop-up in Times Square."],
     // Big hero screen top left, tall portrait on the right, two strips along the bottom.
     featured: [
       tile(P1, { width: '60vw', aspect: '16 / 9', top: '4vh', left: '4vw' }),
@@ -206,7 +206,7 @@ const projectList = [
     // One string per paragraph: description: ['First paragraph.', 'Second paragraph.']
     description: [
       "A personal exploration of materiality and AI.",
-      "This installation at the Clive Davis Gallery, 370 Jay Street, MetroTech, was seeded from an initial interest in the mechanisms and aesthetics of AI generated visuals and a desire to disprove tired judgements of the medium. It uses footage filmed from the perspective of a person looking out the gallery window, and generates video of flowers using a model trained on photos taken at the Brooklyn Botanic Garden in May 2024. I gravitated towards materials that created and came from physicality (painting of the scrim) and naturalness (natural light and scrim) to reframe my collaboration process with the AI algorithms.",
+      "This installation at the Clive Davis Gallery, 370 Jay Street, MetroTech, was seeded from an initial interest in the mechanisms and aesthetics of AI-generated visuals and a desire to disprove tired judgements of the medium. It uses footage filmed from the perspective of a person looking out the gallery window, and generates video of flowers using a model trained on photos taken at the Brooklyn Botanic Garden in May 2024. I gravitated towards materials that created and came from physicality (painting of the scrim) and naturalness (natural light and scrim) to reframe my collaboration process with the AI algorithms.",
       "The piece is deeply intertwined with its environment, changing brightness and opacity in response to subtle changes in the lighting both in the gallery and out on the street. The installation can be viewed from outside and from inside the gallery.",
     ],
     // Full-width panorama with two wide strips beneath.
@@ -243,7 +243,7 @@ const projectList = [
     mediums: 'React, Web, Data Visualization',
     // One string per paragraph: description: ['First paragraph.', 'Second paragraph.']
     description: [
-      "Working with artist Lizania Cruz and co-developer Matt Ross, I developed and designed a touch screen data visualization that acts as a digital archive of Lizania's ongoing research, displaying archival material and collecting museum-goers' thoughts on Frederick Douglass's involvement in US global affairs.",
+      "Working with artist Lizania Cruz and co-developer Matt Ross, I developed and designed a touch-screen data visualization that acts as a digital archive of Lizania's ongoing research, displaying archival material and collecting museum-goers' thoughts on Frederick Douglass's involvement in US global affairs.",
       "This installation, along with the web application and data visualization, was on display as part of the Open Call 2023 group exhibition at The Shed, NYC.",
       "'Evidence 071: Frederick Douglass and The Commission of Inquiry is a multimedia installation, based on Cruz's research in the Dominican Republic, that explores the role of US imperialism and asks audiences to consider their relation to ongoing processes of colonization.'",
     ],
@@ -263,11 +263,11 @@ const projectList = [
     title: 'Drunk Elephant Kiosk',
     heading: ['DRUNK ELEPHANT', 'KIOSK'],
     role: 'Visualist, Technologist',
-    mediums: 'Touch Designer, React, Web, Data Visualization, Animation',
+    mediums: 'TouchDesigner, React, Web, Data Visualization, Animation',
     // One string per paragraph: description: ['First paragraph.', 'Second paragraph.']
     description: [
-      "I worked with Volvox Labs and Drunk Elephant to update the design of an immersive hair-care quiz kiosk. Users enter information on their hair type to receive a custom hair care smoothie recommendation.",
-      "The A/V setup includes a touch screen web application running in tandem with overhead animated visuals. I contributed to upgrading the web animations and integration testing of the installation.",
+      "I worked with Volvox Labs and Drunk Elephant to update the design of an immersive hair-care quiz kiosk. Users enter information about their hair type to receive a custom hair-care smoothie recommendation.",
+      "The A/V setup includes a touch-screen web application running in tandem with overhead animated visuals. I contributed to upgrading the web animations and integration testing of the installation.",
     ],
   },
 ]
