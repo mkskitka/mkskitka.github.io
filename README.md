@@ -60,6 +60,38 @@ scripts/worktree.sh ink-tuning --remove
 `scripts/worktree.sh --list` shows all worktrees. Commit in a worktree before
 merging; uncommitted changes stay in that worktree only.
 
+## Instagram visuals
+
+The VISUALS tiles on the home page come straight from Instagram. A workflow
+(`.github/workflows/instagram-sync.yml`) runs every day: it fetches the newest
+posts, crops each one to a square in `public/images/instagram/`, writes
+`src/data/instagram.json`, commits, and redeploys. Post or archive on Instagram
+and the site follows within a day. Nothing to edit here.
+
+One-time setup. The Instagram account must be a Business (or Creator) account
+linked to a Facebook Page (Instagram app: Settings → Business tools and
+controls → Linked accounts → Facebook).
+
+1. https://developers.facebook.com/apps → **Create App**: use case **Other**,
+   type **Business**, any name. In the dashboard add the **Instagram** product.
+2. Open https://developers.facebook.com/tools/explorer, pick the app in the
+   **Meta App** dropdown. Under **Permissions** add `pages_show_list`,
+   `pages_read_engagement`, `instagram_basic`. Click **Generate Access Token**,
+   log in, and tick the Page and the Instagram account when asked.
+3. Copy the token from the explorer and make it long-lived: paste it at
+   https://developers.facebook.com/tools/debug/accesstoken → **Debug** →
+   **Extend Access Token** → copy the extended token.
+4. Turn it into a Page token that never expires, from this folder:
+   `INSTAGRAM_ACCESS_TOKEN=<extended token> node scripts/instagram-sync.mjs --page-token`
+   It prints the Page token.
+5. GitHub repo → **Settings → Secrets and variables → Actions → New repository
+   secret**: name `INSTAGRAM_ACCESS_TOKEN`, value = the Page token.
+6. **Actions → Sync Instagram visuals → Run workflow**. The tiles are live once
+   the "Deploy to GitHub Pages" run that it kicks off finishes.
+
+Run it locally to check: `INSTAGRAM_ACCESS_TOKEN=... node scripts/instagram-sync.mjs`
+(`INSTAGRAM_MAX=12` sets how many posts to keep).
+
 ## Where things live
 
 | Path | What |

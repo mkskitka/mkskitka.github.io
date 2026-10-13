@@ -1,0 +1,62 @@
+# Keeps the VISUALS tiles in step with Instagram: every day, fetch the newest
+# posts, crop them square, commit them, and redeploy. Nothing to do by hand
+# after the one-time setup in README "Instagram visuals".
+#
+# Secret:
+#   INSTAGRAM_ACCESS_TOKEN   a Page access token for the Facebook Page linked to
+#                            the Instagram account (never expires; see README).
+name: Sync Instagram visuals
+
+on:
+  schedule:
+    - cron: '17 6 * * *' # daily, 06:17 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: write # to kick the deploy workflow
+
+concurrency:
+  group: instagram-sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    env:
+      INSTAGRAM_ACCESS_TOKEN: ${{ secrets.INSTAGRAM_ACCESS_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+
+      - name: Fetch posts and crop them square
+        run: node scripts/instagram-sync.mjs
+
+      - name: Commit changes
+        id: commit
+        run: |
+          git add public/images/instagram src/data/instagram.json
+          if git diff --cached --quiet; then
+            echo "no changes"
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            git config user.name "instagram-sync"
+            git config user.email "actions@users.noreply.github.com"
+            git commit -m "Sync Instagram visuals"
+            git push
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      # Pushes made with GITHUB_TOKEN don't fire other workflows, so kick the
+      # deploy explicitly (workflow_dispatch is the one event that is allowed).
+      - name: Redeploy the site
+        if: steps.commit.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run deploy.yml --ref main

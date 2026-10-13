@@ -1,0 +1,24 @@
+// Visuals: generative pieces, each tile links out (Instagram post, video, etc.).
+// Shown as scattered single-cell tiles when VISUALS is selected on the home page.
+//
+// The tiles come from Instagram automatically: scripts/instagram-sync.mjs (run
+// daily by .github/workflows/instagram-sync.yml) fetches the newest posts, crops
+// them square into public/images/instagram/, and writes instagram.json. Post or
+// archive on Instagram and the site follows within a day. See README
+// "Instagram visuals" for the one-time setup.
+//
+// Until the first sync has run, the placeholders below are shown instead.
+import instagram from './instagram.json'
+
+const placeholders = [
+  { id: 'gem-vertahorizlines', title: 'gem vertahorizlines', url: 'https://www.instagram.com/rgb__tears/', image: '/images/Screenshot-2026-01-27-195710.png' },
+  { id: 'visual-2', title: 'Visual 02', url: 'https://www.instagram.com/rgb__tears/', image: '/images/Screenshot-2026-01-27-195937.png' },
+  { id: 'visual-3', title: 'Visual 03', url: 'https://www.instagram.com/rgb__tears/', image: '/images/792e4018-567c-4c81-8ff7-7bdc60260199.png' },
+  { id: 'visual-4', title: 'Visual 04', url: 'https://www.instagram.com/rgb__tears/', image: '/images/67918fcc-529e-4688-bdbe-9d3cf7d131e8.png' },
+  { id: 'visual-5', title: 'Visual 05', url: 'https://www.instagram.com/rgb__tears/', image: '/images/Screenshot-2026-01-27-195524.png' },
+  { id: 'visual-6', title: 'Visual 06', url: 'https://www.instagram.com/rgb__tears/', image: '/images/Screenshot-2026-01-27-195818.png' },
+  { id: 'visual-7', title: 'Visual 07', url: 'https://www.instagram.com/rgb__tears/', image: '/images/Screenshot-2026-01-27-195850.png' },
+  { id: 'visual-8', title: 'Visual 08', url: 'https://www.instagram.com/rgb__tears/', image: '/images/558e3f5c-c8fa-4baf-8b68-56791c0dbb15.png' },
+]
+
+export const visuals = instagram.length ? instagram : placeholders
