@@ -1,4 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
+import { projects } from '../data/projects.js'
 import HeroBackdrop from '../components/HeroBackdrop.jsx'
 import ProjectThumbs from '../components/ProjectThumbs.jsx'
 import ContactTiles from '../components/ContactTiles.jsx'
@@ -25,7 +27,9 @@ import { revealSections } from '../lib/animations.js'
 // the grid lines (components/ProjectBackdrop.jsx); Escape or SYSTEMS brings the
 // tiles back.
 // Clicking it again, clicking another link, or pressing Escape closes it.
-// /#systems opens the page with the grid already showing.
+// /#systems opens the page with the grid already showing; /projects/<slug> opens that
+// project straight away (over the Systems tiles), and opening or closing a project on the
+// page keeps the address bar in step, so the link there can be copied and sent.
 // Clicking SYSTEMS (to open it) sends a band of light along the grid lines, left to right;
 // clicking VISUALS pours a stream of ink/smoke into the backdrop (GridInkBackdrop SETTINGS.glow / .pour).
 // Only those menu clicks do it: coming back to the tiles from a project or visual does not.
@@ -78,6 +82,8 @@ export default function Home() {
   const [project, setProject] = useState(null)
   const [projectFrom, setProjectFrom] = useState(null)
   const [backdropMounted, setBackdropMounted] = useState(false)
+  const { slug } = useParams() // /projects/<slug>
+  const navigate = useNavigate()
   const [backdropKey, setBackdropKey] = useState(0) // bumped per opened image, so each one plays its own reveal
   // The visual reached by swiping (its index), so the tiles can follow to its screen.
   const [visualAt, setVisualAt] = useState(null)
@@ -96,7 +102,7 @@ export default function Home() {
     if (!active) return undefined
     const onKey = (e) => {
       if (e.key !== 'Escape') return
-      if (project) setProject(null) // back to the tiles first
+      if (project) closeProject() // back to the tiles first
       else setActive(null)
     }
     window.addEventListener('keydown', onKey)
@@ -120,7 +126,7 @@ export default function Home() {
       }
     }
     if (project) {
-      setProject(null) // first click while a project or visual is open: back to its tiles
+      closeProject() // first click while a project or visual is open: back to its tiles
       if (id === active) return
     }
     setActive((cur) => (cur === id ? null : id))
@@ -152,7 +158,29 @@ export default function Home() {
     setBackdropMounted(true)
     setBackdropKey((k) => k + 1)
     setVisualAt(null)
+    if (p.kind !== 'visual' && slug !== p.slug) navigate(`/projects/${p.slug}`)
   }
+
+  // Back to the tiles. A project also leaves its address, so the link is for the open one only.
+  const closeProject = () => {
+    setProject(null)
+    if (slug) navigate(active ? `/#${active}` : '/')
+  }
+
+  // Arriving at /projects/<slug> (a sent link, or the browser's back / forward buttons):
+  // open that project over the Systems tiles, asking for the password first if it has
+  // one. The address going away (back button) closes the open project.
+  useEffect(() => {
+    if (slug) {
+      if (project?.slug === slug || locked?.project.slug === slug) return
+      const p = projects.find((x) => x.slug === slug)
+      if (!p) return navigate('/', { replace: true })
+      setActive('systems')
+      openProject(p)
+    } else if (project && project.kind !== 'visual') {
+      setProject(null)
+    }
+  }, [slug]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // An open visual: step to the next (1) or previous (-1) one. Its image is revealed
   // from the side it comes in from. Stops at the first and last.
@@ -244,7 +272,7 @@ export default function Home() {
                 aria-label="Back to projects"
                 onClick={(e) => {
                   e.preventDefault()
-                  setProject(null)
+                  closeProject()
                 }}
               >
                 &lt;-
@@ -289,7 +317,14 @@ export default function Home() {
           {project && <ProjectGallery images={project.gallery ?? []} />}
         </WriteUp>
       </header>
-      <ProjectLock project={locked?.project} onUnlock={() => show(locked.project, locked.from)} onCancel={() => setLocked(null)} />
+      <ProjectLock
+        project={locked?.project}
+        onUnlock={() => show(locked.project, locked.from)}
+        onCancel={() => {
+          setLocked(null)
+          if (slug) navigate('/#systems', { replace: true }) // a sent link to a locked project, declined
+        }}
+      />
     </div>
   )
 }
