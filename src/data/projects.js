@@ -82,11 +82,14 @@ const AUTO_LAYOUTS = {
   ],
 }
 
+// How many files from a project's folder its gallery shows when it has no `gallery` list.
+const GALLERY_MAX = 8
+
 // `date` is free text shown in the write-up (e.g. '2024', 'Spring 2023', 'Oct 2022').
 // `gallery` (optional) is the list of photos for the Gallery row in the write-up:
 //   gallery: [{ src: 'photo1.jpg' }, { src: 'photo2.jpg', alt: 'Caption' }]
 // Bare file names resolve from the project's folder in src/assets/projects/<slug>/,
-// or use a full path like '/images/x.png'. Without it, the first four photos in the
+// or use a full path like '/images/x.png'. Without it, the first GALLERY_MAX photos in the
 // folder are used (any names, sorted; hero.* and thumb.* skipped); an empty folder shows no gallery.
 // `role`, `mediums` and `description` are the rest of the write-up, set on each project
 // below. A blank `mediums` leaves that row out; an empty `description` shows the
@@ -282,14 +285,14 @@ export const projects = projectList.filter((p) => !p.hidden).map((p) => {
     featured = layout ? photos.map((src, i) => ({ src, alt: '', ...layout[i] })) : []
   }
   featured = featured.map((t) => ({ ...t, src: resolveMedia(p.slug, t.src) }))
-  // Gallery: an explicit `gallery` list wins; otherwise the first four photos, gifs or
+  // Gallery: an explicit `gallery` list wins; otherwise the first GALLERY_MAX photos, gifs or
   // videos in the project's folder (hero.* and thumb.* excluded, sorted by name).
   // An empty folder means no gallery. `video` marks mp4 / webm so the gallery plays them.
   const folder = folderMedia(p.slug)
   const gallery = p.gallery
     ? p.gallery.map((g) => ({ ...g, src: resolveMedia(p.slug, g.src), video: g.video ?? isVideo(g.src) }))
     : folder.length
-      ? folder.slice(0, 4).map((m) => ({ ...m, alt: '' }))
+      ? folder.slice(0, GALLERY_MAX).map((m) => ({ ...m, alt: '' }))
       : undefined
   return {
     ...p,
