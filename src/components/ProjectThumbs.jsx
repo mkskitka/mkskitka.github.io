@@ -32,6 +32,10 @@ import { BOUNCE } from './GridInkBackdrop.jsx'
  * Idle hint (IDLE_HINT): if nothing is pressed for a few seconds, one tile gives a small
  * hop, and another after the same wait, until something is pressed.
  *
+ * `keep`: the tiles are closed only because one of them is open, so they stay scrolled
+ * where they were and come back on the same screen. `focus` (an item's index) moves
+ * them to that item's screen while closed, for when the open item was changed by swiping.
+ *
  * Thumbnails come from src/data/projects.js (`thumb`): an image, a gif, or a
  * looping muted video.
  */
@@ -64,7 +68,7 @@ const mulberry32 = (a) => () => {
 const BEAT = 60 / BOUNCE.bpm
 const BEATS = Math.max(1, Math.round((BOUNCE.seconds + 0.6) / BEAT))
 
-export default function ProjectThumbs({ open = false, onSelect, items = projects, label = 'Projects', external = false, bounce = false, titles = true }) {
+export default function ProjectThumbs({ open = false, onSelect, items = projects, label = 'Projects', external = false, bounce = false, titles = true, keep = false, focus = null }) {
   const nav = useRef(null)
   const seed = useRef(Math.floor(Math.random() * 1e9))
   const [spots, setSpots] = useState(null) // per project: { x, y, s, dx, dy } in px, or null on phones
@@ -220,6 +224,12 @@ export default function ProjectThumbs({ open = false, onSelect, items = projects
     const apply = () => {
       if (track.current) track.current.style.transform = p.cur ? `translate3d(${-p.cur}px, 0, 0)` : ''
     }
+    if (!open && keep && max > 0) {
+      // Closed because one of the tiles is open: stay scrolled where we are.
+      goBy.current = null
+      wasOpen.current = false
+      return undefined
+    }
     if (!open || max <= 0) {
       p.cur = p.target = 0 // closed (or everything fits): back to the start
       apply()
@@ -261,7 +271,7 @@ export default function ProjectThumbs({ open = false, onSelect, items = projects
     }
     const rest = () => go(Math.round(p.target / snap) * snap)
     // Just opened: start two columns to the right, so the tiles slide in from that side.
-    if (!wasOpen.current && !instant) p.cur = -2 * step
+    if (!wasOpen.current && !instant) p.cur = p.target - 2 * step
     wasOpen.current = true
     go(Math.round(p.target / snap) * snap) // after a resize: still on the grid, still in range
     goBy.current = (dir) => go(Math.round((p.target + dir * page) / snap) * snap)
@@ -331,7 +341,19 @@ export default function ProjectThumbs({ open = false, onSelect, items = projects
       window.removeEventListener('keydown', onKey)
       el?.removeEventListener('focusin', onFocus)
     }
-  }, [open, max, snap, step, page, strip?.fadeTo])
+  }, [open, keep, max, snap, step, page, strip?.fadeTo])
+
+  // While closed with an item open: if the open item changes (swiped to the next one),
+  // move to the screen that item's tile is on, so going back lands beside it.
+  useEffect(() => {
+    if (focus == null || open || max <= 0) return
+    const per = strip?.cols != null ? MAX_PER_SCREEN.desktop : MAX_PER_SCREEN.phone
+    const to = Math.min(max, Math.floor(focus / per) * page)
+    pos.current.cur = pos.current.target = to
+    if (track.current) track.current.style.transform = to ? `translate3d(${-to}px, 0, 0)` : ''
+    setNear(to)
+    setShift(Math.round(to / step))
+  }, [focus]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Idle hint: while the tiles are open and nothing has been pressed for IDLE_HINT.every
   // seconds, one tile on screen gives a small hop, then another after the same wait, to

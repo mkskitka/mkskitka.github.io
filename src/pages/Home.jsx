@@ -46,6 +46,9 @@ const flatPalette = (c) => ({ hFrom: c, hTo: c, vFrom: c, vTo: c })
 // is open)? false = no titles anywhere, just the back arrow when one is open.
 const SHOW_VISUAL_TITLES = false
 
+// An open visual: swipe left / right (or the arrow keys) for the next / previous one.
+const VISUAL_SWIPE = 50 // px a finger must travel sideways to count as a swipe
+
 const MENU = [
   { id: 'home', label: 'MK SKITKA' },
   { id: 'systems', label: 'SYSTEMS' },
@@ -75,6 +78,9 @@ export default function Home() {
   const [project, setProject] = useState(null)
   const [projectFrom, setProjectFrom] = useState(null)
   const [backdropMounted, setBackdropMounted] = useState(false)
+  const [backdropKey, setBackdropKey] = useState(0) // bumped per opened image, so each one plays its own reveal
+  // The visual reached by swiping (its index), so the tiles can follow to its screen.
+  const [visualAt, setVisualAt] = useState(null)
   const [palette, setPalette] = useState(null) // grid line colours sampled from the open project's image
   const heroRef = useRef(null)
 
@@ -144,7 +150,58 @@ export default function Home() {
     setProject(p)
     setVisualsFresh(false)
     setBackdropMounted(true)
+    setBackdropKey((k) => k + 1)
+    setVisualAt(null)
   }
+
+  // An open visual: step to the next (1) or previous (-1) one. Its image is revealed
+  // from the side it comes in from. Stops at the first and last.
+  const visualIndex = isVisual ? VISUAL_ITEMS.findIndex((v) => v.slug === project.slug) : -1
+  const stepVisual = (dir) => {
+    const next = VISUAL_ITEMS[visualIndex + dir]
+    const host = heroRef.current
+    if (visualIndex < 0 || !next || !host) return
+    setProjectFrom({ left: dir > 0 ? host.clientWidth : 0, top: host.clientHeight / 2, width: 0, height: 0 })
+    setProject(next)
+    setBackdropKey((k) => k + 1)
+    setVisualAt(visualIndex + dir)
+  }
+  const stepRef = useRef(stepVisual)
+  stepRef.current = stepVisual
+
+  useEffect(() => {
+    if (visualIndex < 0) return undefined
+    // Have the neighbours' images ready, so a swipe shows the next one straight away.
+    for (const d of [-1, 1]) {
+      const src = VISUAL_ITEMS[visualIndex + d]?.thumb?.image
+      if (src) new Image().src = src
+    }
+    let touch = null
+    const onStart = (e) => {
+      const t = e.touches[0]
+      touch = e.touches.length === 1 ? { x: t.clientX, y: t.clientY } : null
+    }
+    const onEnd = (e) => {
+      if (!touch) return
+      const t = e.changedTouches[0]
+      const dx = t.clientX - touch.x
+      const dy = t.clientY - touch.y
+      touch = null
+      if (Math.abs(dx) >= VISUAL_SWIPE && Math.abs(dx) > Math.abs(dy)) stepRef.current(dx < 0 ? 1 : -1)
+    }
+    const onKey = (e) => {
+      if (e.key === 'ArrowRight') stepRef.current(1)
+      else if (e.key === 'ArrowLeft') stepRef.current(-1)
+    }
+    window.addEventListener('touchstart', onStart, { passive: true })
+    window.addEventListener('touchend', onEnd)
+    window.addEventListener('keydown', onKey)
+    return () => {
+      window.removeEventListener('touchstart', onStart)
+      window.removeEventListener('touchend', onEnd)
+      window.removeEventListener('keydown', onKey)
+    }
+  }, [visualIndex])
 
   return (
     <div ref={root} className="home home--fixed">
@@ -167,6 +224,7 @@ export default function Home() {
           behind={
             backdropMounted && (isVisual || !isPhone) ? (
               <ProjectBackdrop
+                key={backdropKey}
                 project={project}
                 from={projectFrom}
                 host={heroRef}
@@ -212,8 +270,8 @@ export default function Home() {
             ))
           )}
         </div>
-        <ProjectThumbs open={active === 'systems' && !project} onSelect={openProject} />
-        <ProjectThumbs open={active === 'visuals' && !project} items={VISUAL_ITEMS} label="Visuals" onSelect={openProject} bounce={visualsFresh} titles={SHOW_VISUAL_TITLES} />
+        <ProjectThumbs open={active === 'systems' && !project} keep={active === 'systems' && !!project} onSelect={openProject} />
+        <ProjectThumbs open={active === 'visuals' && !project} keep={active === 'visuals' && !!project} focus={visualAt} items={VISUAL_ITEMS} label="Visuals" onSelect={openProject} bounce={visualsFresh} titles={SHOW_VISUAL_TITLES} />
         <ContactTiles open={active === 'contact'} />
         {/* MK SKITKA: the bio (src/data/about.js). A project: its write-up (src/data/projects.js). */}
         <WriteUp open={active === 'home' && !project} heading={about.heading} paragraphs={about.paragraphs} align="center" />
