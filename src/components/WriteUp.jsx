@@ -6,7 +6,8 @@ import { useLayoutEffect, useRef, useState } from 'react'
  * project's description. `lines` is a list of label/value rows shown above the
  * paragraphs (e.g. Role, Mediums); either may be empty.
  *
- * On phones the panel is capped to the space under the menu and scrolls inside.
+ * On phones the panel is capped to the space under the menu and the text scrolls inside;
+ * `children` (the project gallery) stays fixed at the bottom of the panel, outside the scroll.
  * Desktop width is a whole number of grid cells: up to --writeup-cells (custom.css),
  * but never more than fit between the menu panel and the right edge. If fewer than
  * MIN_CELLS fit (a long project title makes the panel wide), the write-up drops to
@@ -83,7 +84,7 @@ export default function WriteUp({ open = false, heading, lines = [], paragraphs 
   }, [open, heading, align])
 
   const style = place?.phone
-    ? { maxHeight: `${place.maxHeight}px`, overflowY: 'auto' }
+    ? { maxHeight: `${place.maxHeight}px` }
     : place
     ? place.below
       ? { position: 'absolute', left: place.left, top: place.top, width: `calc(var(--grid-spacing) * ${place.cells})`, margin: 0 }
@@ -92,6 +93,7 @@ export default function WriteUp({ open = false, heading, lines = [], paragraphs 
 
   return (
     <aside ref={ref} className={`writeup${open ? ' is-open' : ''}`} aria-hidden={!open} style={style}>
+      <div className="writeup_body">
       {heading && <h2 className="writeup_heading">{heading}</h2>}
       {lines.filter((l) => l.value).length > 0 && (
         <dl className="writeup_lines">
@@ -108,7 +110,8 @@ export default function WriteUp({ open = false, heading, lines = [], paragraphs 
       {paragraphs.map((p, i) => (
         <p key={i}>{p}</p>
       ))}
-      {children}
+      </div>
+      {children && <div className="writeup_foot">{children}</div>}
     </aside>
   )
 }

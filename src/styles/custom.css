@@ -677,14 +677,17 @@ a:hover,
   margin-bottom: 0;
 }
 /* Slim scrollbar when the panel has more than fits. */
-.writeup {
+.writeup,
+.writeup_body {
   scrollbar-width: thin;
   scrollbar-color: rgba(255, 255, 255, 0.35) transparent;
 }
-.writeup::-webkit-scrollbar {
+.writeup::-webkit-scrollbar,
+.writeup_body::-webkit-scrollbar {
   width: 6px;
 }
-.writeup::-webkit-scrollbar-thumb {
+.writeup::-webkit-scrollbar-thumb,
+.writeup_body::-webkit-scrollbar-thumb {
   background: rgba(255, 255, 255, 0.3);
   border-radius: 3px;
 }
@@ -709,8 +712,31 @@ a:hover,
     padding: 1rem 1.1rem;
     box-sizing: border-box;
     overflow-wrap: anywhere;
+  }
+  /* The text scrolls; the gallery (.writeup_foot) stays put at the bottom of the panel. */
+  .home .section.is-full-screen > .writeup.is-open {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .writeup_body {
+    flex: 0 1 auto;
+    min-height: 0;
+    overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     overscroll-behavior: contain;
+  }
+  .writeup_foot {
+    flex: none;
+    margin-top: 0.9em;
+    padding-top: 0.8em;
+    border-top: 1px solid rgba(255, 255, 255, 0.15);
+  }
+  .writeup_foot:empty {
+    display: none;
+  }
+  .writeup_foot .gallery {
+    margin-top: 0;
   }
 }
 
