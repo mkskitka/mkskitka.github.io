@@ -117,7 +117,7 @@ const projectList = [
       'I worked across the whole project: system architecture, sensor integration and calibration, the target and level system, real-time visuals and shaders, communication with the control panel, session recording, and on-site installation and commissioning.',
     ],
     // Password protected: see "To lock a project" above.
-    lock: '559a0feee60ed2c83dac8aee4c213220b3830c4b2117368b313785eb5f3af978',
+    lock: '9e456f26807c93ec5a495efd82c1938addaa115ab37f624d6af5e7cd212ece3a',
     // Two columns: big screen + wide strip on the left, two wide frames stacked right.
     featured: [
       tile(P1, { width: '50vw', aspect: '16 / 9', top: '4vh', left: '4vw' }),
