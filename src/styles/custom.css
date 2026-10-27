@@ -678,15 +678,18 @@ a:hover,
 }
 /* Slim scrollbar when the panel has more than fits. */
 .writeup,
+.writeup_main,
 .writeup_body {
   scrollbar-width: thin;
   scrollbar-color: rgba(255, 255, 255, 0.35) transparent;
 }
 .writeup::-webkit-scrollbar,
+.writeup_main::-webkit-scrollbar,
 .writeup_body::-webkit-scrollbar {
   width: 6px;
 }
 .writeup::-webkit-scrollbar-thumb,
+.writeup_main::-webkit-scrollbar-thumb,
 .writeup_body::-webkit-scrollbar-thumb {
   background: rgba(255, 255, 255, 0.3);
   border-radius: 3px;
@@ -699,9 +702,40 @@ a:hover,
     margin-left: var(--grid-spacing, 64px); /* one gap column after the menu panel */
     width: calc(var(--grid-spacing, 64px) * var(--writeup-cells));
     max-height: calc(100vh - var(--hero-panel-top, 0px) - var(--grid-spacing, 64px));
-    overflow: auto;
+    overflow: hidden;
     padding: calc(var(--grid-spacing, 64px) * 0.5);
     box-sizing: border-box;
+  }
+  /* Heading and lines fixed at the top, gallery (.writeup_foot) at the bottom; only the
+     paragraphs (.writeup_body) scroll. */
+  .home .section.is-full-screen > .writeup.is-open {
+    display: flex;
+    flex-direction: column;
+  }
+  .writeup_main {
+    flex: 0 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  .writeup_head {
+    flex: none;
+  }
+  .writeup_body {
+    flex: 0 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding-right: 6px; /* room for the scrollbar beside the text */
+  }
+  .writeup_foot {
+    flex: none;
+    margin-top: 0.9em;
+    padding-top: 0.8em;
+    border-top: 1px solid rgba(255, 255, 255, 0.15);
+  }
+  .writeup_foot .gallery {
+    margin-top: 0;
   }
 }
 @media (max-width: 767px) {
@@ -713,13 +747,14 @@ a:hover,
     box-sizing: border-box;
     overflow-wrap: anywhere;
   }
-  /* The text scrolls; the gallery (.writeup_foot) stays put at the bottom of the panel. */
+  /* The heading and text scroll together; the gallery (.writeup_foot) stays put at the
+     bottom of the panel. */
   .home .section.is-full-screen > .writeup.is-open {
     display: flex;
     flex-direction: column;
     overflow: hidden;
   }
-  .writeup_body {
+  .writeup_main {
     flex: 0 1 auto;
     min-height: 0;
     overflow-y: auto;

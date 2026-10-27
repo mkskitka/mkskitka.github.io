@@ -6,8 +6,10 @@ import { useLayoutEffect, useRef, useState } from 'react'
  * project's description. `lines` is a list of label/value rows shown above the
  * paragraphs (e.g. Role, Mediums); either may be empty.
  *
- * On phones the panel is capped to the space under the menu and the text scrolls inside;
- * `children` (the project gallery) stays fixed at the bottom of the panel, outside the scroll.
+ * Only the paragraphs scroll when there is more than fits: the heading and `lines` stay
+ * at the top and `children` (the project gallery) at the bottom. On phones the heading
+ * scrolls away with the text (the screen is short), and the panel is capped to the
+ * space under the menu.
  * Desktop width is a whole number of grid cells: up to --writeup-cells (custom.css),
  * but never more than fit between the menu panel and the right edge. If fewer than
  * MIN_CELLS fit (a long project title makes the panel wide), the write-up drops to
@@ -49,6 +51,8 @@ export default function WriteUp({ open = false, heading, lines = [], paragraphs 
       const panelRight = pr ? pr.right - secRect.left : 0
       const panelBottom = pr ? pr.bottom - secRect.top : 0
       const fit = Math.floor((secRect.width - panelRight - s) / s) // cells to the right, after one gap column
+      // Tallest the panel may be: from where it sits to one gap row above the page bottom.
+      const capFrom = (top) => Math.max(160, Math.floor(secRect.height - top - s))
       if (fit >= MIN_CELLS) {
         let cells = Math.min(want, fit)
         // Whole columns between the panel's right edge and the last grid line on screen.
@@ -61,13 +65,13 @@ export default function WriteUp({ open = false, heading, lines = [], paragraphs 
           if ((free - cells) % 2) cells += free - cells - 1 >= 2 ? 1 : -1 // same gap both sides
           gap = Math.max(1, (free - cells) / 2)
         }
-        setPlace({ cells, gap, below: false, top: 0 })
+        setPlace({ cells, gap, below: false, top: 0, maxHeight: capFrom(el.getBoundingClientRect().top - secRect.top) })
       }
       else {
         // Under the panel: left edge on the panel's left edge, one gap row below it.
         const pl = pr ? pr.left - secRect.left : s / 2
         const maxCells = Math.floor((secRect.width - pl - s / 2) / s)
-        setPlace({ cells: Math.min(want + 2, maxCells), below: true, top: panelBottom + s, left: pl })
+        setPlace({ cells: Math.min(want + 2, maxCells), below: true, top: panelBottom + s, left: pl, maxHeight: capFrom(panelBottom + s) })
       }
     }
     measure()
@@ -87,13 +91,14 @@ export default function WriteUp({ open = false, heading, lines = [], paragraphs 
     ? { maxHeight: `${place.maxHeight}px` }
     : place
     ? place.below
-      ? { position: 'absolute', left: place.left, top: place.top, width: `calc(var(--grid-spacing) * ${place.cells})`, margin: 0 }
-      : { width: `calc(var(--grid-spacing) * ${place.cells})`, marginLeft: `calc(var(--grid-spacing) * ${place.gap})` }
+      ? { position: 'absolute', left: place.left, top: place.top, width: `calc(var(--grid-spacing) * ${place.cells})`, margin: 0, maxHeight: `${place.maxHeight}px` }
+      : { width: `calc(var(--grid-spacing) * ${place.cells})`, marginLeft: `calc(var(--grid-spacing) * ${place.gap})`, maxHeight: `${place.maxHeight}px` }
     : undefined
 
   return (
     <aside ref={ref} className={`writeup${open ? ' is-open' : ''}`} aria-hidden={!open} style={style}>
-      <div className="writeup_body">
+      <div className="writeup_main">
+      <div className="writeup_head">
       {heading && <h2 className="writeup_heading">{heading}</h2>}
       {lines.filter((l) => l.value).length > 0 && (
         <dl className="writeup_lines">
@@ -107,9 +112,12 @@ export default function WriteUp({ open = false, heading, lines = [], paragraphs 
             ))}
         </dl>
       )}
+      </div>
+      <div className="writeup_body">
       {paragraphs.map((p, i) => (
         <p key={i}>{p}</p>
       ))}
+      </div>
       </div>
       {children && <div className="writeup_foot">{children}</div>}
     </aside>
