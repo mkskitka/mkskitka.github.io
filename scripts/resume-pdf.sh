@@ -1,5 +1,5 @@
 #!/bin/sh
-# Export the resume (or the CV) to PDF with headless Chrome (A4, no margins,
+# Export the resume (or the CV) to PDF with headless Chrome (Letter, no margins,
 # colours kept). Usage:
 #   sh scripts/resume-pdf.sh [out.pdf] [dark|light] [source.html]
 # Defaults: ~/Desktop/MK_Skitka_Resume_<month_day>.pdf, dark, resume/resume.html.

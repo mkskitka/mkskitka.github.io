@@ -66,6 +66,12 @@ export default function Resume() {
                       &nbsp;·&nbsp; <a href={`https://${d.linkedin}`}>LinkedIn</a>
                     </>
                   )}
+                  {d.instagram && (
+                    <>
+                      {' '}
+                      &nbsp;·&nbsp; <a href={`https://${d.instagram}`}>Instagram</a>
+                    </>
+                  )}
                 </div>
               </header>
 
@@ -108,16 +114,6 @@ export default function Resume() {
                   </section>
 
                   <section>
-                    <h2>Education</h2>
-                    {d.education.map((e) => (
-                      <div className="entry" key={e.degree}>
-                        <h3 className="entry_title">{e.degree}</h3>
-                        <span className="entry_when">{e.when}</span>
-                      </div>
-                    ))}
-                  </section>
-
-                  <section>
                     <h2>Employment History</h2>
                     {d.jobs.map((j) => (
                       <div className="entry" key={j.title + j.when}>
@@ -130,6 +126,29 @@ export default function Resume() {
                             ))}
                           </ul>
                         )}
+                        {(j.sub || []).map((s) => (
+                          <div className="entry entry_sub" key={s.title + s.when}>
+                            <h3 className="entry_title">{s.title}</h3>
+                            <span className="entry_when">{s.when}</span>
+                            {s.bullets.length > 0 && (
+                              <ul>
+                                {s.bullets.map((b, i) => (
+                                  <li key={i}>{rich(bulletText(b))}</li>
+                                ))}
+                              </ul>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    ))}
+                  </section>
+
+                  <section>
+                    <h2>Education</h2>
+                    {d.education.map((e) => (
+                      <div className="entry" key={e.degree}>
+                        <h3 className="entry_title">{e.degree}</h3>
+                        <span className="entry_when">{e.when}</span>
                       </div>
                     ))}
                   </section>

@@ -106,7 +106,7 @@ drawGrid()
     say('Exporting PDF…', false)
     try {
       const theme = root.classList.contains('light') ? 'light' : 'dark'
-      const j = await post('/export', JSON.stringify({ theme, doc: document.body.classList.contains('cv') ? 'cv' : 'resume' }))
+      const j = await post('/export', JSON.stringify({ theme, doc: document.body.dataset.doc || 'resume' }))
       say('Wrote ' + j.file.replace(/^.*\/Desktop\//, '~/Desktop/'), false)
     } catch (e) {
       say('Export failed: ' + e.message, true)

@@ -297,3 +297,16 @@
 .writeup_link:hover {
   opacity: 1;
 }
+
+/* Sub-entries: contracts nested under a freelance heading */
+.resume_page .entry_sub {
+  margin: 0.6em 0 0 0.9em;
+  padding-left: 0.8em;
+  border-left: 1px solid rgba(255, 255, 255, 0.12);
+}
+.resume_page .entry_sub:last-child {
+  margin-bottom: 0;
+}
+.resume_page .entry_sub .entry_title {
+  font-size: 0.95rem;
+}

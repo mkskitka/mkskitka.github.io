@@ -76,9 +76,10 @@ http
       } else if (req.method === 'POST' && url.pathname === '/export') {
         const { theme, doc } = JSON.parse((await body(req)) || '{}')
         const stamp = new Date().toLocaleDateString('en-US', { month: '2-digit', day: '2-digit' }).replace('/', '_')
-        const which = doc === 'cv' ? 'CV' : 'Resume'
+        const name = /^[a-z][a-z0-9-]*$/.test(doc || '') ? doc : 'resume'
+        const which = name === 'cv' ? 'CV' : name === 'resume' ? 'Resume' : `Resume_${name.replace(/^resume-/, '')}`
         const out = path.join(process.env.HOME, 'Desktop', `MK_Skitka_${which}_${stamp}${theme === 'light' ? '_light' : ''}.pdf`)
-        const args = [path.join(ROOT, 'scripts', 'resume-pdf.sh'), out, theme === 'light' ? 'light' : 'dark', doc === 'cv' ? 'resume/cv.html' : 'resume/resume.html']
+        const args = [path.join(ROOT, 'scripts', 'resume-pdf.sh'), out, theme === 'light' ? 'light' : 'dark', `resume/${name}.html`]
         execFile('sh', args, (err, stdout, stderr) => {
           if (err) return json(res, 500, { error: String(stderr || err) })
           json(res, 200, { ok: true, file: out })

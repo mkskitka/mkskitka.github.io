@@ -4,15 +4,15 @@
    vertical lines blue -> pink (the site's 'mk-original' palette), white
    Open Sans text, and translucent panels sitting on the grid.
 
-   Export: sh scripts/resume-pdf.sh   (headless Chrome, A4, no margins)
+   Export: sh scripts/resume-pdf.sh   (headless Chrome, Letter, no margins)
    Light version for printing: add ?theme=light to the address, or
    body.light.
    ------------------------------------------------------------------ */
 :root {
-  --page-w: 210mm;
-  --page-h: 297mm;
-  --cell-x: 10.5mm; /* 20 columns across the page */
-  --cell-y: 11mm; /* 27 rows down the page */
+  --page-w: 215.9mm; /* US Letter */
+  --page-h: 279.4mm;
+  --cell-x: 10.795mm; /* 20 columns across the page */
+  --cell-y: 10.746mm; /* 26 rows down the page */
   --line-w: 1.1px; /* the site's grid line weight */
 
   --bg: #0c0c0e;
@@ -52,8 +52,8 @@ body {
   background: transparent; /* the grid is on html */
   color: var(--text);
   font-family: 'Open Sans', Helvetica, Arial, sans-serif;
-  font-size: 8.9pt;
-  line-height: 1.42;
+  font-size: 8.8pt;
+  line-height: 1.33;
   font-weight: 400;
   -webkit-print-color-adjust: exact;
   print-color-adjust: exact;
@@ -107,7 +107,7 @@ html {
   align-items: flex-end;
   gap: var(--cell-x);
   padding: calc(var(--cell-y) * 0.75) calc(var(--cell-x) * 0.75);
-  margin-bottom: var(--cell-y);
+  margin-bottom: calc(var(--cell-y) * 0.6);
   break-inside: avoid;
 }
 .head_name {
@@ -154,6 +154,16 @@ html {
   column-gap: var(--cell-x);
   align-items: start;
 }
+/* The main column comes first in the markup (so parsers read the profile and
+   experience before the skills list); the grid still draws the sidebar on the left. */
+.cols .side {
+  grid-column: 1;
+  grid-row: 1;
+}
+.cols .main {
+  grid-column: 2;
+  grid-row: 1;
+}
 
 /* Section headings: the write-up panel's heading style, with a short
    gradient rule under it (a piece of the grid). */
@@ -177,7 +187,7 @@ h2::after {
   background: linear-gradient(to right, var(--red), var(--teal));
 }
 section {
-  margin-bottom: calc(var(--cell-y) * 0.6);
+  margin-bottom: calc(var(--cell-y) * 0.42);
 }
 
 /* Labels: the write-up's dt style */
@@ -232,7 +242,7 @@ section {
   margin-bottom: 0;
 }
 .entry {
-  margin-bottom: 6pt;
+  margin-bottom: 4pt;
 }
 .entry_title,
 .entry_when {
@@ -254,7 +264,7 @@ section {
 }
 .entry_when {
   display: block;
-  margin: 1pt 0 3pt;
+  margin: 1pt 0 2pt;
   font-size: 7.6pt;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -268,7 +278,7 @@ section {
 .entry li {
   position: relative;
   padding-left: 11pt;
-  margin: 0 0 2pt;
+  margin: 0 0 1.5pt;
   color: var(--text-soft);
 }
 .entry li::before {
@@ -288,7 +298,7 @@ section {
 .teaching li {
   position: relative;
   padding-left: 54pt; /* hanging indent: wrapped lines line up with the text, not the year */
-  margin: 0 0 4pt;
+  margin: 0 0 3pt;
   color: var(--text-soft);
 }
 .teaching .year {
@@ -302,7 +312,7 @@ section {
 }
 
 @page {
-  size: A4;
+  size: Letter;
   margin: var(--cell-y) 0; /* one grid row top and bottom on every page */
 }
 @media print {
@@ -399,4 +409,19 @@ em {
 }
 .teaching .year:empty::before {
   content: '\00a0';
+}
+
+/* Sub-entries: contracts nested under a freelance heading */
+.entry_sub {
+  margin: 5pt 0 0 calc(var(--cell-x) * 0.6);
+  padding-left: calc(var(--cell-x) * 0.4);
+  border-left: 1px solid var(--panel-edge);
+}
+.entry_sub .entry_title {
+  font-size: 9.2pt;
+}
+
+/* A sub-heading inside a section (the workshop list under Teaching Experience). */
+.list_heading {
+  margin: 8pt 0 2pt;
 }

@@ -11,78 +11,23 @@
   <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="resume.css" />
 </head>
-<body class="cv">
+<body class="cv" data-doc="cv">
   <div class="page">
     <!-- page:start -->
     <header class="head panel">
       <div>
         <h1 class="head_name" data-path="name">Mary Kate Skitka</h1>
-        <p class="head_title" data-path="title">Creative Technologist, Developer &amp; Educator</p>
+        <p class="head_title" data-path="title">Creative Technologist</p>
       </div>
       <div class="head_contact">
         <span data-path="location">Brooklyn, NY</span><br>
         <a href="tel:7179799564" data-path="phone">(717) 979-9564</a> &nbsp;·&nbsp;
         <a href="mailto:mkskitka@gmail.com" data-path="email">mkskitka@gmail.com</a><br>
-        <a class="head_site" href="https://mkskitka.com/">mkskitka.com</a>
+        <a class="head_site" href="https://mkskitka.com/">mkskitka.com</a> &nbsp;·&nbsp; <a href="https://www.linkedin.com/in/mary-kate-skitka-6b6051135">LinkedIn</a> &nbsp;·&nbsp; <a href="https://www.instagram.com/rgb__tears">Instagram</a>
       </div>
     </header>
 
     <div class="cols">
-      <aside class="side panel">
-        <section>
-          <h2>Technical Skills</h2>
-          <dl class="skills">
-            <div class="skill_group" data-list="skills.0.items" data-tag="dd">
-              <dt data-path="skills.0.group">Real-Time &amp; Creative Coding</dt>
-              <dd>TouchDesigner</dd>
-              <dd>GLSL shaders</dd>
-              <dd>Three.js</dd>
-              <dd>p5.js, Processing</dd>
-              <dd>Unity</dd>
-            </div>
-            <div class="skill_group" data-list="skills.1.items" data-tag="dd">
-              <dt data-path="skills.1.group">Generative AI</dt>
-              <dd>ComfyUI</dd>
-              <dd>Stable Diffusion, custom-trained models</dd>
-              <dd>Midjourney</dd>
-              <dd>Claude, Gemini and ChatGPT APIs</dd>
-            </div>
-            <div class="skill_group" data-list="skills.2.items" data-tag="dd">
-              <dt data-path="skills.2.group">Sensors &amp; Tracking</dt>
-              <dd>Body and eye tracking</dd>
-              <dd>MediaPipe, Teachable Machine</dd>
-              <dd>Orbbec depth cameras</dd>
-              <dd>Lidar</dd>
-              <dd>Audio-reactive systems</dd>
-            </div>
-            <div class="skill_group" data-list="skills.3.items" data-tag="dd">
-              <dt data-path="skills.3.group">Installation &amp; Hardware</dt>
-              <dd>Projection mapping</dd>
-              <dd>LED walls</dd>
-              <dd>A/V Systems &amp; Live Media</dd>
-              <dd>Physical Computing, Arduino</dd>
-            </div>
-            <div class="skill_group" data-list="skills.4.items" data-tag="dd">
-              <dt data-path="skills.4.group">Web &amp; Data Visualization</dt>
-              <dd>React.js, Next.js</dd>
-              <dd>D3.js</dd>
-              <dd>HTML/CSS/JavaScript</dd>
-              <dd>Node.js, SQL</dd>
-            </div>
-            <div class="skill_group" data-list="skills.5.items" data-tag="dd">
-              <dt data-path="skills.5.group">Languages</dt>
-              <dd>Python</dd>
-              <dd>JavaScript</dd>
-              <dd>C++, C#</dd>
-            </div>
-            <div class="skill_group" data-list="skills.6.items" data-tag="dd">
-              <dt data-path="skills.6.group">Tools</dt>
-              <dd>Git/GitHub</dd>
-            </div>
-          </dl>
-        </section>
-      </aside>
-
       <main class="main panel">
         <section>
           <h2>Profile</h2>
@@ -94,66 +39,68 @@
           <div class="entry">
             <h3 class="entry_title" data-path="jobs.0.title">Freelance Creative Technologist, Brooklyn, NY</h3>
             <span class="entry_when" data-path="jobs.0.when">September 2022 — Present</span>
-            <ul data-list="jobs.0.bullets" data-tag="li">
-              <li>Build real-time visual systems for installations, live performance and brand activations, as a regular collaborator of studios including Smooth Technology and Volvox Labs</li>
-              <li>Designed and developed a real-time generative AI video system with Volvox Labs for artist Fatimah Tuggar's Creampods at the 2024 Venice Biennale, producing days of unique content</li>
-              <li>Designed and developed a touch-screen data visualization and digital archive for artist Lizania Cruz's Evidence 071, shown in The Shed's Open Call 2023 exhibition</li>
-            </ul>
-          </div>
-
-          <div class="entry">
-            <h3 class="entry_title" data-path="jobs.1.title">Creative Technologist (Contract), Studio Elsewhere, Brooklyn, NY</h3>
-            <span class="entry_when" data-path="jobs.1.when">April 2026 — October 2026</span>
-            <ul data-list="jobs.1.bullets" data-tag="li">
-              <li>Architected and built PGN, a three-room interactive rehabilitation system (LED hallway, full-body projection room, multi-sensory recharge room) installed at multiple clinical sites</li>
+          <div class="entry entry_sub">
+            <h3 class="entry_title" data-path="jobs.0.sub.0.title">Studio Elsewhere (contract), Brooklyn, NY</h3>
+            <span class="entry_when" data-path="jobs.0.sub.0.when">April 2026 — October 2026</span>
+            <ul data-list="jobs.0.sub.0.bullets" data-tag="li">
+              <li>Architected and built PGN, a three-room interactive rehabilitation system (LED hallway, full-body projection room, multi-sensory recharge room) installed at two sites, including a child’s home for personalized care</li>
               <li>Designed a single TouchDesigner system that configures itself for different rooms and display types, and unified markerless motion capture, depth cameras, lidar and camera-based body and eye tracking into one common tracking pipeline</li>
               <li>Designed and built a level and target system that lets clinicians create reproducible, game-like tests to track vision and mobility progress</li>
               <li>Developed neuroscience-backed real-time visuals for every room</li>
             </ul>
           </div>
 
-          <div class="entry">
-            <h3 class="entry_title" data-path="jobs.2.title">Creative Technologist (Contract), Smooth Technology</h3>
-            <span class="entry_when" data-path="jobs.2.when">November 2025 — May 2026</span>
-            <ul data-list="jobs.2.bullets" data-tag="li">
-              <li>A mix of weekly studio hours and fixed-price project work, mostly real-time visuals, across three client builds</li>
+          <div class="entry entry_sub">
+            <h3 class="entry_title" data-path="jobs.0.sub.1.title">Smooth Technology (contract), Brooklyn, NY</h3>
+            <span class="entry_when" data-path="jobs.0.sub.1.when">November 2025 — May 2026</span>
+            <ul data-list="jobs.0.sub.1.bullets" data-tag="li">
               <li>Audible Story House (March to May 2026): built the audio-reactive visualizer for the listening room of the month-long pop-up, plus a web interface brand ambassadors used to adjust the visuals live</li>
-              <li>Realtor.com Savings Simulator at SXSW (early 2026): produced the 16-bit game graphics for an arcade savings game, with a graphic designer</li>
-              <li>Intel, The Light Keeper (late 2025): built a real-time visual performance driven by dancers' body movement for Intel's pop-up in Times Square</li>
+              <li>Realtor.com Savings Simulator, SXSW (March 2026): produced the 16-bit game graphics for an arcade savings game, with a graphic designer</li>
+              <li>Intel, The Light Keeper (November to December 2025): built a real-time visual performance driven by dancers' body movement for Intel's pop-up in Times Square</li>
             </ul>
           </div>
 
+          <div class="entry entry_sub">
+            <h3 class="entry_title" data-path="jobs.0.sub.2.title">Artist commissions</h3>
+            <span class="entry_when" data-path="jobs.0.sub.2.when">2023 — Present</span>
+            <ul data-list="jobs.0.sub.2.bullets" data-tag="li">
+              <li>Designed and developed a real-time generative AI video system with Volvox Labs for artist Fatimah Tuggar's Creampods at the 2024 Venice Biennale, producing days of unique content</li>
+              <li>Designed and developed a touch-screen data visualization and digital archive for artist Lizania Cruz's Evidence 071, shown in The Shed's Open Call 2023 exhibition</li>
+            </ul>
+          </div>
+          </div>
+
           <div class="entry">
-            <h3 class="entry_title" data-path="jobs.3.title">Adjunct Instructor, New York University, Brooklyn, NY</h3>
-            <span class="entry_when" data-path="jobs.3.when">January 2025 — March 2025</span>
-            <ul data-list="jobs.3.bullets" data-tag="li">
+            <h3 class="entry_title" data-path="jobs.1.title">Adjunct Instructor, New York University, Brooklyn, NY</h3>
+            <span class="entry_when" data-path="jobs.1.when">January 2025 — March 2025</span>
+            <ul data-list="jobs.1.bullets" data-tag="li">
               <li>Designed and taught Immersivity Beyond the Display, an undergraduate Interactive Media Arts (IMA) course exploring immersivity in new media and installation</li>
             </ul>
           </div>
 
           <div class="entry">
-            <h3 class="entry_title" data-path="jobs.4.title">Research Fellow, New York University, Brooklyn, NY</h3>
-            <span class="entry_when" data-path="jobs.4.when">August 2023 — August 2024</span>
-            <ul data-list="jobs.4.bullets" data-tag="li">
-              <li>Managed the Coding Lab to support student project work</li>
+            <h3 class="entry_title" data-path="jobs.2.title">Research Fellow, New York University, Brooklyn, NY</h3>
+            <span class="entry_when" data-path="jobs.2.when">August 2023 — August 2024</span>
+            <ul data-list="jobs.2.bullets" data-tag="li">
+              <li>Managed the ITP/IMA Coding Lab, serving the programs’ roughly 350 students and open to all of NYU</li>
               <li>Supported both undergraduate and graduate students in foundation classes and thesis</li>
             </ul>
           </div>
 
           <div class="entry">
-            <h3 class="entry_title" data-path="jobs.5.title">Software Engineer, Charles River Analytics, Cambridge, MA</h3>
-            <span class="entry_when" data-path="jobs.5.when">August 2018 — August 2022</span>
-            <ul data-list="jobs.5.bullets" data-tag="li">
-              <li>Built web-based visualizations and tools to aid scientists and clients in cutting-edge AI research</li>
-              <li>Managed up to 6 different projects at a time successfully meeting aggressive software deliverable deadlines</li>
+            <h3 class="entry_title" data-path="jobs.3.title">Software Engineer, Charles River Analytics, Cambridge, MA</h3>
+            <span class="entry_when" data-path="jobs.3.when">August 2018 — August 2022</span>
+            <ul data-list="jobs.3.bullets" data-tag="li">
+              <li>Built web-based visualization and analysis tools for scientists and government clients on AI research contracts under the federal SBIR program</li>
+              <li>Managed up to 6 concurrent projects to deadline; contributed to proposals and quarterly research status reports</li>
             </ul>
           </div>
 
           <div class="entry">
-            <h3 class="entry_title" data-path="jobs.6.title">Web Developer, Massachusetts Institute of Technology (MIT), Cambridge, MA</h3>
-            <span class="entry_when" data-path="jobs.6.when">November 2016 — April 2017</span>
-            <ul data-list="jobs.6.bullets" data-tag="li">
-              <li>Implemented versatile, data-rich visualizations of lobbying research, readable by both experts and the public</li>
+            <h3 class="entry_title" data-path="jobs.4.title">Web Developer, Massachusetts Institute of Technology (MIT), Cambridge, MA</h3>
+            <span class="entry_when" data-path="jobs.4.when">November 2016 — April 2017</span>
+            <ul data-list="jobs.4.bullets" data-tag="li">
+              <li>Built the Industry Level Analysis visualization for LobbyView, Professor In Song Kim’s MIT research project on federal lobbying data, making the dataset readable by both experts and the public; still live at lobbyview.org</li>
             </ul>
           </div>
         </section>
@@ -162,12 +109,12 @@
           <h2>Education</h2>
           <div class="entry">
             <h3 class="entry_title" data-path="education.0.degree">MPS, Creative Technology, Interactive Telecommunications Program (ITP), New York University (NYU)</h3>
-            <span class="entry_when" data-path="education.0.when">2021 — 2023</span>
+            <span class="entry_when" data-path="education.0.when">September 2021 — May 2023</span>
           </div>
 
           <div class="entry">
             <h3 class="entry_title" data-path="education.1.degree">BS, Double Major in Cognitive Brain Science and Computer Science, Tufts University</h3>
-            <span class="entry_when" data-path="education.1.when">2014 — 2018</span>
+            <span class="entry_when" data-path="education.1.when">September 2014 — May 2018</span>
           </div>
         </section>
 
@@ -185,7 +132,7 @@
         <section>
           <h2>Commissions &amp; Commercial Work</h2>
           <ul class="teaching" data-list="cv.1.items" data-kind="year" data-tag="li">
-            <li><span class="year">2026</span>PGN, Studio Elsewhere. Multi-room interactive rehabilitation system, installed at clinical sites (see Professional Experience)</li>
+            <li><span class="year">2026</span>PGN, Studio Elsewhere. Multi-room interactive rehabilitation system, installed at two sites, including a family home (see Professional Experience)</li>
             <li><span class="year">2026</span>Realtor.com Savings Simulator, SXSW, Austin. 16-bit game graphics for an arcade savings game, with Smooth Technology</li>
             <li><span class="year">2026</span>Audible Story House, New York. Audio-reactive visualizer for the listening room and a web interface for brand ambassadors, with Smooth Technology</li>
             <li><span class="year">2025</span><em>End of Signal</em>, Cezar Mocan. Live-rendered AI visuals system for the installation; the project won the SOLO AI '25 award and has shown across multiple venues</li>
@@ -223,6 +170,57 @@
           </ul>
         </section>
       </main>
+
+      <aside class="side panel">
+        <section>
+          <h2>Technical Skills</h2>
+          <dl class="skills">
+            <div class="skill_group" data-list="skills.0.items" data-tag="dd">
+              <dt data-path="skills.0.group">Real-Time &amp; Creative Coding</dt>
+              <dd>TouchDesigner</dd>
+              <dd>GLSL shaders</dd>
+              <dd>Three.js</dd>
+              <dd>p5.js, Processing</dd>
+              <dd>Unity</dd>
+              <dd>Audio-reactive systems</dd>
+            </div>
+            <div class="skill_group" data-list="skills.1.items" data-tag="dd">
+              <dt data-path="skills.1.group">Generative AI</dt>
+              <dd>ComfyUI</dd>
+              <dd>Stable Diffusion, custom-trained models</dd>
+              <dd>Midjourney</dd>
+              <dd>Claude, Gemini and OpenAI APIs</dd>
+            </div>
+            <div class="skill_group" data-list="skills.2.items" data-tag="dd">
+              <dt data-path="skills.2.group">Sensors &amp; Tracking</dt>
+              <dd>Body and eye tracking</dd>
+              <dd>MediaPipe, Teachable Machine</dd>
+              <dd>Orbbec depth cameras</dd>
+              <dd>Lidar</dd>
+            </div>
+            <div class="skill_group" data-list="skills.3.items" data-tag="dd">
+              <dt data-path="skills.3.group">Installation &amp; Hardware</dt>
+              <dd>Projection mapping</dd>
+              <dd>LED walls</dd>
+              <dd>A/V Systems &amp; Live Media</dd>
+              <dd>Physical Computing, Arduino</dd>
+            </div>
+            <div class="skill_group" data-list="skills.4.items" data-tag="dd">
+              <dt data-path="skills.4.group">Web &amp; Data Visualization</dt>
+              <dd>React.js, Next.js</dd>
+              <dd>D3.js</dd>
+              <dd>HTML/CSS/JavaScript</dd>
+              <dd>Node.js, SQL</dd>
+              <dd>Git/GitHub</dd>
+            </div>
+            <div class="skill_group" data-list="skills.5.items" data-tag="dd">
+              <dt data-path="skills.5.group">Languages</dt>
+              <dd>Python</dd>
+              <dd>C++, C#</dd>
+            </div>
+          </dl>
+        </section>
+      </aside>
     </div>
     <!-- page:end -->
   </div>
