@@ -107,7 +107,7 @@ const GALLERY_MAX = 8
 const projectList = [
   {
     slug: 'pgn-immersive-mobility-rehab',
-    date: '2025', // placeholder, update
+    date: '2026',
     title: 'PGN - Immersive Mobility Rehab',
     heading: ['PGN', 'IMMERSIVE MOBILITY REHAB'],
     role: 'Visualist, Technologist',
@@ -131,7 +131,7 @@ const projectList = [
   },
   {
     slug: 'realtor-savings-simulator',
-    date: '2026', // placeholder, update
+    date: '2026',
     title: 'Realtor.com Savings Simulator',
     heading: ['REALTOR.COM', 'SAVINGS SIMULATOR'],
     role: 'Visualist, Technologist',
@@ -146,7 +146,7 @@ const projectList = [
   },
   {
     slug: 'audible-popup-visualizer',
-    date: '2024', // placeholder, update
+    date: '2026',
     title: 'Audible Story House',
     heading: ['AUDIBLE', 'STORY HOUSE VISUALIZER'],
     role: 'Visualist, Technologist',
@@ -166,7 +166,7 @@ const projectList = [
   },
   {
     slug: 'intel-the-light-keeper',
-    date: '2023', // placeholder, update
+    date: '2025',
     title: 'INTEL - The Light Keeper',
     heading: ['INTEL x SMOOTH TECH', 'THE LIGHT KEEPER'],
     role: 'Visualist, Technologist',
@@ -262,7 +262,7 @@ const projectList = [
     // Files live in src/assets/projects/DE-Kiosk/ (the folder name is the slug):
     // thumb.jpg is the tile, hero.mp4 + hero.jpg the full-page backdrop, 01.jpg the gallery.
     slug: 'DE-Kiosk',
-    date: '2025', // placeholder, update
+    date: '2023',
     title: 'Drunk Elephant Kiosk',
     heading: ['DRUNK ELEPHANT', 'KIOSK'],
     role: 'Visualist, Technologist',

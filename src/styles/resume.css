@@ -1,0 +1,296 @@
+/* /resume (pages/Resume.jsx): the resume on the site's grid backdrop, in the site's
+   frosted glass panels. The markup comes from resume/resume.html; the class names
+   below are that file's. Sizes follow the backdrop grid (--grid-spacing, set on the
+   section by GridInkBackdrop) so panel edges and gaps sit on the lines. */
+.resume_section {
+  position: relative;
+  color: #fff;
+}
+
+/* The page scrolls in here; the window itself never scrolls on this site. */
+.resume_scroll {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.35) transparent;
+}
+.resume_scroll::-webkit-scrollbar {
+  width: 6px;
+}
+.resume_scroll::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 3px;
+}
+
+.resume_doc {
+  --cell: var(--grid-spacing, 64px);
+  box-sizing: border-box;
+  width: min(100%, 1040px);
+  margin: 0 auto;
+  padding: var(--cell) calc(var(--cell) * 0.5) calc(var(--cell) * 1.5);
+  font-family: var(--_typography---font--body-font, 'Open Sans', sans-serif);
+  font-size: 0.95rem;
+  line-height: 1.55;
+}
+
+/* Back arrow and PDF link, in the hero menu's voice. */
+.resume_nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin: 0 0 calc(var(--cell) * 0.5);
+}
+.resume_back,
+.resume_pdf {
+  color: #fff;
+  text-decoration: none;
+  font-weight: var(--panel-text-weight, 500);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  opacity: 0.6;
+  transition: opacity 0.2s ease;
+  touch-action: manipulation;
+}
+.resume_back {
+  font-size: 1.6rem;
+  letter-spacing: var(--panel-text-tracking, -0.015em);
+  line-height: 1;
+}
+.resume_pdf {
+  font-size: 0.85rem;
+}
+.resume_back:hover,
+.resume_pdf:hover {
+  opacity: 1;
+}
+
+/* The glass: same recipe as the menu and write-up panels. */
+.resume_page .panel {
+  box-sizing: border-box;
+  background-color: var(--glass-tint);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.14);
+  padding: calc(var(--cell) * 0.5);
+}
+.resume_page a {
+  color: inherit;
+  text-decoration: none;
+}
+.resume_page a:hover {
+  color: rgb(45, 215, 205);
+}
+
+/* Header */
+.resume_page .head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: var(--cell);
+  margin-bottom: var(--cell);
+}
+.resume_page .head_name {
+  margin: 0;
+  font-family: var(--_typography---font--body-font, inherit);
+  font-size: clamp(1.7rem, 4vw, 2.6rem);
+  line-height: 1.04;
+  font-weight: var(--panel-text-weight, 500);
+  letter-spacing: var(--panel-text-tracking, -0.015em);
+  text-transform: uppercase;
+}
+.resume_page .head_title {
+  margin: 0.3em 0 0;
+  font-size: 1.05rem;
+  color: rgba(255, 255, 255, 0.88);
+}
+.resume_page .head_contact {
+  text-align: right;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.88);
+  white-space: nowrap;
+}
+.resume_page .head_site {
+  display: inline-block;
+  margin-top: 0.2em;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+.resume_page .head_site::before {
+  content: '-> ';
+  color: rgb(45, 215, 205);
+}
+
+/* Two columns: skills, then everything else. */
+.resume_page .cols {
+  display: grid;
+  grid-template-columns: minmax(180px, 1fr) 2.6fr;
+  column-gap: var(--cell);
+  align-items: start;
+}
+
+/* Section headings: the write-up heading, with a short gradient rule (a piece of the grid). */
+.resume_page h2 {
+  position: relative;
+  margin: 0 0 0.9em;
+  padding-bottom: 0.35em;
+  font-family: var(--_typography---font--body-font, inherit);
+  font-size: 1.1rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  line-height: 1.3;
+}
+.resume_page h2::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: linear-gradient(to right, rgb(235, 70, 55), rgb(45, 215, 205));
+}
+.resume_page section {
+  margin-bottom: calc(var(--cell) * 0.75);
+}
+.resume_page section:last-child {
+  margin-bottom: 0;
+}
+
+/* Labels: the write-up's dt style. */
+.resume_page .label,
+.resume_page .skills dt,
+.resume_page .entry_when,
+.resume_page .teaching .year {
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+/* Skills */
+.resume_page .skills {
+  margin: 0;
+  padding: 0;
+}
+.resume_page .skills dt {
+  margin: 0.9em 0 0.15em;
+}
+.resume_page .skills dt:first-child {
+  margin-top: 0;
+}
+.resume_page .skills dd {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.88);
+}
+
+/* Entries */
+.resume_page .main p {
+  margin: 0 0 0.9em;
+  color: rgba(255, 255, 255, 0.88);
+}
+.resume_page .main p:last-child {
+  margin-bottom: 0;
+}
+.resume_page .entry {
+  margin-bottom: 1.1em;
+}
+.resume_page .entry:last-child {
+  margin-bottom: 0;
+}
+.resume_page .entry_title {
+  margin: 0;
+  font-family: var(--_typography---font--body-font, inherit);
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.35;
+}
+.resume_page .entry_when {
+  display: block;
+  margin: 0.15em 0 0.4em;
+}
+.resume_page .entry ul,
+.resume_page .teaching {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.resume_page .entry li {
+  position: relative;
+  padding-left: 1.1em;
+  margin: 0 0 0.25em;
+  color: rgba(255, 255, 255, 0.88);
+}
+.resume_page .entry li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.75em;
+  width: 0.55em;
+  height: 1px;
+  background: linear-gradient(to right, rgb(235, 70, 55), rgb(45, 215, 205));
+}
+.resume_page .teaching li {
+  position: relative;
+  padding-left: 5.4em;
+  margin: 0 0 0.45em;
+  color: rgba(255, 255, 255, 0.88);
+}
+.resume_page .teaching .year {
+  position: absolute;
+  left: 0;
+  top: 0.25em;
+}
+@media (max-width: 767px) {
+  .resume_page .teaching li {
+    padding-left: 0;
+  }
+  .resume_page .teaching .year {
+    position: static;
+    display: block;
+  }
+}
+
+/* Phones: one column, the story first and the skills after it. */
+@media (max-width: 767px) {
+  .resume_doc {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+  .resume_page .head {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.8em;
+  }
+  .resume_page .head_contact {
+    text-align: left;
+    white-space: normal;
+  }
+  .resume_page .cols {
+    grid-template-columns: 1fr;
+    row-gap: var(--cell);
+  }
+  .resume_page .side {
+    order: 2;
+  }
+}
+
+/* The RESUME -> link at the foot of the about panel (pages/Home.jsx). */
+.writeup_link {
+  display: inline-block;
+  color: #fff;
+  text-decoration: none;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  opacity: 0.75;
+  transition: opacity 0.2s ease;
+}
+.writeup_link:hover {
+  opacity: 1;
+}

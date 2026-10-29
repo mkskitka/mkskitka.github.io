@@ -1,5 +1,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
 import Home from './pages/Home.jsx'
+import Resume from './pages/Resume.jsx'
 import ScrollToTop from './components/ScrollToTop.jsx'
 
 // Only the hero page is live right now. Every address is that same page with something
@@ -17,6 +18,7 @@ export default function App() {
         <Route path="/contact" element={<Home />} />
         <Route path="/projects/:slug" element={<Home />} />
         <Route path="/visuals/:id" element={<Home />} />
+        <Route path="/resume" element={<Resume />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </>

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { projects } from '../data/projects.js'
 import HeroBackdrop from '../components/HeroBackdrop.jsx'
 import ProjectThumbs from '../components/ProjectThumbs.jsx'
@@ -332,7 +332,11 @@ export default function Home() {
         <ProjectThumbs open={active === 'visuals' && !project} keep={active === 'visuals' && !!project} focus={visualAt} items={VISUAL_ITEMS} label="Visuals" onSelect={openProject} bounce={visualsFresh} titles={SHOW_VISUAL_TITLES} />
         <ContactTiles open={active === 'contact'} />
         {/* MK SKITKA: the bio (src/data/about.js). A project: its write-up (src/data/projects.js). */}
-        <WriteUp open={active === 'home' && !project} heading={about.heading} paragraphs={about.paragraphs} align="center" />
+        <WriteUp open={active === 'home' && !project} heading={about.heading} paragraphs={about.paragraphs} align="center">
+          <Link to="/resume" className="writeup_link">
+            Resume -&gt;
+          </Link>
+        </WriteUp>
         <WriteUp
           open={!!project && !isVisual}
           align="right"

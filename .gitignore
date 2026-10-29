@@ -20,3 +20,6 @@ src/assets/projects/**/*.source.*
 
 # site assets (images, video)
 src/assets/
+
+# made by scripts/resume-pdf.sh at deploy time (the PDF behind /resume)
+public/resume.pdf

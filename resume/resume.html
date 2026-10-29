@@ -1,0 +1,702 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mary Kate Skitka — Resume</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&amp;display=swap" rel="stylesheet">
+  <style>
+    /* ------------------------------------------------------------------
+       MK Skitka resume, in the look of mkskitka.com:
+       dark ground, a ruled grid whose horizontal lines run red -> teal and
+       vertical lines blue -> pink (the site's 'mk-original' palette), white
+       Open Sans text, and translucent panels sitting on the grid.
+
+       Export: sh scripts/resume-pdf.sh   (headless Chrome, A4, no margins)
+       Light version for printing: add ?theme=light to the address, or
+       body.light.
+       ------------------------------------------------------------------ */
+    :root {
+      --page-w: 210mm;
+      --page-h: 297mm;
+      --cell-x: 10.5mm; /* 20 columns across the page */
+      --cell-y: 11mm; /* 27 rows down the page */
+      --line-w: 1.1px; /* the site's grid line weight */
+
+      --bg: #0c0c0e;
+      --text: #fff;
+      --text-soft: rgba(255, 255, 255, 0.88);
+      --text-dim: rgba(255, 255, 255, 0.55);
+      --panel: rgba(255, 255, 255, 0.045);
+      --panel-edge: rgba(255, 255, 255, 0.12);
+      --grid-alpha: 0.42;
+      --panel-wash: 55%; /* how much the panel dims the grid behind it */
+
+      --red: rgb(235, 70, 55);
+      --teal: rgb(45, 215, 205);
+      --blue: rgb(50, 90, 235);
+      --pink: rgb(240, 75, 130);
+    }
+    html.light {
+      --bg: #ffffff;
+      --text: #111114;
+      --text-soft: rgba(17, 17, 20, 0.88);
+      --text-dim: rgba(17, 17, 20, 0.55);
+      --panel: rgba(12, 12, 14, 0.035);
+      --panel-edge: rgba(12, 12, 14, 0.14);
+      --grid-alpha: 0.28;
+      --panel-wash: 60%;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      background: transparent; /* the grid is on html */
+      color: var(--text);
+      font-family: 'Open Sans', Helvetica, Arial, sans-serif;
+      font-size: 8.9pt;
+      line-height: 1.42;
+      font-weight: 400;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+      -webkit-font-smoothing: antialiased;
+    }
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    /* The grid is the page background: an SVG tile exactly one page in size,
+       drawn by the script at the bottom (lines as colour gradients, like the
+       site's canvas). Chrome paints the root background under every printed
+       page, margins included, so the lines run edge to edge on each page. */
+    html {
+      background-color: var(--bg);
+      background-repeat: repeat;
+      background-size: var(--page-w) var(--page-h);
+    }
+
+    /* Page frame: one cell of margin all round, content on the grid. */
+    .page {
+      position: relative;
+      z-index: 1;
+      width: var(--page-w);
+      margin: 0 auto;
+      padding: var(--cell-y) var(--cell-x);
+    }
+
+    /* Panels: the site's glass panels, minus the blur (there is nothing to blur
+       on paper). */
+    .panel {
+      /* a light tint over a wash of the ground colour, so the grid shows through
+         the panel the way it does through the blurred glass on the site */
+      background:
+        linear-gradient(var(--panel), var(--panel)),
+        color-mix(in srgb, var(--bg) var(--panel-wash), transparent);
+      border: var(--line-w) solid var(--panel-edge);
+      border-radius: 2px;
+      box-decoration-break: clone;
+      -webkit-box-decoration-break: clone;
+    }
+    .main {
+      padding: calc(var(--cell-y) * 0.6) calc(var(--cell-x) * 0.6);
+    }
+
+    /* Header */
+    .head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: var(--cell-x);
+      padding: calc(var(--cell-y) * 0.75) calc(var(--cell-x) * 0.75);
+      margin-bottom: var(--cell-y);
+      break-inside: avoid;
+    }
+    .head_name {
+      margin: 0;
+      font-size: 27pt;
+      line-height: 1.04;
+      font-weight: 500; /* the site's menu weight and tracking */
+      letter-spacing: -0.015em;
+      text-transform: uppercase;
+    }
+    .head_title {
+      margin: 3pt 0 0;
+      font-size: 11pt;
+      font-weight: 400;
+      letter-spacing: 0.02em;
+      color: var(--text-soft);
+    }
+    .head_contact {
+      text-align: right;
+      font-size: 8.6pt;
+      line-height: 1.6;
+      color: var(--text-soft);
+      white-space: nowrap;
+    }
+    .head_contact a:hover {
+      color: var(--teal);
+    }
+    .head_site {
+      display: inline-block;
+      margin-top: 2pt;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+    }
+    .head_site::before {
+      content: '-> ';
+      color: var(--teal);
+      font-weight: 600;
+    }
+
+    /* Columns on the grid: 5 cells for the side column, 1 cell gap, rest main. */
+    .cols {
+      display: grid;
+      grid-template-columns: calc(var(--cell-x) * 5) minmax(0, 1fr);
+      column-gap: var(--cell-x);
+      align-items: start;
+    }
+
+    /* Section headings: the write-up panel's heading style, with a short
+       gradient rule under it (a piece of the grid). */
+    h2 {
+      margin: 0 0 calc(var(--cell-y) * 0.35);
+      padding-bottom: 4pt;
+      font-size: 10.5pt;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      position: relative;
+      break-after: avoid;
+    }
+    h2::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      width: 100%;
+      height: var(--line-w);
+      background: linear-gradient(to right, var(--red), var(--teal));
+    }
+    section {
+      margin-bottom: calc(var(--cell-y) * 0.7);
+    }
+
+    /* Labels: the write-up's dt style */
+    .label {
+      display: block;
+      margin: 0 0 1pt;
+      font-size: 7.4pt;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+    }
+
+    /* Side column */
+    .side {
+      padding: calc(var(--cell-y) * 0.6) calc(var(--cell-x) * 0.6);
+    }
+    .side section {
+      margin-bottom: calc(var(--cell-y) * 0.8);
+      break-inside: avoid;
+    }
+    .side section:last-child {
+      margin-bottom: 0;
+    }
+    .skills {
+      margin: 0;
+      padding: 0;
+    }
+    .skills dt {
+      margin: 7pt 0 1pt;
+      font-size: 7.4pt;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      break-after: avoid;
+    }
+    .skills dt:first-child {
+      margin-top: 0;
+    }
+    .skills dd {
+      margin: 0;
+      font-size: 9pt;
+      line-height: 1.45;
+      color: var(--text-soft);
+    }
+
+    /* Main column */
+    .main p {
+      margin: 0 0 7pt;
+      color: var(--text-soft);
+    }
+    .main p:last-child {
+      margin-bottom: 0;
+    }
+    .entry {
+      margin-bottom: 7pt;
+    }
+    .entry_title,
+    .entry_when {
+      break-inside: avoid;
+      break-after: avoid; /* a title never ends a page without at least one line under it */
+    }
+    .entry li,
+    .teaching li {
+      break-inside: avoid;
+    }
+    .entry:last-child {
+      margin-bottom: 0;
+    }
+    .entry_title {
+      margin: 0;
+      font-size: 9.8pt;
+      font-weight: 600;
+      line-height: 1.35;
+    }
+    .entry_when {
+      display: block;
+      margin: 1pt 0 3pt;
+      font-size: 7.6pt;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+    }
+    .entry ul {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+    .entry li {
+      position: relative;
+      padding-left: 11pt;
+      margin: 0 0 2pt;
+      color: var(--text-soft);
+    }
+    .entry li::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0.72em;
+      width: 6pt;
+      height: var(--line-w);
+      background: linear-gradient(to right, var(--red), var(--teal));
+    }
+    .teaching {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+    .teaching li {
+      position: relative;
+      padding-left: 54pt; /* hanging indent: wrapped lines line up with the text, not the year */
+      margin: 0 0 4pt;
+      color: var(--text-soft);
+    }
+    .teaching .year {
+      position: absolute;
+      left: 0;
+      top: 0.2em;
+      font-size: 7.6pt;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+    }
+
+    @page {
+      size: A4;
+      margin: var(--cell-y) 0; /* one grid row top and bottom on every page */
+    }
+    @media print {
+      .page {
+        width: auto;
+        margin: 0;
+        padding-top: 0;
+        padding-bottom: 0;
+      }
+    }
+    @media screen {
+      body {
+        padding: 24px 0;
+      }
+      .page {
+        min-height: var(--page-h);
+      }
+    }
+
+    /* Edit mode (npm run resume:edit): the text is editable in place, and the
+       toolbar saves back to this file and exports the PDF. Never printed. */
+    .tools {
+      display: none;
+      position: fixed;
+      right: 16px;
+      bottom: 16px;
+      z-index: 10;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 10px;
+      border-radius: 999px;
+      background: rgba(12, 12, 14, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      color: #fff;
+      font-size: 12px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+    }
+    html.is-editing .tools {
+      display: flex;
+    }
+    .tools button {
+      font: inherit;
+      color: #fff;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 999px;
+      padding: 5px 12px;
+      cursor: pointer;
+    }
+    .tools button:hover {
+      background: rgba(255, 255, 255, 0.18);
+    }
+    .tools button.is-primary {
+      background: linear-gradient(to right, var(--red), var(--teal));
+      border-color: transparent;
+      font-weight: 600;
+    }
+    .tools .status {
+      margin: 0 6px 0 2px;
+      color: rgba(255, 255, 255, 0.7);
+      max-width: 320px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .tools .status.is-dirty {
+      color: var(--teal);
+    }
+    html.is-editing .page {
+      outline: none;
+    }
+    html.is-editing .page:focus-within [contenteditable] {
+      outline: none;
+    }
+    @media print {
+      .tools {
+        display: none !important;
+      }
+    }
+  </style></head>
+<body>
+
+  <div class="page">
+    <!-- page:start -->
+    <header class="head panel">
+      <div>
+        <h1 class="head_name">Mary Kate Skitka</h1>
+        <p class="head_title">Creative Technologist, Developer &amp; Educator</p>
+      </div>
+      <div class="head_contact">
+        Brooklyn, NY<br>
+        <a href="tel:7179799564">(717) 979-9564</a> &nbsp;·&nbsp;
+        <a href="mailto:mkskitka@gmail.com">mkskitka@gmail.com</a><br>
+        <a class="head_site" href="https://mkskitka.com/">mkskitka.com</a>
+      </div>
+    </header>
+
+    <div class="cols">
+      <aside class="side panel">
+        <section>
+          <h2>Technical Skills</h2>
+          <dl class="skills">
+            <dt>Real-Time &amp; Creative Coding</dt>
+            <dd>TouchDesigner</dd>
+            <dd>GLSL shaders</dd>
+            <dd>Three.js</dd>
+            <dd>p5.js, Processing</dd>
+            <dd>Unity</dd>
+
+            <dt>Generative AI</dt>
+            <dd>ComfyUI</dd>
+            <dd>Stable Diffusion, custom-trained models</dd>
+            <dd>Midjourney</dd>
+            <dd>Claude, Gemini and ChatGPT APIs</dd>
+
+            <dt>Sensors &amp; Tracking</dt>
+            <dd>Body and eye tracking</dd>
+            <dd>MediaPipe, Teachable Machine</dd>
+            <dd>Orbbec depth cameras</dd>
+            <dd>Lidar</dd>
+            <dd>Audio-reactive systems</dd>
+
+            <dt>Installation &amp; Hardware</dt>
+            <dd>Projection mapping</dd>
+            <dd>LED walls</dd>
+            <dd>A/V Systems &amp; Live Media</dd>
+            <dd>Physical Computing, Arduino</dd>
+
+            <dt>Web &amp; Data Visualization</dt>
+            <dd>React.js, Next.js</dd>
+            <dd>D3.js</dd>
+            <dd>HTML/CSS/JavaScript</dd>
+            <dd>Node.js, SQL</dd>
+
+            <dt>Languages</dt>
+            <dd>Python</dd>
+            <dd>JavaScript</dd>
+            <dd>C++, C#</dd>
+
+            <dt>Tools</dt>
+            <dd>Git/GitHub</dd>
+          </dl>
+        </section>
+
+        <section>
+          <h2>Selected Projects</h2>
+          <dl class="skills">
+            <dt>2026</dt>
+            <dd>PGN, Studio Elsewhere</dd>
+            <dd>Audible Story House</dd>
+            <dd>Realtor.com, SXSW</dd>
+            <dt>2025</dt>
+            <dd>The Light Keeper, Intel</dd>
+            <dd>End of Signal, Cezar Mocan</dd>
+            <dd>Blueberry Swamp Festival</dd>
+            <dt>2024</dt>
+            <dd>Creampods, Venice Biennale</dd>
+            <dt>2023</dt>
+            <dd>Evidence 071, The Shed</dd>
+          </dl>
+        </section>
+      </aside>
+
+      <main class="main panel">
+        <section>
+          <h2>Profile</h2>
+          <p>
+            Creative technologist, developer and educator with over 8 years of experience building
+            generative and interactive media, from initial ideation through deployment. Most recently
+            built PGN, a multi-room interactive rehabilitation system that runs body and
+            eye tracking, depth cameras and lidar through a single TouchDesigner system, now installed
+            at clinical sites. Earlier work includes a real-time generative AI visuals system for an
+            installation at the Venice Biennale '24, and four years building visualization tools for
+            AI research. Has taught courses and workshops in creative technology at NYU.</p>
+        </section>
+
+        <section>
+          <h2>Education</h2>
+          <div class="entry">
+            <h3 class="entry_title">
+              MPS, Creative Technology, Interactive Telecommunications Program (ITP), New York
+              University (NYU)
+            </h3>
+            <span class="entry_when">January 2021 — December 2023</span>
+          </div>
+          <div class="entry">
+            <h3 class="entry_title">
+              BS, Double Major in Cognitive Brain Science and Computer Science, Tufts University
+            </h3>
+            <span class="entry_when">January 2014 — December 2018</span>
+          </div>
+        </section>
+
+        <section>
+          <h2>Employment History</h2>
+
+          <div class="entry">
+            <h3 class="entry_title">Freelance Creative Technologist, Brooklyn, NY</h3>
+            <span class="entry_when">September 2022 — Present</span>
+            <ul>
+              <li>Build real-time visual systems for installations, live performance and brand activations, as a regular collaborator of studios including Smooth Technology and Volvox Labs</li>
+              <li>Designed and developed a real-time generative AI video system with Volvox Labs for artist Fatimah Tuggar's Creampods at the 2024 Venice Biennale, producing days of unique content</li>
+              <li>Designed and developed a touch-screen data visualization and digital archive for artist Lizania Cruz's Evidence 071, shown in The Shed's Open Call 2023 exhibition</li>
+              <li>Built a live-rendered AI visuals system for artist Cezar Mocan's End of Signal, winner of the SOLO AI '25 award; further work includes a video booth for Tapestry Electric at a gaming conference, festival visuals for Blueberry Swamp Festival (2025 and 2026), the Drunk Elephant kiosk with Volvox Labs, and technical direction at Brooklyn Art Haus</li>
+            </ul>
+          </div>
+
+          <div class="entry">
+            <h3 class="entry_title">Creative Technologist (Contract), Studio Elsewhere, Brooklyn, NY</h3>
+            <span class="entry_when">April 2026 — October 2026</span>
+            <ul>
+              <li>Architected and built PGN, a three-room interactive rehabilitation system (LED hallway, full-body projection room, multi-sensory recharge room) installed at multiple clinical sites</li>
+              <li>Designed a single TouchDesigner system that configures itself for different rooms and display types, and unified markerless motion capture, depth cameras, lidar and camera-based body and eye tracking into one common tracking pipeline</li>
+              <li>Designed and built a level and target system that lets clinicians create reproducible, game-like tests to track vision and mobility progress</li>
+              <li>Developed neuroscience-backed real-time visuals for every room</li>
+            </ul>
+          </div>
+
+          <div class="entry">
+            <h3 class="entry_title">Creative Technologist (Contract), Smooth Technology</h3>
+            <span class="entry_when">November 2025 — May 2026</span>
+            <ul>
+              <li>A mix of weekly studio hours and fixed-price project work, mostly real-time visuals, across three client builds</li>
+              <li>Audible Story House (March to May 2026): built the audio-reactive visualizer for the listening room of the month-long pop-up, plus a web interface brand ambassadors used to adjust the visuals live</li>
+              <li>Realtor.com Savings Simulator at SXSW (early 2026): produced the 16-bit game graphics for an arcade savings game, with a graphic designer</li>
+              <li>Intel, The Light Keeper (late 2025): built a real-time visual performance driven by dancers' body movement for Intel's pop-up in Times Square</li>
+            </ul>
+          </div>
+
+          <div class="entry">
+            <h3 class="entry_title">Adjunct Instructor, New York University, Brooklyn, NY</h3>
+            <span class="entry_when">January 2025 — March 2025</span>
+            <ul>
+              <li>Designed and taught Immersivity Beyond the Display, an undergraduate Interactive Media Arts (IMA) course exploring immersivity in new media and installation</li>
+            </ul>
+          </div>
+
+          <div class="entry">
+            <h3 class="entry_title">Research Fellow, New York University, Brooklyn, NY</h3>
+            <span class="entry_when">August 2023 — August 2024</span>
+            <ul>
+              <li>Managed the Coding Lab to support student project work</li>
+              <li>Supported both undergraduate and graduate students in foundation classes and thesis</li>
+            </ul>
+          </div>
+
+          <div class="entry">
+            <h3 class="entry_title">Software Engineer, Charles River Analytics, Cambridge, MA</h3>
+            <span class="entry_when">August 2018 — August 2022</span>
+            <ul>
+              <li>Built web-based visualizations and tools to aid scientists and clients in cutting-edge AI research</li>
+              <li>Managed up to 6 different projects at a time successfully meeting aggressive software deliverable deadlines</li>
+            </ul>
+          </div>
+
+          <div class="entry">
+            <h3 class="entry_title">Web Developer, Massachusetts Institute of Technology (MIT), Cambridge, MA</h3>
+            <span class="entry_when">November 2016 — April 2017</span>
+            <ul>
+              <li>Implemented versatile, data-rich visualizations of lobbying research, readable by both experts and the public</li>
+            </ul>
+          </div>
+        </section>
+
+        <section>
+          <h2>Additional Teaching Experience</h2>
+          <ul class="teaching">
+            <li><span class="year">2024</span>Instructor, two workshops at ITP Camp, NYU: Collaging with TouchDesigner, and Train Your Own Stable Diffusion Model</li>
+            <li><span class="year">2023–2024</span>Instructor, Teachable Machine and Intro to p5.js workshop, College and Career Lab Exploratory Program, NYU</li>
+            <li><span class="year">2022–2023</span>Lead Coding Lab Mentor, ITP/IMA, NYU</li>
+            <li><span class="year">2022</span>Teaching Assistant, Creative Computation, IMA, NYU</li>
+            <li><span class="year">2021–2022</span>Coding Lab Mentor, ITP/IMA, NYU</li>
+          </ul>
+        </section>
+      </main>
+    </div>
+    <!-- page:end -->
+  </div>
+
+  <script>
+    if (new URLSearchParams(location.search).get('theme') === 'light') document.documentElement.classList.add('light')
+    const drawGrid = () => {
+      const css = getComputedStyle(document.documentElement)
+      const v = (n) => css.getPropertyValue(n).trim()
+      const W = 210, H = 297, cx = 10.5, cy = 11 // mm
+      const w = parseFloat(v('--line-w')) * 0.2646 // px -> mm
+      const a = parseFloat(v('--grid-alpha'))
+      let r = ''
+      for (let y = cy; y <= H + 0.01; y += cy) r += `<rect x="0" y="${(y - w).toFixed(3)}" width="${W}" height="${w.toFixed(3)}" fill="url(#h)"/>`
+      for (let x = cx; x <= W + 0.01; x += cx) r += `<rect x="${(x - w).toFixed(3)}" y="0" width="${w.toFixed(3)}" height="${H}" fill="url(#v)" opacity="0.55"/>`
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}"><defs>` +
+        `<linearGradient id="h" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="${v('--red')}"/><stop offset="1" stop-color="${v('--teal')}"/></linearGradient>` +
+        `<linearGradient id="v" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${v('--blue')}"/><stop offset="1" stop-color="${v('--pink')}"/></linearGradient>` +
+        `</defs><g opacity="${a}">${r}</g></svg>`
+      document.documentElement.style.backgroundImage = `url("data:image/svg+xml,${encodeURIComponent(svg)}")`
+    }
+    drawGrid()
+
+    /* Edit mode: on when the page is opened with ?edit (npm run resume:edit). */
+    ;(() => {
+      if (!new URLSearchParams(location.search).has('edit')) return
+      const root = document.documentElement
+      root.classList.add('is-editing')
+      const page = document.querySelector('.page')
+      page.contentEditable = 'true'
+      page.spellcheck = true
+
+      const tools = document.createElement('div')
+      tools.className = 'tools'
+      tools.innerHTML =
+        '<span class="status">Click any text to edit</span>' +
+        '<button type="button" data-do="theme">Light / dark</button>' +
+        '<button type="button" data-do="export">Export PDF</button>' +
+        '<button type="button" data-do="save" class="is-primary">Save</button>'
+      document.body.appendChild(tools)
+      const status = tools.querySelector('.status')
+      let dirty = false
+      const say = (msg, isDirty = dirty) => {
+        status.textContent = msg
+        status.classList.toggle('is-dirty', isDirty)
+      }
+      page.addEventListener('input', () => {
+        dirty = true
+        say('Unsaved changes (Cmd+S to save)')
+      })
+      window.addEventListener('beforeunload', (e) => {
+        if (dirty) e.preventDefault()
+      })
+
+      // Only the page's contents go to the server, which splices them into the
+      // file between the page:start / page:end markers. The CSS and this script
+      // are never rewritten by the browser.
+      const serialize = () => JSON.stringify({ page: page.innerHTML })
+      const post = async (path, data) => {
+        const r = await fetch(path, { method: 'POST', body: data })
+        const j = await r.json()
+        if (!r.ok) throw new Error(j.error || r.statusText)
+        return j
+      }
+      const save = async () => {
+        say('Saving…')
+        try {
+          await post('/save', serialize())
+          dirty = false
+          say('Saved', false)
+        } catch (e) {
+          say('Save failed: ' + e.message, true)
+        }
+      }
+      const exportPdf = async () => {
+        if (dirty) await save()
+        if (dirty) return
+        say('Exporting PDF…', false)
+        try {
+          const theme = root.classList.contains('light') ? 'light' : 'dark'
+          const j = await post('/export', JSON.stringify({ theme }))
+          say('Wrote ' + j.file.replace(/^.*\/Desktop\//, '~/Desktop/'), false)
+        } catch (e) {
+          say('Export failed: ' + e.message, true)
+        }
+      }
+      tools.addEventListener('click', (e) => {
+        const b = e.target.closest('button')
+        if (!b) return
+        if (b.dataset.do === 'save') save()
+        if (b.dataset.do === 'export') exportPdf()
+        if (b.dataset.do === 'theme') {
+          root.classList.toggle('light')
+          drawGrid()
+        }
+      })
+      document.addEventListener('keydown', (e) => {
+        if ((e.metaKey || e.ctrlKey) && e.key === 's') {
+          e.preventDefault()
+          save()
+        }
+      })
+      // Paste as plain text so outside formatting never gets into the page.
+      page.addEventListener('paste', (e) => {
+        e.preventDefault()
+        document.execCommand('insertText', false, e.clipboardData.getData('text/plain'))
+      })
+    })()
+  </script>
+
+
+</body></html>

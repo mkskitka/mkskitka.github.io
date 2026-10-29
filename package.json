@@ -7,7 +7,10 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "deploy": "sh scripts/deploy-aws.sh"
+    "deploy": "sh scripts/deploy-aws.sh",
+    "resume": "sh scripts/resume-pdf.sh",
+    "resume:light": "sh scripts/resume-pdf.sh \"$HOME/Desktop/MK_Skitka_Resume_$(date +%m_%d)_light.pdf\" light",
+    "resume:edit": "node scripts/resume-edit.mjs"
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",

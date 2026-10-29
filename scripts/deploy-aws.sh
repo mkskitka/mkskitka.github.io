@@ -8,6 +8,9 @@ set -e
 BUCKET=mk-skitka-site
 DISTRIBUTION=E2L55K784TVBE6 # https://mkskitka.com (also https://d2vfx0f1xojaxw.cloudfront.net)
 
+# The PDF behind the "PDF ->" link on /resume, made from resume/resume.html.
+sh scripts/resume-pdf.sh public/resume.pdf
+
 npm run build
 
 # Vite names everything in dist/assets after its contents, so those files can be

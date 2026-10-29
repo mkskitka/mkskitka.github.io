@@ -1,0 +1,646 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mary Kate Skitka — CV</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&amp;display=swap" rel="stylesheet">
+  <style>
+    /* ------------------------------------------------------------------
+       MK Skitka CV (the full record; resume.html is the short version), in the look of mkskitka.com:
+       dark ground, a ruled grid whose horizontal lines run red -> teal and
+       vertical lines blue -> pink (the site's 'mk-original' palette), white
+       Open Sans text, and translucent panels sitting on the grid.
+
+       Export: sh scripts/resume-pdf.sh ~/Desktop/MK_Skitka_CV.pdf dark resume/cv.html
+       Light version for printing: add ?theme=light to the address, or
+       body.light.
+       ------------------------------------------------------------------ */
+    :root {
+      --page-w: 210mm;
+      --page-h: 297mm;
+      --cell-x: 10.5mm; /* 20 columns across the page */
+      --cell-y: 11mm; /* 27 rows down the page */
+      --line-w: 1.1px; /* the site's grid line weight */
+
+      --bg: #0c0c0e;
+      --text: #fff;
+      --text-soft: rgba(255, 255, 255, 0.88);
+      --text-dim: rgba(255, 255, 255, 0.55);
+      --panel: rgba(255, 255, 255, 0.045);
+      --panel-edge: rgba(255, 255, 255, 0.12);
+      --grid-alpha: 0.42;
+      --panel-wash: 55%; /* how much the panel dims the grid behind it */
+
+      --red: rgb(235, 70, 55);
+      --teal: rgb(45, 215, 205);
+      --blue: rgb(50, 90, 235);
+      --pink: rgb(240, 75, 130);
+    }
+    html.light {
+      --bg: #ffffff;
+      --text: #111114;
+      --text-soft: rgba(17, 17, 20, 0.88);
+      --text-dim: rgba(17, 17, 20, 0.55);
+      --panel: rgba(12, 12, 14, 0.035);
+      --panel-edge: rgba(12, 12, 14, 0.14);
+      --grid-alpha: 0.28;
+      --panel-wash: 60%;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      background: transparent; /* the grid is on html */
+      color: var(--text);
+      font-family: 'Open Sans', Helvetica, Arial, sans-serif;
+      font-size: 8.9pt;
+      line-height: 1.42;
+      font-weight: 400;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+      -webkit-font-smoothing: antialiased;
+    }
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    /* The grid is the page background: an SVG tile exactly one page in size,
+       drawn by the script at the bottom (lines as colour gradients, like the
+       site's canvas). Chrome paints the root background under every printed
+       page, margins included, so the lines run edge to edge on each page. */
+    html {
+      background-color: var(--bg);
+      background-repeat: repeat;
+      background-size: var(--page-w) var(--page-h);
+    }
+
+    /* Page frame: one cell of margin all round, content on the grid. */
+    .page {
+      position: relative;
+      z-index: 1;
+      width: var(--page-w);
+      margin: 0 auto;
+      padding: var(--cell-y) var(--cell-x);
+    }
+
+    /* Panels: the site's glass panels, minus the blur (there is nothing to blur
+       on paper). */
+    .panel {
+      /* a light tint over a wash of the ground colour, so the grid shows through
+         the panel the way it does through the blurred glass on the site */
+      background:
+        linear-gradient(var(--panel), var(--panel)),
+        color-mix(in srgb, var(--bg) var(--panel-wash), transparent);
+      border: var(--line-w) solid var(--panel-edge);
+      border-radius: 2px;
+      box-decoration-break: clone;
+      -webkit-box-decoration-break: clone;
+    }
+    .main {
+      padding: calc(var(--cell-y) * 0.6) calc(var(--cell-x) * 0.6);
+    }
+
+    /* Header */
+    .head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: var(--cell-x);
+      padding: calc(var(--cell-y) * 0.75) calc(var(--cell-x) * 0.75);
+      margin-bottom: var(--cell-y);
+      break-inside: avoid;
+    }
+    .head_name {
+      margin: 0;
+      font-size: 27pt;
+      line-height: 1.04;
+      font-weight: 500; /* the site's menu weight and tracking */
+      letter-spacing: -0.015em;
+      text-transform: uppercase;
+    }
+    .head_title {
+      margin: 3pt 0 0;
+      font-size: 11pt;
+      font-weight: 400;
+      letter-spacing: 0.02em;
+      color: var(--text-soft);
+    }
+    .head_contact {
+      text-align: right;
+      font-size: 8.6pt;
+      line-height: 1.6;
+      color: var(--text-soft);
+      white-space: nowrap;
+    }
+    .head_contact a:hover {
+      color: var(--teal);
+    }
+    .head_site {
+      display: inline-block;
+      margin-top: 2pt;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+    }
+    .head_site::before {
+      content: '-> ';
+      color: var(--teal);
+      font-weight: 600;
+    }
+
+    /* Columns on the grid: 5 cells for the side column, 1 cell gap, rest main. */
+    .cols {
+      display: grid;
+      grid-template-columns: calc(var(--cell-x) * 5) minmax(0, 1fr);
+      column-gap: var(--cell-x);
+      align-items: start;
+    }
+
+    /* Section headings: the write-up panel's heading style, with a short
+       gradient rule under it (a piece of the grid). */
+    h2 {
+      margin: 0 0 calc(var(--cell-y) * 0.35);
+      padding-bottom: 4pt;
+      font-size: 10.5pt;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      position: relative;
+      break-after: avoid;
+    }
+    h2::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      width: 100%;
+      height: var(--line-w);
+      background: linear-gradient(to right, var(--red), var(--teal));
+    }
+    section {
+      margin-bottom: calc(var(--cell-y) * 0.55);
+    }
+
+    /* Labels: the write-up's dt style */
+    .label {
+      display: block;
+      margin: 0 0 1pt;
+      font-size: 7.4pt;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+    }
+
+    /* Side column */
+    .side {
+      padding: calc(var(--cell-y) * 0.6) calc(var(--cell-x) * 0.6);
+    }
+    .side section {
+      margin-bottom: calc(var(--cell-y) * 0.8);
+    }
+    .side section:last-child {
+      margin-bottom: 0;
+    }
+    .skills {
+      margin: 0;
+      padding: 0;
+    }
+    .skills dt {
+      margin: 7pt 0 1pt;
+      font-size: 7.4pt;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      break-after: avoid;
+    }
+    .skills dt:first-child {
+      margin-top: 0;
+    }
+    .skills dd {
+      margin: 0;
+      font-size: 9pt;
+      line-height: 1.45;
+      color: var(--text-soft);
+    }
+
+    /* Main column */
+    .main p {
+      margin: 0 0 7pt;
+      color: var(--text-soft);
+    }
+    .main p:last-child {
+      margin-bottom: 0;
+    }
+    .entry {
+      margin-bottom: 7pt;
+    }
+    .entry_title,
+    .entry_when {
+      break-inside: avoid;
+      break-after: avoid; /* a title never ends a page without at least one line under it */
+    }
+    .entry li,
+    .teaching li {
+      break-inside: avoid;
+    }
+    .entry:last-child {
+      margin-bottom: 0;
+    }
+    .entry_title {
+      margin: 0;
+      font-size: 9.8pt;
+      font-weight: 600;
+      line-height: 1.35;
+    }
+    .entry_when {
+      display: block;
+      margin: 1pt 0 3pt;
+      font-size: 7.6pt;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+    }
+    .entry ul {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+    .entry li {
+      position: relative;
+      padding-left: 11pt;
+      margin: 0 0 2pt;
+      color: var(--text-soft);
+    }
+    .entry li::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0.72em;
+      width: 6pt;
+      height: var(--line-w);
+      background: linear-gradient(to right, var(--red), var(--teal));
+    }
+    .teaching {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+    .teaching li {
+      position: relative;
+      padding-left: 54pt; /* hanging indent: wrapped lines line up with the text, not the year */
+      margin: 0 0 3pt;
+      color: var(--text-soft);
+    }
+    .teaching .year {
+      position: absolute;
+      left: 0;
+      top: 0.2em;
+      font-size: 7.6pt;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+    }
+
+    em {
+      font-style: italic;
+    }
+    .teaching .year:empty::before {
+      content: '\00a0';
+    }
+    @page {
+      size: A4;
+      margin: var(--cell-y) 0; /* one grid row top and bottom on every page */
+    }
+    @media print {
+      .page {
+        width: auto;
+        margin: 0;
+        padding-top: 0;
+        padding-bottom: 0;
+      }
+    }
+    @media screen {
+      body {
+        padding: 24px 0;
+      }
+      .page {
+        min-height: var(--page-h);
+      }
+    }
+
+    /* Edit mode (npm run resume:edit): the text is editable in place, and the
+       toolbar saves back to this file and exports the PDF. Never printed. */
+    .tools {
+      display: none;
+      position: fixed;
+      right: 16px;
+      bottom: 16px;
+      z-index: 10;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 10px;
+      border-radius: 999px;
+      background: rgba(12, 12, 14, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      color: #fff;
+      font-size: 12px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+    }
+    html.is-editing .tools {
+      display: flex;
+    }
+    .tools button {
+      font: inherit;
+      color: #fff;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 999px;
+      padding: 5px 12px;
+      cursor: pointer;
+    }
+    .tools button:hover {
+      background: rgba(255, 255, 255, 0.18);
+    }
+    .tools button.is-primary {
+      background: linear-gradient(to right, var(--red), var(--teal));
+      border-color: transparent;
+      font-weight: 600;
+    }
+    .tools .status {
+      margin: 0 6px 0 2px;
+      color: rgba(255, 255, 255, 0.7);
+      max-width: 320px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .tools .status.is-dirty {
+      color: var(--teal);
+    }
+    html.is-editing .page {
+      outline: none;
+    }
+    html.is-editing .page:focus-within [contenteditable] {
+      outline: none;
+    }
+    @media print {
+      .tools {
+        display: none !important;
+      }
+    }
+  </style></head>
+<body>
+
+  <div class="page">
+    <!-- page:start -->
+    <header class="head panel">
+      <div>
+        <h1 class="head_name">Mary Kate Skitka</h1>
+        <p class="head_title">Creative Technologist, Developer &amp; Educator</p>
+      </div>
+      <div class="head_contact">
+        Brooklyn, NY<br>
+        <a href="tel:7179799564">(717) 979-9564</a> &nbsp;·&nbsp;
+        <a href="mailto:mkskitka@gmail.com">mkskitka@gmail.com</a><br>
+        <a class="head_site" href="https://mkskitka.com/">mkskitka.com</a>
+      </div>
+    </header>
+
+    <div class="cols">
+      <aside class="side panel">
+        <section>
+          <h2>Technical Skills</h2>
+          <dl class="skills">
+            <dt>Real-Time &amp; Creative Coding</dt>
+            <dd>TouchDesigner</dd>
+            <dd>GLSL shaders</dd>
+            <dd>Three.js</dd>
+            <dd>p5.js, Processing</dd>
+            <dd>Unity</dd>
+
+            <dt>Generative AI</dt>
+            <dd>ComfyUI</dd>
+            <dd>Stable Diffusion, custom-trained models</dd>
+            <dd>Midjourney</dd>
+            <dd>Claude, Gemini and ChatGPT APIs</dd>
+
+            <dt>Sensors &amp; Tracking</dt>
+            <dd>Body and eye tracking</dd>
+            <dd>MediaPipe, Teachable Machine</dd>
+            <dd>Orbbec depth cameras</dd>
+            <dd>Lidar</dd>
+            <dd>Audio-reactive systems</dd>
+
+            <dt>Installation &amp; Hardware</dt>
+            <dd>Projection mapping</dd>
+            <dd>LED walls</dd>
+            <dd>A/V Systems &amp; Live Media</dd>
+            <dd>Physical Computing, Arduino</dd>
+
+            <dt>Web &amp; Data Visualization</dt>
+            <dd>React.js, Next.js</dd>
+            <dd>D3.js</dd>
+            <dd>HTML/CSS/JavaScript</dd>
+            <dd>Node.js, SQL</dd>
+
+            <dt>Languages</dt>
+            <dd>Python</dd>
+            <dd>JavaScript</dd>
+            <dd>C++, C#</dd>
+
+            <dt>Tools</dt>
+            <dd>Git/GitHub</dd>
+          </dl>
+        </section>
+      </aside>
+
+      <main class="main panel">
+        <section>
+          <h2>Profile</h2>
+          <p>
+            Creative technologist, developer and educator working in generative and interactive
+            media: real-time visual systems for installations, live performance and clinical
+            environments, from concept through on-site commissioning. Practice runs on two tracks,
+            visuals and systems: generative, environment-aware content built in TouchDesigner, ComfyUI
+            and Three.js, and the sensing, display and software architecture that ties it to a space.
+            Teaches creative technology at NYU and performs and exhibits in New York City as rgb__tears.</p>
+        </section>
+
+        <section>
+          <h2>Education</h2>
+          <div class="entry">
+            <h3 class="entry_title">
+              MPS, Creative Technology, Interactive Telecommunications Program (ITP), New York
+              University (NYU)
+            </h3>
+            <span class="entry_when">January 2021 — December 2023</span>
+          </div>
+          <div class="entry">
+            <h3 class="entry_title">
+              BS, Double Major in Cognitive Brain Science and Computer Science, Tufts University
+            </h3>
+            <span class="entry_when">January 2014 — December 2018</span>
+          </div>
+        </section>
+        </section>
+
+        <section>
+          <h2>Professional Experience</h2>
+
+          <div class="entry">
+            <h3 class="entry_title">Freelance Creative Technologist, Brooklyn, NY</h3>
+            <span class="entry_when">September 2022 — Present</span>
+            <ul>
+              <li>Build real-time visual systems for installations, live performance and brand activations, as a regular collaborator of studios including Smooth Technology and Volvox Labs</li>
+              <li>Designed and developed a real-time generative AI video system with Volvox Labs for artist Fatimah Tuggar's Creampods at the 2024 Venice Biennale, producing days of unique content</li>
+              <li>Designed and developed a touch-screen data visualization and digital archive for artist Lizania Cruz's Evidence 071, shown in The Shed's Open Call 2023 exhibition</li>
+            </ul>
+          </div>
+
+          <div class="entry">
+            <h3 class="entry_title">Creative Technologist (Contract), Studio Elsewhere, Brooklyn, NY</h3>
+            <span class="entry_when">April 2026 — October 2026</span>
+            <ul>
+              <li>Architected and built PGN, a three-room interactive rehabilitation system (LED hallway, full-body projection room, multi-sensory recharge room) installed at multiple clinical sites</li>
+              <li>Designed a single TouchDesigner system that configures itself for different rooms and display types, and unified markerless motion capture, depth cameras, lidar and camera-based body and eye tracking into one common tracking pipeline</li>
+              <li>Designed and built a level and target system that lets clinicians create reproducible, game-like tests to track vision and mobility progress</li>
+              <li>Developed neuroscience-backed real-time visuals for every room</li>
+            </ul>
+          </div>
+
+          <div class="entry">
+            <h3 class="entry_title">Creative Technologist (Contract), Smooth Technology</h3>
+            <span class="entry_when">November 2025 — May 2026</span>
+            <ul>
+              <li>A mix of weekly studio hours and fixed-price project work, mostly real-time visuals, across three client builds</li>
+              <li>Audible Story House (March to May 2026): built the audio-reactive visualizer for the listening room of the month-long pop-up, plus a web interface brand ambassadors used to adjust the visuals live</li>
+              <li>Realtor.com Savings Simulator at SXSW (early 2026): produced the 16-bit game graphics for an arcade savings game, with a graphic designer</li>
+              <li>Intel, The Light Keeper (late 2025): built a real-time visual performance driven by dancers' body movement for Intel's pop-up in Times Square</li>
+            </ul>
+          </div>
+
+          <div class="entry">
+            <h3 class="entry_title">Adjunct Instructor, New York University, Brooklyn, NY</h3>
+            <span class="entry_when">January 2025 — March 2025</span>
+            <ul>
+              <li>Designed and taught Immersivity Beyond the Display, an undergraduate Interactive Media Arts (IMA) course exploring immersivity in new media and installation</li>
+            </ul>
+          </div>
+
+          <div class="entry">
+            <h3 class="entry_title">Research Fellow, New York University, Brooklyn, NY</h3>
+            <span class="entry_when">August 2023 — August 2024</span>
+            <ul>
+              <li>Managed the Coding Lab to support student project work</li>
+              <li>Taught tutorials/workshops that advanced the mission of the graduate program</li>
+              <li>Built a body of work around personal research interests in embodiment and technology</li>
+              <li>Supported both undergraduate and graduate students in foundation classes and thesis</li>
+            </ul>
+          </div>
+
+          <div class="entry">
+            <h3 class="entry_title">Software Engineer, Charles River Analytics, Cambridge, MA</h3>
+            <span class="entry_when">August 2018 — August 2022</span>
+            <ul>
+              <li>Built web-based visualizations and tools to aid scientists and clients in cutting-edge AI research</li>
+              <li>Managed up to 6 different projects at a time successfully meeting aggressive software deliverable deadlines</li>
+            </ul>
+          </div>
+
+          <div class="entry">
+            <h3 class="entry_title">Web Developer, Massachusetts Institute of Technology (MIT), Cambridge, MA</h3>
+            <span class="entry_when">November 2016 — April 2017</span>
+            <ul>
+              <li>Implemented versatile, data-rich visualizations of lobbying research, readable by both experts and the public</li>
+            </ul>
+          </div>
+        </section>
+
+        <section>
+          <h2>Exhibitions &amp; Installations</h2>
+          <ul class="teaching">
+            <li><span class="year">2025–2026</span>Blueberry Swamp Festival, festival visuals</li>
+            <li><span class="year">2025</span><em>The Light Keeper</em>, Intel pop-up, Times Square, New York. Real-time visuals driven by dancers' body movement, with Smooth Technology</li>
+            <li><span class="year">2024</span><em>Creampods</em>, Fatimah Tuggar with Volvox Labs, 60th Venice Biennale, Venice. Design and development of the real-time generative video</li>
+            <li><span class="year">2024</span><em>370 Botanic Gardens</em>, Clive Davis Gallery, 370 Jay Street, Brooklyn. Solo installation: projection on scrim, generative video from a model trained on the Brooklyn Botanic Garden, responsive to gallery and street light</li>
+            <li><span class="year">2023</span><em>Evidence 071: Frederick Douglass and The Commission of Inquiry</em>, Lizania Cruz, Open Call 2023, The Shed, New York. Touch-screen data visualization and digital archive, with Matt Ross</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2>Commissions &amp; Commercial Work</h2>
+          <ul class="teaching">
+            <li><span class="year">2026</span>PGN, Studio Elsewhere. Multi-room interactive rehabilitation system, installed at clinical sites (see Professional Experience)</li>
+            <li><span class="year">2026</span>Realtor.com Savings Simulator, SXSW, Austin. 16-bit game graphics for an arcade savings game, with Smooth Technology</li>
+            <li><span class="year">2026</span>Audible Story House, New York. Audio-reactive visualizer for the listening room and a web interface for brand ambassadors, with Smooth Technology</li>
+            <li><span class="year">2025</span><em>End of Signal</em>, Cezar Mocan. Live-rendered AI visuals system for the installation; the project won the SOLO AI '25 award and has shown across multiple venues</li>
+            <li><span class="year">2025</span>Video booth for Tapestry Electric, a gaming and performing arts company, at a gaming conference</li>
+            <li><span class="year">2023</span>Drunk Elephant hair-care quiz kiosk, with Volvox Labs. Web animation and integration</li>
+            <li><span class="year">2022–</span>Brooklyn Art Haus, Brooklyn. Technical direction for projection mapping and installation</li>
+            <li><span class="year"></span>Further clients include National Geographic and the David Bowie estate</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2>Performance</h2>
+          <ul class="teaching">
+            <li><span class="year">2022–</span>Live audio-visual performances as <em>rgb__tears</em> at venues around New York City, including Brooklyn Art Haus</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2>Residencies</h2>
+          <ul class="teaching">
+            <li><span class="year">2023–2024</span>Artist in Residence / Research Fellow, Interactive Telecommunications Program (ITP), NYU</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2>Teaching</h2>
+          <ul class="teaching">
+            <li><span class="year">2025</span>Adjunct Instructor, <em>Immersivity Beyond the Display</em>, undergraduate course, Interactive Media Arts (IMA), NYU. Self-designed introduction to experience design with interactive systems</li>
+            <li><span class="year">2024</span>Instructor, <em>Collaging with TouchDesigner</em> and <em>Train Your Own Stable Diffusion Model</em>, workshops, ITP Camp, NYU</li>
+            <li><span class="year">2023–2024</span>Instructor, <em>Teachable Machine</em> and <em>Intro to p5.js</em>, workshops, College and Career Lab Exploratory Program, NYU</li>
+            <li><span class="year">2023–2024</span>Research Fellow, ITP, NYU. Managed the Coding Lab; tutorials and workshops; thesis and foundation support for undergraduate and graduate students</li>
+            <li><span class="year">2022–2023</span>Lead Coding Lab Mentor, ITP/IMA, NYU</li>
+            <li><span class="year">2022</span>Teaching Assistant, <em>Creative Computation</em>, IMA, NYU</li>
+            <li><span class="year">2021–2022</span>Coding Lab Mentor, ITP/IMA, NYU</li>
+          </ul>
+        </section>
+      </main>
+    </div>
+    <!-- page:end -->
+  </div>
+
+  <script>
+    if (new URLSearchParams(location.search).get('theme') === 'light') document.documentElement.classList.add('light')
+    const drawGrid = () => {
+      const css = getComputedStyle(document.documentElement)
+      const v = (n) => css.getPropertyValue(n).trim()
+      const W = 210, H = 297, cx = 10.5, cy = 11 // mm
+      const w = parseFloat(v('--line-w')) * 0.2646 // px -> mm
+      const a = parseFloat(v('--grid-alpha'))
+      let r = ''
+      for (let y = cy; y <= H + 0.01; y += cy) r += `<rect x="0" y="${(y - w).toFixed(3)}" width="${W}" height="${w.toFixed(3)}" fill="url(#h)"/>`
+      for (let x = cx; x <= W + 0.01; x += cx) r += `<rect x="${(x - w).toFixed(3)}" y="0" width="${w.toFixed(3)}" height="${H}" fill="url(#v)" opacity="0.55"/>`
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}"><defs>` +
+        `<linearGradient id="h" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="${v('--red')}"/><stop offset="1" stop-color="${v('--teal')}"/></linearGradient>` +
+        `<linearGradient id="v" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${v('--blue')}"/><stop offset="1" stop-color="${v('--pink')}"/></linearGradient>` +
+        `</defs><g opacity="${a}">${r}</g></svg>`
+      document.documentElement.style.backgroundImage = `url("data:image/svg+xml,${encodeURIComponent(svg)}")`
+    }
+    drawGrid()
+
+  </script>
+
+
+</body></html>

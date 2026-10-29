@@ -1234,7 +1234,7 @@ export default function GridInkBackdrop({ className = '', transparent = false, p
     }
     // Scrolling inside a panel (the write-up, the photo viewer) belongs to that panel,
     // not to the backdrop animation.
-    const inPanel = (t) => !!(t && t.closest && t.closest('.writeup, .lightbox'))
+    const inPanel = (t) => !!(t && t.closest && t.closest('.writeup, .lightbox, .resume_scroll'))
     const onWheel = (e) => {
       if (S.scroll.mode !== 'virtual' || inPanel(e.target)) return
       e.preventDefault()
