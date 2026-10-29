@@ -1,15 +1,18 @@
-// Edit the resume in the browser: serves resume/resume.html with edit mode on,
-// saves the page back to that file, and exports the PDF on request.
-//   npm run resume:edit     (Ctrl+C to stop)
+// Edit the resume (or the CV) in the browser: serves the generated pages with edit
+// mode on, saves edits back into resume/resume.json, rebuilds the pages, and exports
+// PDFs on request.
+//   npm run resume:edit        then http://localhost:5181/?edit  (CV: /cv?edit)
+//   Ctrl+C to stop
 import http from 'node:http'
 import { readFile, writeFile } from 'node:fs/promises'
 import { execFile } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
+import { build, DATA } from './resume-build.mjs'
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
-const FILE = path.join(ROOT, 'resume', 'resume.html')
 const PORT = 5181
+const TYPES = { '.html': 'text/html; charset=utf-8', '.css': 'text/css', '.js': 'text/javascript', '.json': 'application/json' }
 
 const body = (req) =>
   new Promise((resolve) => {
@@ -22,35 +25,60 @@ const json = (res, code, data) => {
   res.end(JSON.stringify(data))
 }
 
+// "jobs.2.bullets" -> the parent object and the final key
+const locate = (obj, dotted) => {
+  const keys = dotted.split('.')
+  const last = keys.pop()
+  let o = obj
+  for (const k of keys) {
+    if (o == null || !(k in o)) return null
+    o = o[k]
+  }
+  return o == null ? null : { o, k: last }
+}
+
+const applyEdits = (d, { fields = [], lists = [] }) => {
+  for (const f of fields) {
+    const at = locate(d, f.path)
+    if (at && typeof at.o[at.k] === 'string') at.o[at.k] = f.value
+  }
+  for (const l of lists) {
+    const at = locate(d, l.path)
+    if (!at || !Array.isArray(at.o[at.k])) continue
+    // items arrive as strings, { year, text } or { text, resumeOnly }, exactly as stored
+    at.o[at.k] = l.items
+  }
+}
+
 http
   .createServer(async (req, res) => {
     const url = new URL(req.url, `http://localhost:${PORT}`)
     try {
-      if (req.method === 'GET' && (url.pathname === '/' || url.pathname === '/resume.html')) {
-        res.writeHead(200, { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store' })
-        res.end(await readFile(FILE, 'utf8'))
-      } else if (req.method === 'POST' && url.pathname === '/save') {
-        // Splice the edited page contents between the markers; the rest of the
-        // file (styles, script) is left exactly as it is.
-        const { page } = JSON.parse(await body(req))
-        if (typeof page !== 'string' || !page.includes('class="head')) {
-          return json(res, 400, { error: 'that does not look like the resume page; not saved' })
+      if (req.method === 'GET') {
+        let file = url.pathname === '/' ? '/resume.html' : url.pathname === '/cv' ? '/cv.html' : url.pathname
+        file = path.normalize(file).replace(/^(\.\.[/\\])+/, '')
+        const ext = path.extname(file)
+        if (!TYPES[ext]) {
+          res.writeHead(404)
+          return res.end('not found')
         }
-        const file = await readFile(FILE, 'utf8')
-        const START = '<!-- page:start -->'
-        const END = '<!-- page:end -->'
-        const a = file.indexOf(START)
-        const b = file.indexOf(END)
-        if (a < 0 || b < 0 || b < a) return json(res, 400, { error: 'page markers missing in resume.html; not saved' })
-        const inner = page.replace(START, '').replace(END, '').trim()
-        await writeFile(FILE, file.slice(0, a + START.length) + '\n    ' + inner + '\n    ' + file.slice(b))
-        json(res, 200, { ok: true, file: FILE })
+        const data = await readFile(path.join(ROOT, 'resume', file))
+        res.writeHead(200, { 'content-type': TYPES[ext], 'cache-control': 'no-store' })
+        res.end(data)
+      } else if (req.method === 'POST' && url.pathname === '/save') {
+        const edits = JSON.parse(await body(req))
+        if (!Array.isArray(edits.fields) || !Array.isArray(edits.lists)) return json(res, 400, { error: 'bad save payload' })
+        const d = JSON.parse(await readFile(DATA, 'utf8'))
+        applyEdits(d, edits)
+        await writeFile(DATA, JSON.stringify(d, null, 2) + '\n')
+        await build()
+        json(res, 200, { ok: true, file: DATA })
       } else if (req.method === 'POST' && url.pathname === '/export') {
-        const { theme } = JSON.parse((await body(req)) || '{}')
+        const { theme, doc } = JSON.parse((await body(req)) || '{}')
         const stamp = new Date().toLocaleDateString('en-US', { month: '2-digit', day: '2-digit' }).replace('/', '_')
-        const out = path.join(process.env.HOME, 'Desktop', `MK_Skitka_Resume_${stamp}${theme === 'light' ? '_light' : ''}.pdf`)
-        const args = [path.join(ROOT, 'scripts', 'resume-pdf.sh'), out]
-        if (theme === 'light') args.push('light')
+        const which = doc === 'cv' ? 'CV' : 'Resume'
+        const out = path.join(process.env.HOME, 'Desktop', `MK_Skitka_${which}_${stamp}${theme === 'light' ? '_light' : ''}.pdf`)
+        const args = [path.join(ROOT, 'scripts', 'resume-pdf.sh'), out, theme === 'light' ? 'light' : 'dark', doc === 'cv' ? 'resume/cv.html' : 'resume/resume.html']
         execFile('sh', args, (err, stdout, stderr) => {
           if (err) return json(res, 500, { error: String(stderr || err) })
           json(res, 200, { ok: true, file: out })
@@ -63,8 +91,9 @@ http
       json(res, 500, { error: String(e) })
     }
   })
-  .listen(PORT, () => {
+  .listen(PORT, async () => {
+    await build()
     const addr = `http://localhost:${PORT}/?edit`
-    console.log(`Editing ${path.relative(ROOT, FILE)} at ${addr}  (Ctrl+C to stop)`)
+    console.log(`Editing resume/resume.json at ${addr}  (CV: http://localhost:${PORT}/cv?edit; Ctrl+C to stop)`)
     execFile('open', [addr])
   })

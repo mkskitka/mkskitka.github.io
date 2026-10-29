@@ -15,6 +15,10 @@
 // image is used.
 
 import { folderImages, folderMedia, heroFor, isVideo, resolveMedia, thumbFor } from './media.js'
+import resume from '../../resume/resume.json'
+// A project's year, from resume/resume.json when it is listed there (the resume, the CV
+// and the site then always agree); otherwise the `date` written below.
+const year = (slug, fallback) => resume.projects.find((p) => p.slug === slug)?.year ?? fallback
 
 const img = (name) => `/images/${name}`
 
@@ -107,7 +111,7 @@ const GALLERY_MAX = 8
 const projectList = [
   {
     slug: 'pgn-immersive-mobility-rehab',
-    date: '2026',
+    date: year('pgn-immersive-mobility-rehab', '2026'),
     title: 'PGN - Immersive Mobility Rehab',
     heading: ['PGN', 'IMMERSIVE MOBILITY REHAB'],
     role: 'Visualist, Technologist',
@@ -131,7 +135,7 @@ const projectList = [
   },
   {
     slug: 'realtor-savings-simulator',
-    date: '2026',
+    date: year('realtor-savings-simulator', '2026'),
     title: 'Realtor.com Savings Simulator',
     heading: ['REALTOR.COM', 'SAVINGS SIMULATOR'],
     role: 'Visualist, Technologist',
@@ -146,7 +150,7 @@ const projectList = [
   },
   {
     slug: 'audible-popup-visualizer',
-    date: '2026',
+    date: year('audible-popup-visualizer', '2026'),
     title: 'Audible Story House',
     heading: ['AUDIBLE', 'STORY HOUSE VISUALIZER'],
     role: 'Visualist, Technologist',
@@ -166,7 +170,7 @@ const projectList = [
   },
   {
     slug: 'intel-the-light-keeper',
-    date: '2025',
+    date: year('intel-the-light-keeper', '2025'),
     title: 'INTEL - The Light Keeper',
     heading: ['INTEL x SMOOTH TECH', 'THE LIGHT KEEPER'],
     role: 'Visualist, Technologist',
@@ -184,7 +188,7 @@ const projectList = [
   {
     slug: 'blueberry-swamp-festival',
     hidden: 'true',
-    date: '2025', // placeholder, update
+    date: year('blueberry-swamp-festival', '2025'),
     title: 'Blueberry Swamp Festival',
     heading: ['BLUEBERRY', 'SWAMP FESTIVAL'],
     role: 'Visualist, Technologist',
@@ -201,7 +205,7 @@ const projectList = [
   },
   {
     slug: '370-botanic-gardens',
-    date: '2024', // placeholder, update
+    date: year('370-botanic-gardens', '2024'),
     title: '370 BOTANIC GARDENS',
     heading: ['370', 'BOTANIC GARDENS'],
     role: 'Visualist, Technologist',
@@ -221,7 +225,7 @@ const projectList = [
   },
   {
     slug: 'venice-biennale-24',
-    date: '2024', // placeholder, update
+    date: year('venice-biennale-24', '2024'),
     title: "'24 VENICE BIENNALE",
     heading: ["'24", 'VENICE BIENNALE'],
     role: 'Visualist, Technologist',
@@ -239,7 +243,7 @@ const projectList = [
   },
   {
     slug: 'evidence-71-the-shed',
-    date: '2023', // placeholder, update
+    date: year('evidence-71-the-shed', '2023'),
     title: 'EVIDENCE 071 @ The Shed',
     heading: ['EVIDENCE 071', '@ THE SHED'],
     role: 'Visualist, Technologist',
@@ -262,7 +266,7 @@ const projectList = [
     // Files live in src/assets/projects/DE-Kiosk/ (the folder name is the slug):
     // thumb.jpg is the tile, hero.mp4 + hero.jpg the full-page backdrop, 01.jpg the gallery.
     slug: 'DE-Kiosk',
-    date: '2023',
+    date: year('DE-Kiosk', '2023'),
     title: 'Drunk Elephant Kiosk',
     heading: ['DRUNK ELEPHANT', 'KIOSK'],
     role: 'Visualist, Technologist',

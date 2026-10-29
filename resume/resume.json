@@ -1,0 +1,330 @@
+{
+  "_about": "The one source for the resume (resume.html, the PDF, mkskitka.com/resume) and the CV (cv.html). Edit here or with npm run resume:edit, then npm run resume:build. *text* is italic.",
+  "name": "Mary Kate Skitka",
+  "title": "Creative Technologist, Developer & Educator",
+  "location": "Brooklyn, NY",
+  "phone": "(717) 979-9564",
+  "email": "mkskitka@gmail.com",
+  "site": "mkskitka.com",
+  "linkedin": "",
+  "profile": {
+    "resume": "Creative technologist, developer and educator with over 8 years of experience building generative and interactive media, from initial ideation through deployment. Most recently built PGN, a multi-room interactive rehabilitation system that runs body and eye tracking, depth cameras and lidar through a single TouchDesigner system, now installed at clinical sites. Earlier work includes a real-time generative AI visuals system for an installation at the Venice Biennale '24, and four years building visualization tools for AI research. Has taught courses and workshops in creative technology at NYU.",
+    "cv": "Creative technologist, developer and educator working in generative and interactive media: real-time visual systems for installations, live performance and clinical environments, from concept through on-site commissioning. Practice runs on two tracks, visuals and systems: generative, environment-aware content built in TouchDesigner, ComfyUI and Three.js, and the sensing, display and software architecture that ties it to a space. Teaches creative technology at NYU and performs and exhibits in New York City as rgb__tears."
+  },
+  "skills": [
+    {
+      "group": "Real-Time & Creative Coding",
+      "items": [
+        "TouchDesigner",
+        "GLSL shaders",
+        "Three.js",
+        "p5.js, Processing",
+        "Unity"
+      ]
+    },
+    {
+      "group": "Generative AI",
+      "items": [
+        "ComfyUI",
+        "Stable Diffusion, custom-trained models",
+        "Midjourney",
+        "Claude, Gemini and ChatGPT APIs"
+      ]
+    },
+    {
+      "group": "Sensors & Tracking",
+      "items": [
+        "Body and eye tracking",
+        "MediaPipe, Teachable Machine",
+        "Orbbec depth cameras",
+        "Lidar",
+        "Audio-reactive systems"
+      ]
+    },
+    {
+      "group": "Installation & Hardware",
+      "items": [
+        "Projection mapping",
+        "LED walls",
+        "A/V Systems & Live Media",
+        "Physical Computing, Arduino"
+      ]
+    },
+    {
+      "group": "Web & Data Visualization",
+      "items": [
+        "React.js, Next.js",
+        "D3.js",
+        "HTML/CSS/JavaScript",
+        "Node.js, SQL"
+      ]
+    },
+    {
+      "group": "Languages",
+      "items": [
+        "Python",
+        "JavaScript",
+        "C++, C#"
+      ]
+    },
+    {
+      "group": "Tools",
+      "items": [
+        "Git/GitHub"
+      ]
+    }
+  ],
+  "education": [
+    {
+      "degree": "MPS, Creative Technology, Interactive Telecommunications Program (ITP), New York University (NYU)",
+      "when": "2021 — 2023"
+    },
+    {
+      "degree": "BS, Double Major in Cognitive Brain Science and Computer Science, Tufts University",
+      "when": "2014 — 2018"
+    }
+  ],
+  "jobs": [
+    {
+      "title": "Freelance Creative Technologist, Brooklyn, NY",
+      "when": "September 2022 — Present",
+      "bullets": [
+        "Build real-time visual systems for installations, live performance and brand activations, as a regular collaborator of studios including Smooth Technology and Volvox Labs",
+        "Designed and developed a real-time generative AI video system with Volvox Labs for artist Fatimah Tuggar's Creampods at the 2024 Venice Biennale, producing days of unique content",
+        "Designed and developed a touch-screen data visualization and digital archive for artist Lizania Cruz's Evidence 071, shown in The Shed's Open Call 2023 exhibition",
+        {
+          "text": "Built a live-rendered AI visuals system for artist Cezar Mocan's End of Signal, winner of the SOLO AI '25 award; further work includes a video booth for Tapestry Electric at a gaming conference, festival visuals for Blueberry Swamp Festival (2025 and 2026), the Drunk Elephant kiosk with Volvox Labs, and technical direction at Brooklyn Art Haus",
+          "resumeOnly": true
+        }
+      ]
+    },
+    {
+      "title": "Creative Technologist (Contract), Studio Elsewhere, Brooklyn, NY",
+      "when": "April 2026 — October 2026",
+      "bullets": [
+        "Architected and built PGN, a three-room interactive rehabilitation system (LED hallway, full-body projection room, multi-sensory recharge room) installed at multiple clinical sites",
+        "Designed a single TouchDesigner system that configures itself for different rooms and display types, and unified markerless motion capture, depth cameras, lidar and camera-based body and eye tracking into one common tracking pipeline",
+        "Designed and built a level and target system that lets clinicians create reproducible, game-like tests to track vision and mobility progress",
+        "Developed neuroscience-backed real-time visuals for every room"
+      ]
+    },
+    {
+      "title": "Creative Technologist (Contract), Smooth Technology",
+      "when": "November 2025 — May 2026",
+      "bullets": [
+        "A mix of weekly studio hours and fixed-price project work, mostly real-time visuals, across three client builds",
+        "Audible Story House (March to May 2026): built the audio-reactive visualizer for the listening room of the month-long pop-up, plus a web interface brand ambassadors used to adjust the visuals live",
+        "Realtor.com Savings Simulator at SXSW (early 2026): produced the 16-bit game graphics for an arcade savings game, with a graphic designer",
+        "Intel, The Light Keeper (late 2025): built a real-time visual performance driven by dancers' body movement for Intel's pop-up in Times Square"
+      ]
+    },
+    {
+      "title": "Adjunct Instructor, New York University, Brooklyn, NY",
+      "when": "January 2025 — March 2025",
+      "bullets": [
+        "Designed and taught Immersivity Beyond the Display, an undergraduate Interactive Media Arts (IMA) course exploring immersivity in new media and installation"
+      ]
+    },
+    {
+      "title": "Research Fellow, New York University, Brooklyn, NY",
+      "when": "August 2023 — August 2024",
+      "bullets": [
+        "Managed the Coding Lab to support student project work",
+        "Supported both undergraduate and graduate students in foundation classes and thesis"
+      ]
+    },
+    {
+      "title": "Software Engineer, Charles River Analytics, Cambridge, MA",
+      "when": "August 2018 — August 2022",
+      "bullets": [
+        "Built web-based visualizations and tools to aid scientists and clients in cutting-edge AI research",
+        "Managed up to 6 different projects at a time successfully meeting aggressive software deliverable deadlines"
+      ]
+    },
+    {
+      "title": "Web Developer, Massachusetts Institute of Technology (MIT), Cambridge, MA",
+      "when": "November 2016 — April 2017",
+      "bullets": [
+        "Implemented versatile, data-rich visualizations of lobbying research, readable by both experts and the public"
+      ]
+    }
+  ],
+  "projects": [
+    {
+      "year": "2026",
+      "name": "PGN, Studio Elsewhere",
+      "slug": "pgn-immersive-mobility-rehab"
+    },
+    {
+      "year": "2026",
+      "name": "Audible Story House",
+      "slug": "audible-popup-visualizer"
+    },
+    {
+      "year": "2026",
+      "name": "Realtor.com, SXSW",
+      "slug": "realtor-savings-simulator"
+    },
+    {
+      "year": "2025",
+      "name": "The Light Keeper, Intel",
+      "slug": "intel-the-light-keeper"
+    },
+    {
+      "year": "2025",
+      "name": "End of Signal, Cezar Mocan"
+    },
+    {
+      "year": "2025",
+      "name": "Blueberry Swamp Festival",
+      "slug": "blueberry-swamp-festival"
+    },
+    {
+      "year": "2024",
+      "name": "Creampods, Venice Biennale",
+      "slug": "venice-biennale-24"
+    },
+    {
+      "year": "2023",
+      "name": "Evidence 071, The Shed",
+      "slug": "evidence-71-the-shed"
+    }
+  ],
+  "teaching": [
+    {
+      "year": "2024",
+      "text": "Instructor, two workshops at ITP Camp, NYU: Collaging with TouchDesigner, and Train Your Own Stable Diffusion Model"
+    },
+    {
+      "year": "2023–2024",
+      "text": "Instructor, Teachable Machine and Intro to p5.js workshop, College and Career Lab Exploratory Program, NYU"
+    },
+    {
+      "year": "2022–2023",
+      "text": "Lead Coding Lab Mentor, ITP/IMA, NYU"
+    },
+    {
+      "year": "2022",
+      "text": "Teaching Assistant, Creative Computation, IMA, NYU"
+    },
+    {
+      "year": "2021–2022",
+      "text": "Coding Lab Mentor, ITP/IMA, NYU"
+    }
+  ],
+  "cv": [
+    {
+      "heading": "Exhibitions & Installations",
+      "items": [
+        {
+          "year": "2025–2026",
+          "text": "Blueberry Swamp Festival, festival visuals"
+        },
+        {
+          "year": "2025",
+          "text": "*The Light Keeper*, Intel pop-up, Times Square, New York. Real-time visuals driven by dancers' body movement, with Smooth Technology"
+        },
+        {
+          "year": "2024",
+          "text": "*Creampods*, Fatimah Tuggar with Volvox Labs, 60th Venice Biennale, Venice. Design and development of the real-time generative video"
+        },
+        {
+          "year": "2024",
+          "text": "*370 Botanic Gardens*, Clive Davis Gallery, 370 Jay Street, Brooklyn. Solo installation: projection on scrim, generative video from a model trained on the Brooklyn Botanic Garden, responsive to gallery and street light"
+        },
+        {
+          "year": "2023",
+          "text": "*Evidence 071: Frederick Douglass and The Commission of Inquiry*, Lizania Cruz, Open Call 2023, The Shed, New York. Touch-screen data visualization and digital archive, with Matt Ross"
+        }
+      ]
+    },
+    {
+      "heading": "Commissions & Commercial Work",
+      "items": [
+        {
+          "year": "2026",
+          "text": "PGN, Studio Elsewhere. Multi-room interactive rehabilitation system, installed at clinical sites (see Professional Experience)"
+        },
+        {
+          "year": "2026",
+          "text": "Realtor.com Savings Simulator, SXSW, Austin. 16-bit game graphics for an arcade savings game, with Smooth Technology"
+        },
+        {
+          "year": "2026",
+          "text": "Audible Story House, New York. Audio-reactive visualizer for the listening room and a web interface for brand ambassadors, with Smooth Technology"
+        },
+        {
+          "year": "2025",
+          "text": "*End of Signal*, Cezar Mocan. Live-rendered AI visuals system for the installation; the project won the SOLO AI '25 award and has shown across multiple venues"
+        },
+        {
+          "year": "2025",
+          "text": "Video booth for Tapestry Electric, a gaming and performing arts company, at a gaming conference"
+        },
+        {
+          "year": "2023",
+          "text": "Drunk Elephant hair-care quiz kiosk, with Volvox Labs. Web animation and integration"
+        },
+        {
+          "year": "2022–",
+          "text": "Brooklyn Art Haus, Brooklyn. Technical direction for projection mapping and installation"
+        },
+        {
+          "year": "",
+          "text": "Further clients include National Geographic and the David Bowie estate"
+        }
+      ]
+    },
+    {
+      "heading": "Performance",
+      "items": [
+        {
+          "year": "2022–",
+          "text": "Live audio-visual performances as *rgb__tears* at venues around New York City, including Brooklyn Art Haus"
+        }
+      ]
+    },
+    {
+      "heading": "Residencies",
+      "items": [
+        {
+          "year": "2023–2024",
+          "text": "Artist in Residence / Research Fellow, Interactive Telecommunications Program (ITP), NYU"
+        }
+      ]
+    },
+    {
+      "heading": "Teaching",
+      "items": [
+        {
+          "year": "2025",
+          "text": "Adjunct Instructor, *Immersivity Beyond the Display*, undergraduate course, Interactive Media Arts (IMA), NYU. Self-designed introduction to experience design with interactive systems"
+        },
+        {
+          "year": "2024",
+          "text": "Instructor, *Collaging with TouchDesigner* and *Train Your Own Stable Diffusion Model*, workshops, ITP Camp, NYU"
+        },
+        {
+          "year": "2023–2024",
+          "text": "Instructor, *Teachable Machine* and *Intro to p5.js*, workshops, College and Career Lab Exploratory Program, NYU"
+        },
+        {
+          "year": "2023–2024",
+          "text": "Research Fellow, ITP, NYU. Managed the Coding Lab; tutorials and workshops; thesis and foundation support for undergraduate and graduate students"
+        },
+        {
+          "year": "2022–2023",
+          "text": "Lead Coding Lab Mentor, ITP/IMA, NYU"
+        },
+        {
+          "year": "2022",
+          "text": "Teaching Assistant, *Creative Computation*, IMA, NYU"
+        },
+        {
+          "year": "2021–2022",
+          "text": "Coding Lab Mentor, ITP/IMA, NYU"
+        }
+      ]
+    }
+  ]
+}

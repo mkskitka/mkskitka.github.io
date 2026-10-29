@@ -1,0 +1,402 @@
+/* ------------------------------------------------------------------
+   MK Skitka resume, in the look of mkskitka.com:
+   dark ground, a ruled grid whose horizontal lines run red -> teal and
+   vertical lines blue -> pink (the site's 'mk-original' palette), white
+   Open Sans text, and translucent panels sitting on the grid.
+
+   Export: sh scripts/resume-pdf.sh   (headless Chrome, A4, no margins)
+   Light version for printing: add ?theme=light to the address, or
+   body.light.
+   ------------------------------------------------------------------ */
+:root {
+  --page-w: 210mm;
+  --page-h: 297mm;
+  --cell-x: 10.5mm; /* 20 columns across the page */
+  --cell-y: 11mm; /* 27 rows down the page */
+  --line-w: 1.1px; /* the site's grid line weight */
+
+  --bg: #0c0c0e;
+  --text: #fff;
+  --text-soft: rgba(255, 255, 255, 0.88);
+  --text-dim: rgba(255, 255, 255, 0.55);
+  --panel: rgba(255, 255, 255, 0.045);
+  --panel-edge: rgba(255, 255, 255, 0.12);
+  --grid-alpha: 0.42;
+  --panel-wash: 55%; /* how much the panel dims the grid behind it */
+
+  --red: rgb(235, 70, 55);
+  --teal: rgb(45, 215, 205);
+  --blue: rgb(50, 90, 235);
+  --pink: rgb(240, 75, 130);
+}
+html.light {
+  --bg: #ffffff;
+  --text: #111114;
+  --text-soft: rgba(17, 17, 20, 0.88);
+  --text-dim: rgba(17, 17, 20, 0.55);
+  --panel: rgba(12, 12, 14, 0.035);
+  --panel-edge: rgba(12, 12, 14, 0.14);
+  --grid-alpha: 0.28;
+  --panel-wash: 60%;
+}
+
+* {
+  box-sizing: border-box;
+}
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+body {
+  background: transparent; /* the grid is on html */
+  color: var(--text);
+  font-family: 'Open Sans', Helvetica, Arial, sans-serif;
+  font-size: 8.9pt;
+  line-height: 1.42;
+  font-weight: 400;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+  -webkit-font-smoothing: antialiased;
+}
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* The grid is the page background: an SVG tile exactly one page in size,
+   drawn by the script at the bottom (lines as colour gradients, like the
+   site's canvas). Chrome paints the root background under every printed
+   page, margins included, so the lines run edge to edge on each page. */
+html {
+  background-color: var(--bg);
+  background-repeat: repeat;
+  background-size: var(--page-w) var(--page-h);
+}
+
+/* Page frame: one cell of margin all round, content on the grid. */
+.page {
+  position: relative;
+  z-index: 1;
+  width: var(--page-w);
+  margin: 0 auto;
+  padding: var(--cell-y) var(--cell-x);
+}
+
+/* Panels: the site's glass panels, minus the blur (there is nothing to blur
+   on paper). */
+.panel {
+  /* a light tint over a wash of the ground colour, so the grid shows through
+     the panel the way it does through the blurred glass on the site */
+  background:
+    linear-gradient(var(--panel), var(--panel)),
+    color-mix(in srgb, var(--bg) var(--panel-wash), transparent);
+  border: var(--line-w) solid var(--panel-edge);
+  border-radius: 2px;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+.main {
+  padding: calc(var(--cell-y) * 0.6) calc(var(--cell-x) * 0.6);
+}
+
+/* Header */
+.head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: var(--cell-x);
+  padding: calc(var(--cell-y) * 0.75) calc(var(--cell-x) * 0.75);
+  margin-bottom: var(--cell-y);
+  break-inside: avoid;
+}
+.head_name {
+  margin: 0;
+  font-size: 27pt;
+  line-height: 1.04;
+  font-weight: 500; /* the site's menu weight and tracking */
+  letter-spacing: -0.015em;
+  text-transform: uppercase;
+}
+.head_title {
+  margin: 3pt 0 0;
+  font-size: 11pt;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  color: var(--text-soft);
+}
+.head_contact {
+  text-align: right;
+  font-size: 8.6pt;
+  line-height: 1.6;
+  color: var(--text-soft);
+  white-space: nowrap;
+}
+.head_contact a:hover {
+  color: var(--teal);
+}
+.head_site {
+  display: inline-block;
+  margin-top: 2pt;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+.head_site::before {
+  content: '-> ';
+  color: var(--teal);
+  font-weight: 600;
+}
+
+/* Columns on the grid: 5 cells for the side column, 1 cell gap, rest main. */
+.cols {
+  display: grid;
+  grid-template-columns: calc(var(--cell-x) * 5) minmax(0, 1fr);
+  column-gap: var(--cell-x);
+  align-items: start;
+}
+
+/* Section headings: the write-up panel's heading style, with a short
+   gradient rule under it (a piece of the grid). */
+h2 {
+  margin: 0 0 calc(var(--cell-y) * 0.35);
+  padding-bottom: 4pt;
+  font-size: 10.5pt;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  position: relative;
+  break-after: avoid;
+}
+h2::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: var(--line-w);
+  background: linear-gradient(to right, var(--red), var(--teal));
+}
+section {
+  margin-bottom: calc(var(--cell-y) * 0.6);
+}
+
+/* Labels: the write-up's dt style */
+.label {
+  display: block;
+  margin: 0 0 1pt;
+  font-size: 7.4pt;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+/* Side column */
+.side {
+  padding: calc(var(--cell-y) * 0.6) calc(var(--cell-x) * 0.6);
+}
+.side section {
+  margin-bottom: calc(var(--cell-y) * 0.8);
+  break-inside: avoid;
+}
+.side section:last-child {
+  margin-bottom: 0;
+}
+.skills {
+  margin: 0;
+  padding: 0;
+}
+.skills dt {
+  margin: 7pt 0 1pt;
+  font-size: 7.4pt;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  break-after: avoid;
+}
+.skill_group:first-child dt {
+  margin-top: 0;
+}
+.skills dd {
+  margin: 0;
+  font-size: 9pt;
+  line-height: 1.45;
+  color: var(--text-soft);
+}
+
+/* Main column */
+.main p {
+  margin: 0 0 7pt;
+  color: var(--text-soft);
+}
+.main p:last-child {
+  margin-bottom: 0;
+}
+.entry {
+  margin-bottom: 6pt;
+}
+.entry_title,
+.entry_when {
+  break-inside: avoid;
+  break-after: avoid; /* a title never ends a page without at least one line under it */
+}
+.entry li,
+.teaching li {
+  break-inside: avoid;
+}
+.entry:last-child {
+  margin-bottom: 0;
+}
+.entry_title {
+  margin: 0;
+  font-size: 9.8pt;
+  font-weight: 600;
+  line-height: 1.35;
+}
+.entry_when {
+  display: block;
+  margin: 1pt 0 3pt;
+  font-size: 7.6pt;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+.entry ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.entry li {
+  position: relative;
+  padding-left: 11pt;
+  margin: 0 0 2pt;
+  color: var(--text-soft);
+}
+.entry li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.72em;
+  width: 6pt;
+  height: var(--line-w);
+  background: linear-gradient(to right, var(--red), var(--teal));
+}
+.teaching {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.teaching li {
+  position: relative;
+  padding-left: 54pt; /* hanging indent: wrapped lines line up with the text, not the year */
+  margin: 0 0 4pt;
+  color: var(--text-soft);
+}
+.teaching .year {
+  position: absolute;
+  left: 0;
+  top: 0.2em;
+  font-size: 7.6pt;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+@page {
+  size: A4;
+  margin: var(--cell-y) 0; /* one grid row top and bottom on every page */
+}
+@media print {
+  .page {
+    width: auto;
+    margin: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+}
+@media screen {
+  body {
+    padding: 24px 0;
+  }
+  .page {
+    min-height: var(--page-h);
+  }
+}
+
+/* Edit mode (npm run resume:edit): the text is editable in place, and the
+   toolbar saves back to this file and exports the PDF. Never printed. */
+.tools {
+  display: none;
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 10;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 10px;
+  border-radius: 999px;
+  background: rgba(12, 12, 14, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: #fff;
+  font-size: 12px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+}
+html.is-editing .tools {
+  display: flex;
+}
+.tools button {
+  font: inherit;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 999px;
+  padding: 5px 12px;
+  cursor: pointer;
+}
+.tools button:hover {
+  background: rgba(255, 255, 255, 0.18);
+}
+.tools button.is-primary {
+  background: linear-gradient(to right, var(--red), var(--teal));
+  border-color: transparent;
+  font-weight: 600;
+}
+.tools .status {
+  margin: 0 6px 0 2px;
+  color: rgba(255, 255, 255, 0.7);
+  max-width: 320px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.tools .status.is-dirty {
+  color: var(--teal);
+}
+html.is-editing .page {
+  outline: none;
+}
+html.is-editing .page:focus-within [contenteditable] {
+  outline: none;
+}
+@media print {
+  .tools {
+    display: none !important;
+  }
+}
+
+/* The CV (cv.html): longer, so a touch tighter. */
+body.cv {
+  font-size: 8.9pt;
+  line-height: 1.42;
+}
+body.cv section {
+  margin-bottom: calc(var(--cell-y) * 0.55);
+}
+body.cv .teaching li {
+  margin-bottom: 3pt;
+}
+em {
+  font-style: italic;
+}
+.teaching .year:empty::before {
+  content: '\00a0';
+}

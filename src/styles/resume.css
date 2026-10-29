@@ -180,8 +180,11 @@
 .resume_page .skills dt {
   margin: 0.9em 0 0.15em;
 }
-.resume_page .skills dt:first-child {
+.resume_page .skill_group:first-child dt {
   margin-top: 0;
+}
+.resume_page .skills dd a {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.25);
 }
 .resume_page .skills dd {
   margin: 0;
