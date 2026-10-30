@@ -145,7 +145,7 @@ const page = (d, cv, variant = null) => {
       : section('Additional Teaching Experience', yearList(d.teaching, 'teaching')),
     cv: d.cv.map((s, i) => section(s.heading, yearList(s.items, `cv.${i}.items`))).join('\n'),
   }
-  const order = cv ? ['profile', 'jobs', 'education', 'cv'] : v?.sections ?? ['profile', 'jobs', 'education', 'teaching']
+  const order = cv ? ['profile', 'jobs', 'education', 'cv'] : v?.sections ?? ['profile', 'jobs', 'education'] // the base resume folds the teaching list into the Research Fellow entry; variants list it
   return `<!-- page:start -->${header(d, v, vpath)}
 
     <div class="cols">

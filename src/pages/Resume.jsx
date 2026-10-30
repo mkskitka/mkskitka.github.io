@@ -152,18 +152,6 @@ export default function Resume() {
                       </div>
                     ))}
                   </section>
-
-                  <section>
-                    <h2>Additional Teaching Experience</h2>
-                    <ul className="teaching">
-                      {d.teaching.map((t, i) => (
-                        <li key={i}>
-                          <span className="year">{t.year}</span>
-                          {rich(t.text)}
-                        </li>
-                      ))}
-                    </ul>
-                  </section>
                 </main>
               </div>
             </div>
