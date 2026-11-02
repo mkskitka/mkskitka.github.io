@@ -1162,7 +1162,8 @@ export default function GridInkBackdrop({ className = '', transparent = false, p
           let textW = 0
           const prevWidth = panel.style.width
           panel.style.width = 'max-content'
-          panel.querySelectorAll('.hero_menu_text_color').forEach((a) => {
+          // (The sort strip under the menu, .hero_sort, counts too, so the panel is never narrower than it.)
+          panel.querySelectorAll('.hero_menu_text_color, .hero_sort').forEach((a) => {
             const r = document.createRange()
             r.selectNodeContents(a)
             textW = Math.max(textW, r.getBoundingClientRect().width)

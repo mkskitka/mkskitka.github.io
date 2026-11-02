@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { projects } from '../data/projects.js'
 import HeroBackdrop from '../components/HeroBackdrop.jsx'
@@ -11,6 +11,7 @@ import ProjectGallery from '../components/ProjectGallery.jsx'
 import ProjectBackdrop from '../components/ProjectBackdrop.jsx'
 import ProjectLock, { isUnlocked } from '../components/ProjectLock.jsx'
 import { revealSections } from '../lib/animations.js'
+import { DEFAULT_SORT, SORTS, isSort, sortItems } from '../lib/sortItems.js'
 
 // The site is currently just the hero, fixed to one screen with no scrolling: wheel,
 // touch and keys drive the backdrop animation instead (GridInkBackdrop SETTINGS.scroll).
@@ -35,6 +36,10 @@ import { revealSections } from '../lib/animations.js'
 //   /contact     the contact tiles
 // (<slug> and <id> are from src/data/projects.js and src/data/visuals.js.) The old
 // /#systems style still works and is turned into /systems.
+// The Systems and Visuals tiles can be sorted (the strip under the menu while they are
+// open; orders in src/lib/sortItems.js). A non-default order is part of the address,
+// /systems?sort=oldest, so a sorted view can be sent too; swiping through the visuals
+// follows the chosen order.
 // Clicking SYSTEMS (to open it) sends a band of light along the grid lines, left to right;
 // clicking VISUALS pours a stream of ink/smoke into the backdrop (GridInkBackdrop SETTINGS.glow / .pour).
 // Only those menu clicks do it: coming back to the tiles from a project or visual does not.
@@ -65,8 +70,19 @@ const MENU = [
   { id: 'contact', label: 'CONTACT', path: '/contact' },
 ]
 // The address for a state of the page, and the state an address asks for.
-const pathFor = (active, project) =>
-  project ? (project.kind === 'visual' ? `/visuals/${project.slug}` : `/projects/${project.slug}`) : (MENU.find((m) => m.id === active)?.path ?? '/')
+const pathFor = (active, project, sort = DEFAULT_SORT) => {
+  if (project) return project.kind === 'visual' ? `/visuals/${project.slug}` : `/projects/${project.slug}`
+  const path = MENU.find((m) => m.id === active)?.path ?? '/'
+  const order = sort[active]
+  return order && order !== DEFAULT_SORT[active] ? `${path}?sort=${order}` : path
+}
+// The sort orders an address asks for: the default for each kind, overridden by ?sort= for
+// the kind the address opens.
+const parseSort = (pathname, search) => {
+  const { active } = parsePath(pathname)
+  const want = new URLSearchParams(search).get('sort')
+  return active && isSort(active, want) ? { ...DEFAULT_SORT, [active]: want } : { ...DEFAULT_SORT }
+}
 const parsePath = (pathname) => {
   const menu = MENU.find((m) => m.path === pathname.replace(/\/$/, '') || m.path === pathname)
   if (menu) return { active: menu.id }
@@ -94,6 +110,12 @@ export default function Home() {
   const navigate = useNavigate()
   // What is selected in the menu (the address decides; see pathFor / parsePath above).
   const [active, setActive] = useState(() => parsePath(location.pathname).active)
+
+  // Sort order per kind of tiles (src/lib/sortItems.js), and the seed behind a shuffle.
+  const [sort, setSort] = useState(() => parseSort(location.pathname, location.search))
+  const [shuffleSeed, setShuffleSeed] = useState(() => Math.random())
+  const PROJECT_LIST = useMemo(() => sortItems(projects, sort.systems), [sort.systems])
+  const VISUAL_LIST = useMemo(() => sortItems(VISUAL_ITEMS, sort.visuals, shuffleSeed), [sort.visuals, shuffleSeed])
 
   // The open project (if any) and the tile rectangle it grew out of.
   const [project, setProject] = useState(null)
@@ -149,7 +171,17 @@ export default function Home() {
     }
     const next = active === id ? null : id
     setActive(next)
-    navigate(pathFor(next, null))
+    navigate(pathFor(next, null, sort))
+  }
+
+  // The sort strip: reorder the open tiles, and put the order in the address (replacing
+  // it, so the back button does not step through every order tried).
+  const pickSort = (id) => (e) => {
+    e.preventDefault()
+    if (id === 'shuffle') setShuffleSeed(Math.random())
+    const next = { ...sort, [active]: id }
+    setSort(next)
+    navigate(pathFor(active, null, next), { replace: true })
   }
 
   // Visuals are shown as the piece itself: the whole image as large as it fits, no
@@ -185,7 +217,7 @@ export default function Home() {
   // Back to the tiles (and to their address).
   const closeProject = () => {
     setProject(null)
-    navigate(pathFor(active, null))
+    navigate(pathFor(active, null, sort))
   }
 
   // The address changed under us (a sent link on arrival, or the browser's back / forward
@@ -197,6 +229,11 @@ export default function Home() {
     const want = parsePath(location.pathname)
     if (want.item === false) return navigate('/', { replace: true })
     if (want.active !== active) setActive(want.active)
+    // A sent link, or back / forward, naming an order.
+    if (!want.item) {
+      const order = parseSort(location.pathname, location.search)
+      if (want.active && order[want.active] !== sort[want.active]) setSort(order)
+    }
     if (want.item) {
       if (project?.slug !== want.item.slug && locked?.project.slug !== want.item.slug) openProject(want.item)
     } else if (project || locked) {
@@ -213,9 +250,9 @@ export default function Home() {
 
   // An open visual: step to the next (1) or previous (-1) one. Its image is revealed
   // from the side it comes in from. Stops at the first and last.
-  const visualIndex = isVisual ? VISUAL_ITEMS.findIndex((v) => v.slug === project.slug) : -1
+  const visualIndex = isVisual ? VISUAL_LIST.findIndex((v) => v.slug === project.slug) : -1
   const stepVisual = (dir) => {
-    const next = VISUAL_ITEMS[visualIndex + dir]
+    const next = VISUAL_LIST[visualIndex + dir]
     const host = heroRef.current
     if (visualIndex < 0 || !next || !host) return
     setProjectFrom({ left: dir > 0 ? host.clientWidth : 0, top: host.clientHeight / 2, width: 0, height: 0 })
@@ -231,7 +268,7 @@ export default function Home() {
     if (visualIndex < 0) return undefined
     // Have the neighbours' images ready, so a swipe shows the next one straight away.
     for (const d of [-1, 1]) {
-      const src = VISUAL_ITEMS[visualIndex + d]?.thumb?.image
+      const src = VISUAL_LIST[visualIndex + d]?.thumb?.image
       if (src) new Image().src = src
     }
     let touch = null
@@ -259,7 +296,7 @@ export default function Home() {
       window.removeEventListener('touchend', onEnd)
       window.removeEventListener('keydown', onKey)
     }
-  }, [visualIndex])
+  }, [visualIndex, VISUAL_LIST])
 
   return (
     <div ref={root} className="home home--fixed">
@@ -315,21 +352,39 @@ export default function Home() {
               ))}
             </>
           ) : (
-            MENU.map((m) => (
-              <a
-                key={m.id}
-                href="#"
-                className={`heading_primary hero_menu_text_color${active === m.id ? ' is-active' : ''}`}
-                aria-pressed={active === m.id}
-                onClick={pick(m.id)}
-              >
-                {m.label}
-              </a>
-            ))
+            <>
+              {MENU.map((m) => (
+                <a
+                  key={m.id}
+                  href="#"
+                  className={`heading_primary hero_menu_text_color${active === m.id ? ' is-active' : ''}`}
+                  aria-pressed={active === m.id}
+                  onClick={pick(m.id)}
+                >
+                  {m.label}
+                </a>
+              ))}
+              {/* Sort strip: one grid row under the menu while Systems or Visuals tiles are open. */}
+              {SORTS[active] && (
+                <nav className="hero_sort" aria-label={`Sort ${MENU.find((m) => m.id === active).label.toLowerCase()}`}>
+                  {SORTS[active].map((s) => (
+                    <a
+                      key={s.id}
+                      href="#"
+                      className={`hero_sort_link${sort[active] === s.id ? ' is-active' : ''}`}
+                      aria-pressed={sort[active] === s.id}
+                      onClick={pickSort(s.id)}
+                    >
+                      {s.label}
+                    </a>
+                  ))}
+                </nav>
+              )}
+            </>
           )}
         </div>
-        <ProjectThumbs open={active === 'systems' && !project} keep={active === 'systems' && !!project} onSelect={openProject} cells={{ desktop: 2 }} columns={{ phone: 3 }} rows />
-        <ProjectThumbs open={active === 'visuals' && !project} keep={active === 'visuals' && !!project} focus={visualAt} items={VISUAL_ITEMS} label="Visuals" onSelect={openProject} bounce={visualsFresh} titles={SHOW_VISUAL_TITLES} />
+        <ProjectThumbs open={active === 'systems' && !project} keep={active === 'systems' && !!project} items={PROJECT_LIST} onSelect={openProject} cells={{ desktop: 2 }} columns={{ phone: 3 }} rows />
+        <ProjectThumbs open={active === 'visuals' && !project} keep={active === 'visuals' && !!project} focus={visualAt} items={VISUAL_LIST} label="Visuals" onSelect={openProject} bounce={visualsFresh} titles={SHOW_VISUAL_TITLES} />
         <ContactTiles open={active === 'contact'} />
         {/* MK SKITKA: the bio (src/data/about.js). A project: its write-up (src/data/projects.js). */}
         <WriteUp open={active === 'home' && !project} heading={about.heading} paragraphs={about.paragraphs} align="center">

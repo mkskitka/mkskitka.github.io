@@ -157,6 +157,41 @@ a:hover,
   opacity: 1;
 }
 
+/* Sort strip (pages/Home.jsx, orders in lib/sortItems.js): one more row in the menu
+   panel while the Systems or Visuals tiles are open. It is exactly one grid row tall,
+   so the panel's bottom edge stays on a line, and the backdrop measures it with the
+   menu text so the panel is always wide enough for it. The chosen order dims the
+   others the way the menu does. */
+.hero_sort {
+  display: flex;
+  align-items: center;
+  gap: 1.2em;
+  height: var(--grid-spacing, 1.15em);
+  margin: 0;
+  padding: 0;
+  font-size: clamp(0.6rem, 1.8vw, 0.76rem);
+  font-weight: var(--panel-text-weight);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.hero_sort_link {
+  color: #fff;
+  text-decoration: none;
+  opacity: var(--menu-dim);
+  transition: opacity 0.25s ease, color 0.2s ease;
+  touch-action: manipulation;
+}
+.hero_sort_link.is-active {
+  opacity: 1;
+}
+@media (hover: hover) {
+  .hero_sort_link:not(.is-active):hover {
+    opacity: 0.7;
+    color: var(--_colors---core-accent-color--accent-primary-hover, #fff);
+  }
+}
+
 /* The grid of tiles. Hidden until SYSTEMS is selected; tiles fade and rise in one
    after another, and fade out together when it closes. */
 .project_thumbs {
