@@ -12,15 +12,39 @@ npm run build   # production build into dist/
 npm run preview # serve the production build locally
 ```
 
-Hosted on GitHub Pages at https://mkskitka.github.io from the `mkskitka.github.io` repo.
-Every push to `main` rebuilds and redeploys automatically (see `.github/workflows/deploy.yml`);
-it takes about a minute. To publish changes:
+## Deploy
+
+The site is hosted on AWS at https://mkskitka.com: a private S3 bucket (`mk-skitka-site`)
+served through CloudFront (distribution `E2L55K784TVBE6`, also reachable at
+https://d2vfx0f1xojaxw.cloudfront.net). Deploys are run from this machine, because the
+media in `src/assets` lives here. Nothing on GitHub deploys to AWS.
 
 ```bash
+aws login        # once per session; the AWS CLI session expires after a while
 git add -A
 git commit -m "describe your change"
-git push
+git push         # keep the repo in step with what is live
+npm run deploy   # build + upload + CloudFront invalidation (scripts/deploy-aws.sh)
 ```
+
+`npm run deploy` does, in order:
+
+1. Rebuilds the resume HTML from `resume/resume.json` and exports `public/resume.pdf`
+   (the "PDF ->" link on /resume). The PDF is not committed; it is remade every deploy.
+2. `npm run build` into `dist/`.
+3. Uploads `dist/assets` with a one-year immutable cache (Vite names those files after
+   their contents), then everything else with a five-minute cache, and `index.html`
+   with `no-cache`. Files no longer in `dist/` are deleted from the bucket.
+4. Invalidates `/*` on CloudFront, so the new pages show within a minute or two.
+
+It deploys the **working tree**, not the last commit, so uncommitted edits go live too.
+If `aws` says the session has expired, run `aws login` and try again. To check what is
+live, compare the bundle name in `dist/index.html` with the one in the page source at
+https://mkskitka.com.
+
+A copy is also published to GitHub Pages at https://mkskitka.github.io on every push to
+`main` (`.github/workflows/deploy.yml`, about a minute). That is a side effect of pushing,
+not the real site: a push alone does not update mkskitka.com.
 
 ## Current state
 
@@ -86,8 +110,9 @@ controls → Linked accounts → Facebook).
    It prints the Page token.
 5. GitHub repo → **Settings → Secrets and variables → Actions → New repository
    secret**: name `INSTAGRAM_ACCESS_TOKEN`, value = the Page token.
-6. **Actions → Sync Instagram visuals → Run workflow**. The tiles are live once
-   the "Deploy to GitHub Pages" run that it kicks off finishes.
+6. **Actions → Sync Instagram visuals → Run workflow**. The tiles are live on
+   GitHub Pages once the "Deploy to GitHub Pages" run that it kicks off finishes; to
+   get them onto mkskitka.com, `git pull` and `npm run deploy` (see "Deploy").
 
 Run it locally to check: `INSTAGRAM_ACCESS_TOKEN=... node scripts/instagram-sync.mjs`
 (every post is kept by default; `INSTAGRAM_MAX=24` limits it to the newest 24).
