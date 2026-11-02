@@ -133,6 +133,7 @@ a:hover,
   --thumb-gap-cells: 1; /* whole cells between tiles, and between the menu panel and the grid */
   --thumb-opacity: 1; /* tiles at rest (1 = solid); the hovered tile always goes solid */
   --thumb-opacity-dim: 0.45; /* the other tiles while one is hovered */
+  --thumb-title-rest: 1; /* project names on the tiles at rest: 1 = always shown, 0 = only on hover / focus */
 }
 /* Windows under ~1000px tall: 2x2 blocks so all the projects still fit beside the
    menu (eight 3x3 tiles need three rows, about 11 cells tall). */
@@ -274,7 +275,7 @@ a:hover,
   text-transform: uppercase;
   color: #fff;
   background: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.7));
-  opacity: 0;
+  opacity: var(--thumb-title-rest, 0);
   transition: opacity 0.25s ease;
 }
 .project_thumb:focus-visible .project_thumb_title {
@@ -312,15 +313,15 @@ a:hover,
   will-change: transform;
 }
 
-/* Scrollable tiles on desktop slide under the menu panel: everything left of the
-   panel's right edge (--fade-from, set by ProjectThumbs) is cut off, so a tile leaves
-   as if it went beneath the panel and never shows over the menu. The tiles' container
-   has no height of its own, hence the huge negative insets. (A gradient mask with
+/* Scrollable tiles on desktop slide under the menu panel: the panel is stacked above
+   the tiles (z-index, in the desktop block below), so a tile scrolled past the panel's
+   right edge passes behind the glass, blurred, and carries on off the left edge of the
+   page. (Earlier, everything left of the panel's right edge (--fade-from, set by
+   ProjectThumbs) was cut off with a clip-path instead, so the tiles vanished at the
+   panel's edge: to have that back, give .project_thumbs--fade
+   `clip-path: inset(-200vh -200vw -200vh var(--fade-from, 0px))`. A gradient mask with
    `mask-clip: no-clip` was tried for a soft fade; Chrome drops it once the tiles'
    track is transformed.) */
-.project_thumbs--fade {
-  clip-path: inset(-200vh -200vw -200vh var(--fade-from, 0px));
-}
 
 /* Arrows for scrollable tiles (ProjectThumbs): one grid cell at each end of the bottom
    row, which is kept free of tiles. Shown only when there is more that way; the one
@@ -465,6 +466,11 @@ a:hover,
     display: block;
     margin: 0;
     z-index: 2;
+  }
+  /* The menu panel sits over the tiles, so scrolling tiles pass behind its glass. */
+  .home .section.is-full-screen > .header.margin-bottom_none {
+    position: relative;
+    z-index: 3;
   }
   .project_thumbs--scatter .project_thumb {
     position: absolute;

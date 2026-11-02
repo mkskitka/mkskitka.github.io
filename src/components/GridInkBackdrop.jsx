@@ -265,9 +265,19 @@ const SETTINGS = {
   // right angle. The leftmost goes furthest down and each one after it turns a step
   // higher, so the right angles sit one inside the next and never cross. The leading
   // end glows as it travels. They fade away when Contact closes.
+  // A second group sets off at the same time from the opposite end of the page
+  // (`second`): 'complete' comes up from the bottom edge on the same columns, turns at
+  // the same corners and runs out to the left edge, so each column and row is coloured
+  // along its whole length once both groups are done; 'mirror' is the first group
+  // turned upside down, coming up from the bottom on the right-hand columns and
+  // turning left towards the top; 'none' is the first group on its own, as before.
   trace: {
     enabled: true,
-    count: 8, // how many lines come down (max 16; fewer if the page runs out of rows or columns)
+    count: 'all', // how many lines per group: a number, or 'all' = as many as fit on the page
+    //            (at most 32 per group with a second group, 64 without)
+    second: 'complete', // the second group, from the opposite end: 'complete' | 'mirror' | 'none'
+    fillColumns: true, // once the page runs out of rows to turn on, the remaining columns come
+    //                    straight down with no turn, so every column is coloured (false = stop there)
     firstColumn: 1, // grid column of the leftmost line (0 = the left edge of the page)
     columnStep: 1, // grid columns between one line and the next
     lowestRow: 1, // how many rows up from the bottom the leftmost line turns
@@ -341,7 +351,7 @@ const PANEL_UP_ROWS_PHONE = 1 // phones: grid rows to lift the menu panel above 
 const PANEL_LEFT_COLS = 1 // clear grid columns between the page edge and the menu panel (fitted grid only)
 
 const MAX_DROPS = 16
-const MAX_TRACES = 16
+const MAX_TRACES = 64 // Contact traces, both groups together (the shader loops over this many)
 const MAX_PUFFS = 8 // Visuals pour puffs
 const SIM_SCALE = .1 // simulation resolution relative to the page (lower = cheaper, blockier edges)
 const SIM_STEPS = 2 // simulation steps per frame
@@ -577,8 +587,11 @@ const DISPLAY_FRAG = /* glsl */ `
   uniform vec4 uGlow;        // amount 0..1, brightness, thicken px, halo px
   uniform float uGlowHalo;   // halo strength
   uniform vec2 uGlowBand;    // centre x and half-width of the travelling band, css px
-  uniform vec4 uTrace[${MAX_TRACES}];     // Contact traces: column x (css px), turn y (css px), from (0 top, 1 bottom), turn (-1 left, 1 right)
-  uniform float uTraceLen[${MAX_TRACES}]; // how far each has travelled, css px (0 = not set off)
+  // Contact traces, one vec4 each: column x (css px), turn y (css px), shape, and how far
+  // it has travelled (css px; 0 = not set off). shape = from * 2 + right: from 0 = the top
+  // edge, 1 = the bottom; right 1 = turns right, 0 = turns left. (One vec4 per trace
+  // rather than a second float array keeps the uniform count within what phones allow.)
+  uniform vec4 uTrace[${MAX_TRACES}];
   uniform vec4 uTraceLook;   // amount 0..1, trail px, brightness, thicken px
   uniform vec2 uTraceHalo;   // halo px, halo strength
   uniform vec3 uTraceFrom, uTraceTo; // colour at the top of the page -> at the bottom
@@ -774,21 +787,23 @@ const DISPLAY_FRAG = /* glsl */ `
       vec3 tCol = mix(uTraceFrom, uTraceTo, clamp(px.y / uSize.y, 0.0, 1.0));
       float ta = uTraceLook.x * uLineAlpha;
       for (int i = 0; i < ${MAX_TRACES}; i++) {
-        float len = uTraceLen[i];
-        if (len <= 0.0) continue;
         vec4 tr = uTrace[i];
-        float y0 = tr.z * uSize.y;
-        float sgn = 1.0 - 2.0 * tr.z;
+        float len = tr.w;
+        if (len <= 0.0) continue;
+        float from = tr.z >= 2.0 ? 1.0 : 0.0;              // 0 = from the top edge, 1 = from the bottom
+        float turn = mod(tr.z, 2.0) >= 1.0 ? 1.0 : -1.0;   // 1 = turns right, -1 = turns left
+        float y0 = from * uSize.y;
+        float sgn = 1.0 - 2.0 * from;
         float lenV = abs(tr.y - y0);                       // the column part
-        float lenH = tr.w > 0.0 ? uSize.x - tr.x : tr.x;   // the row part, to the page edge
+        float lenH = turn > 0.0 ? uSize.x - tr.x : tr.x;   // the row part, to the page edge
         float done = min(len, lenV + lenH);
         float lv = min(done, lenV);
         float lh = max(0.0, done - lenV);
         float sV = (px.y - y0) * sgn;  // how far along the column this pixel is
-        float sH = (px.x - tr.x) * tr.w; // and along the row
+        float sH = (px.x - tr.x) * turn; // and along the row
         float onV = step(0.0, sV) * step(sV, lv);
         float onH = step(0.0, sH) * step(sH, lh) * step(0.5, lh);
-        vec2 tip = done < lenV ? vec2(tr.x, y0 + sgn * lv) : vec2(tr.x + tr.w * lh, tr.y);
+        vec2 tip = done < lenV ? vec2(tr.x, y0 + sgn * lv) : vec2(tr.x + turn * lh, tr.y);
         float live = clamp((lenV + lenH - len) / 80.0, 0.0, 1.0); // the light goes out as it reaches the edge
         float bV = (done - sV) / uTraceLook.y;
         float bH = (done - lenV - sH) / uTraceLook.y;
@@ -1007,7 +1022,6 @@ export default function GridInkBackdrop({ className = '', transparent = false, p
         uGlowBand: { value: new THREE.Vector2(-1e4, 1) },
         uTip: { value: new THREE.Vector2(1, 0) },
         uTrace: { value: Array.from({ length: MAX_TRACES }, () => new THREE.Vector4(0, 0, 0, 1)) },
-        uTraceLen: { value: new Array(MAX_TRACES).fill(0) },
         uTraceLook: { value: new THREE.Vector4(0, 1, glowLook('contact').brightness, glowLook('contact').thicken) },
         uTraceHalo: { value: new THREE.Vector2(glowLook('contact').halo, glowLook('contact').haloStrength) },
         uTraceFrom: { value: c255(S.trace.colors.from) },
@@ -1382,16 +1396,54 @@ export default function GridInkBackdrop({ className = '', transparent = false, p
       const og = dispMat.uniforms.uOrigin.value
       const cols = Math.floor((cssW - og.x) / sp.x + 1e-6)
       const rows = Math.floor((cssH - og.y) / sp.y + 1e-6)
-      // Line n: down column firstColumn + n * columnStep, turning right at a row
-      // `rowStep` higher than the one before, while there are columns and rows left.
       const T = S.trace
+      const colStep = Math.max(1, T.columnStep)
+      const rowStep = Math.max(1, T.rowStep)
+      const groups = T.second === 'none' ? 1 : 2
+      const perGroup = Math.floor(MAX_TRACES / groups)
+      const want = T.count === 'all' ? perGroup : Math.min(perGroup, T.count)
       traces.list = []
-      for (let n = 0; n < Math.min(MAX_TRACES, T.count); n++) {
-        const col = T.firstColumn + n * Math.max(1, T.columnStep)
-        const row = rows - T.lowestRow - n * Math.max(1, T.rowStep)
-        if (col >= cols || row < 1) break
-        dispMat.uniforms.uTrace.value[n].set(og.x + col * sp.x, og.y + row * sp.y, 0, 1)
-        traces.list.push({ delay: n * T.stagger })
+      // One trace: column x and turn y in css px, from (0 top, 1 bottom), turn (-1 left, 1 right).
+      // The shader reads them packed as (x, y, from * 2 + right, distance travelled).
+      const add = (col, row, from, turn, delay) => {
+        if (traces.list.length >= MAX_TRACES) return
+        dispMat.uniforms.uTrace.value[traces.list.length].set(og.x + col * sp.x, og.y + row * sp.y, from * 2 + (turn > 0 ? 1 : 0), 0)
+        traces.list.push({ delay })
+      }
+      // First group, line n: down column firstColumn + n * columnStep from the top edge,
+      // turning right at a row `rowStep` higher than the one before, while there are
+      // columns and rows left.
+      // Once the rows run out (wide pages have more columns than rows), the remaining
+      // columns come straight down with no turn (`fillColumns`): a turn row off the
+      // bottom of the page puts the whole run along the column and the rest out of sight.
+      const first = []
+      for (let n = 0; n < want; n++) {
+        const col = T.firstColumn + n * colStep
+        if (col >= cols) break
+        const row = rows - T.lowestRow - n * rowStep
+        if (row >= 1) {
+          first.push({ col, row })
+          add(col, row, 0, 1, n * T.stagger)
+        } else if (T.fillColumns) add(col, rows + 1, 0, 1, n * T.stagger)
+        else break
+      }
+      if (T.second === 'complete') {
+        // Up the same columns from the bottom edge, turning left at the same corners and
+        // running to the left edge: the two halves make each column and row whole.
+        // (The straight columns are whole already, so they get no second half.)
+        first.forEach(({ col, row }, n) => add(col, row, 1, -1, n * T.stagger))
+      } else if (T.second === 'mirror') {
+        // The first group turned upside down: up from the bottom edge on the right-hand
+        // columns, the rightmost going furthest up, each turning left a step lower;
+        // straight up the rest of the columns once the rows run out.
+        for (let n = 0; n < want; n++) {
+          const col = cols - T.firstColumn - n * colStep
+          if (col < 1) break
+          const row = T.lowestRow + n * rowStep
+          if (row < rows) add(col, row, 1, -1, n * T.stagger)
+          else if (T.fillColumns) add(col, -1, 1, -1, n * T.stagger)
+          else break
+        }
       }
       traces.at = seconds
       traces.w = cssW
@@ -1489,10 +1541,10 @@ export default function GridInkBackdrop({ className = '', transparent = false, p
         traces.amount = 0
         traces.list = null
       }
-      const traceLen = dispMat.uniforms.uTraceLen.value
+      const traceSlots = dispMat.uniforms.uTrace.value
       for (let n = 0; n < MAX_TRACES; n++) {
         const t = traces.list?.[n]
-        traceLen[n] = t ? Math.max(0, seconds - traces.at - t.delay) * S.trace.speed * cssH : 0
+        traceSlots[n].w = t ? Math.max(0, seconds - traces.at - t.delay) * S.trace.speed * cssH : 0
       }
       dispMat.uniforms.uTraceLook.value.x = traces.amount
       dispMat.uniforms.uTraceLook.value.y = Math.max(1, glowLook('contact').length * cssH)
