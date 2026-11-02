@@ -128,10 +128,25 @@
 /* Two columns: skills, then everything else. */
 .resume_page .cols {
   display: grid;
-  grid-template-columns: minmax(180px, 1fr) 2.6fr;
+  grid-template-columns: minmax(180px, 1fr) minmax(0, 2.6fr);
   column-gap: var(--cell);
   align-items: start;
 }
+.resume_page .side,
+.resume_page .main {
+  min-width: 0;
+}
+/* The main column comes first in the markup (so parsers read the story before the
+   skills list); the grid still draws the sidebar on the left. */
+.resume_page .side {
+  grid-column: 1;
+  grid-row: 1;
+}
+.resume_page .main {
+  grid-column: 2;
+  grid-row: 1;
+}
+
 
 /* Section headings: the write-up heading, with a short gradient rule (a piece of the grid). */
 .resume_page h2 {
@@ -183,12 +198,33 @@
 .resume_page .skill_group:first-child dt {
   margin-top: 0;
 }
-.resume_page .skills dd a {
-  border-bottom: 1px solid rgba(255, 255, 255, 0.25);
-}
 .resume_page .skills dd {
   margin: 0;
   color: rgba(255, 255, 255, 0.88);
+}
+/* The Core line: one comma-separated run, in full white. */
+.resume_page .skill_inline {
+  margin-bottom: 0.3em;
+}
+.resume_page .skill_inline dd {
+  display: inline;
+  color: #fff;
+  font-weight: 500;
+}
+.resume_page .skill_inline dd:not(:last-child)::after {
+  content: ',';
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+/* Links in the text (project pages, the class site): a thin teal underline. */
+.resume_page .main p a,
+.resume_page .main li a,
+.resume_page .skills dd a {
+  text-decoration: underline;
+  text-decoration-color: rgb(45, 215, 205);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
 }
 
 /* Entries */
@@ -274,11 +310,16 @@
     white-space: normal;
   }
   .resume_page .cols {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     row-gap: var(--cell);
   }
   .resume_page .side {
-    order: 2;
+    grid-column: 1;
+    grid-row: 2;
+  }
+  .resume_page .main {
+    grid-column: 1;
+    grid-row: 1;
   }
 }
 

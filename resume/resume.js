@@ -57,9 +57,10 @@ drawGrid()
     if (dirty) e.preventDefault()
   })
 
-  // Text of an element with <em> turned back into *...*
+  // Text of an element with <em> turned back into *...* and <a> into [text](url)
   const textOf = (el) => {
     const c = el.cloneNode(true)
+    c.querySelectorAll('a[href]').forEach((a) => a.replaceWith(`[${a.textContent}](${a.getAttribute('href')})`))
     c.querySelectorAll('em, i').forEach((e) => e.replaceWith(`*${e.textContent}*`))
     c.querySelectorAll('br').forEach((b) => b.replaceWith(' '))
     return c.textContent.replace(/ /g, ' ').replace(/\s+/g, ' ').trim()

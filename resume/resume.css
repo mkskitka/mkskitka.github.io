@@ -232,6 +232,31 @@ section {
   line-height: 1.45;
   color: var(--text-soft);
 }
+/* A run-in group (the Core line): items in one comma-separated run, in the
+   full text colour so it reads as the headline of the list. */
+.skill_inline {
+  margin-bottom: 3pt;
+}
+.skill_inline dd {
+  display: inline;
+  color: var(--text);
+  font-weight: 500;
+}
+.skill_inline dd:not(:last-child)::after {
+  content: ',';
+  font-weight: 400;
+  color: var(--text-dim);
+}
+
+/* Links inside body text: a teal underline so they survive print */
+.main p a,
+.main li a,
+.skills dd a {
+  text-decoration: underline;
+  text-decoration-color: var(--teal);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2pt;
+}
 
 /* Main column */
 .main p {

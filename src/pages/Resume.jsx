@@ -1,36 +1,44 @@
-import { Fragment, useEffect } from 'react'
-import { Link } from 'react-router-dom'
+import { useEffect } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import GridInkBackdrop from '../components/GridInkBackdrop.jsx'
-import resume from '../../resume/resume.json'
+import resumeHtml from '../../resume/resume-site.html?raw'
 import '../styles/resume.css'
 
 /**
  * /resume: the resume as a page of the site, on the live grid backdrop, in the same
  * frosted glass panels as the rest of the site.
  *
- * The content is resume/resume.json, the one source the printed resume, the CV and
- * the PDF are built from too (scripts/resume-build.mjs; edit with npm run
- * resume:edit). The class names match the printed page so src/styles/resume.css
- * styles both the same way.
+ * The content is resume/resume-site.html, the "site" variant (no profile paragraph)
+ * that scripts/resume-build.mjs renders from resume/resume.json (edit with npm run
+ * resume:edit, then npm run resume:build). The part between the page:start /
+ * page:end markers is dropped in as is; src/styles/resume.css restyles its class
+ * names for the screen.
  *
  * The page scrolls inside .resume_scroll (the site keeps the window itself from
  * scrolling), and the backdrop leaves wheel/touch inside it alone.
  */
 
-// *text* -> <em>text</em>
-const rich = (s) =>
-  String(s ?? '')
-    .split(/(\*[^*]+\*)/)
-    .map((part, i) => (part.startsWith('*') && part.endsWith('*') ? <em key={i}>{part.slice(1, -1)}</em> : part))
-
-const bulletText = (b) => (typeof b === 'string' ? b : b.text)
+const SITE = 'https://mkskitka.com'
+const page = (() => {
+  const m = resumeHtml.match(/<!-- page:start -->([\s\S]*)<!-- page:end -->/)
+  return m ? m[1] : resumeHtml
+})()
 
 export default function Resume() {
+  const navigate = useNavigate()
   useEffect(() => {
     document.title = 'Resume — MK Skitka'
   }, [])
-  const d = resume
-  const years = [...new Set(d.projects.map((p) => p.year))]
+
+  // Links to this site (the project pages) stay in the app instead of reloading it.
+  const onClick = (e) => {
+    const a = e.target.closest('a[href]')
+    if (!a || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || a.target === '_blank') return
+    const href = a.getAttribute('href')
+    if (!href.startsWith(SITE + '/')) return
+    e.preventDefault()
+    navigate(href.slice(SITE.length))
+  }
 
   return (
     <div className="home home--fixed resume">
@@ -46,110 +54,7 @@ export default function Resume() {
                 PDF -&gt;
               </a>
             </nav>
-            <div className="resume_page">
-              <header className="head panel">
-                <div>
-                  <h1 className="head_name">{d.name}</h1>
-                  <p className="head_title">{d.title}</p>
-                </div>
-                <div className="head_contact">
-                  {d.location}
-                  <br />
-                  <a href={`tel:${d.phone.replace(/\D/g, '')}`}>{d.phone}</a> &nbsp;·&nbsp; <a href={`mailto:${d.email}`}>{d.email}</a>
-                  <br />
-                  <a className="head_site" href={`https://${d.site}/`}>
-                    {d.site}
-                  </a>
-                  {d.linkedin && (
-                    <>
-                      {' '}
-                      &nbsp;·&nbsp; <a href={`https://${d.linkedin}`}>LinkedIn</a>
-                    </>
-                  )}
-                  {d.instagram && (
-                    <>
-                      {' '}
-                      &nbsp;·&nbsp; <a href={`https://${d.instagram}`}>Instagram</a>
-                    </>
-                  )}
-                </div>
-              </header>
-
-              <div className="cols">
-                <aside className="side panel">
-                  <section>
-                    <h2>Technical Skills</h2>
-                    <dl className="skills">
-                      {d.skills.map((g) => (
-                        <div className="skill_group" key={g.group}>
-                          <dt>{g.group}</dt>
-                          {g.items.map((it) => (
-                            <dd key={it}>{it}</dd>
-                          ))}
-                        </div>
-                      ))}
-                    </dl>
-                  </section>
-                  <section>
-                    <h2>Selected Projects</h2>
-                    <dl className="skills">
-                      {years.map((y) => (
-                        <div className="skill_group" key={y}>
-                          <dt>{y}</dt>
-                          {d.projects
-                            .filter((p) => p.year === y)
-                            .map((p) => (
-                              <dd key={p.name}>{p.slug ? <Link to={`/projects/${p.slug}`}>{p.name}</Link> : p.name}</dd>
-                            ))}
-                        </div>
-                      ))}
-                    </dl>
-                  </section>
-                </aside>
-
-                <main className="main panel">
-                  <section>
-                    <h2>Employment History</h2>
-                    {d.jobs.map((j) => (
-                      <div className="entry" key={j.title + j.when}>
-                        <h3 className="entry_title">{j.title}</h3>
-                        <span className="entry_when">{j.when}</span>
-                        {j.bullets.length > 0 && (
-                          <ul>
-                            {j.bullets.map((b, i) => (
-                              <li key={i}>{rich(bulletText(b))}</li>
-                            ))}
-                          </ul>
-                        )}
-                        {(j.sub || []).map((s) => (
-                          <div className="entry entry_sub" key={s.title + s.when}>
-                            <h3 className="entry_title">{s.title}</h3>
-                            <span className="entry_when">{s.when}</span>
-                            {s.bullets.length > 0 && (
-                              <ul>
-                                {s.bullets.map((b, i) => (
-                                  <li key={i}>{rich(bulletText(b))}</li>
-                                ))}
-                              </ul>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    ))}
-                  </section>
-
-                  <section>
-                    <h2>Education</h2>
-                    {d.education.map((e) => (
-                      <div className="entry" key={e.degree}>
-                        <h3 className="entry_title">{e.degree}</h3>
-                        <span className="entry_when">{e.when}</span>
-                      </div>
-                    ))}
-                  </section>
-                </main>
-              </div>
-            </div>
+            <div className="resume_page" onClick={onClick} dangerouslySetInnerHTML={{ __html: page }} />
           </div>
         </div>
       </section>

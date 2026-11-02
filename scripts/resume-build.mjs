@@ -11,8 +11,11 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 export const DATA = path.join(ROOT, 'resume', 'resume.json')
 
 const esc = (s) => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-// *text* -> <em>text</em>, everything else escaped
-const rich = (s) => esc(s).replace(/\*([^*]+)\*/g, '<em>$1</em>')
+// [text](url) -> <a href="url">text</a>, *text* -> <em>text</em>, everything else escaped
+const rich = (s) =>
+  esc(s)
+    .replace(/\[([^\]]+)\]\((https?:[^)\s]+)\)/g, '<a href="$2">$1</a>')
+    .replace(/\*([^*]+)\*/g, '<em>$1</em>')
 const bulletText = (b) => (typeof b === 'string' ? b : b.text)
 
 const li = (b) => `<li${typeof b === 'object' && b.resumeOnly ? ' data-resume-only="1"' : ''}>${rich(bulletText(b))}</li>`
@@ -39,7 +42,7 @@ const skills = (d) => `
           <dl class="skills">
 ${d.skills
   .map(
-    (g, i) => `            <div class="skill_group" data-list="skills.${i}.items" data-tag="dd">
+    (g, i) => `            <div class="skill_group${g.inline ? ' skill_inline' : ''}" data-list="skills.${i}.items" data-tag="dd">
               <dt data-path="skills.${i}.group">${rich(g.group)}</dt>
 ${g.items.map((it) => `              <dd>${rich(it)}</dd>`).join('\n')}
             </div>`
@@ -47,6 +50,8 @@ ${g.items.map((it) => `              <dd>${rich(it)}</dd>`).join('\n')}
   .join('\n')}
           </dl>`
 
+// Selected Projects: each name with a `slug` links to its page on the site.
+const SITE = 'https://mkskitka.com'
 const sideProjects = (d) => {
   const years = [...new Set(d.projects.map((p) => p.year))]
   return `
@@ -58,7 +63,13 @@ ${years
     (y) => `            <div class="skill_group">
               <dt>${esc(y)}</dt>
 ${d.projects
-  .map((p, i) => (p.year === y ? `              <dd data-path="projects.${i}.name">${rich(p.name)}</dd>` : null))
+  .map((p, i) =>
+    p.year === y
+      ? p.slug
+        ? `              <dd><a data-path="projects.${i}.name" href="${SITE}/projects/${esc(p.slug)}">${rich(p.name)}</a></dd>`
+        : `              <dd data-path="projects.${i}.name">${rich(p.name)}</dd>`
+      : null
+  )
   .filter(Boolean)
   .join('\n')}
             </div>`
@@ -154,7 +165,7 @@ const page = (d, cv, variant = null) => {
 
       <aside class="side panel">
         <section>${skills(d)}
-        </section>${cv ? '' : sideProjects(d)}
+        </section>${cv || v?.sideProjects === false ? '' : sideProjects(d)}
       </aside>
     </div>
     <!-- page:end -->`
