@@ -29,6 +29,7 @@ import { mkdir, readdir, rm, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import sharp from 'sharp'
+import { imageColor } from './image-color.mjs'
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const IMAGE_DIR = path.join(ROOT, 'public/images/instagram')
@@ -139,8 +140,10 @@ async function main() {
       continue
     }
     const name = `${post.id}.jpg`
+    let color = {}
     try {
       await saveSquare(src, path.join(IMAGE_DIR, name))
+      color = await imageColor(path.join(IMAGE_DIR, name)) // for the Visuals "Color" sort
     } catch (err) {
       console.warn(`skip ${post.id}: ${err.message}`)
       continue
@@ -152,6 +155,7 @@ async function main() {
       url: post.permalink,
       image: `/images/instagram/${name}`,
       timestamp: post.timestamp,
+      ...color, // color (hex swatch) and hue (0..359, or null for a grey image)
     })
   }
 

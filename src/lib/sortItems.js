@@ -3,7 +3,10 @@
 // as ?sort=<id>, so a sorted view can be sent as a link).
 //
 // Projects carry a year (`date` in src/data/projects.js, from resume/resume.json);
-// visuals carry the Instagram post's `timestamp`. Items with no date go last.
+// visuals carry the Instagram post's `timestamp`, and a `hue` (0..359, from
+// scripts/image-color.mjs; null for a grey image) for the colour-wheel order, which
+// runs red, orange, yellow, green, cyan, blue, violet, back to red, with the grey
+// images after. Items with no date or no hue go last.
 // Sorting is stable, so ties keep the hand-written order from the data file.
 export const SORTS = {
   systems: [
@@ -15,6 +18,7 @@ export const SORTS = {
   visuals: [
     { id: 'newest', label: 'Newest' }, // Instagram order
     { id: 'oldest', label: 'Oldest' },
+    { id: 'color', label: 'Color' }, // around the colour wheel
     { id: 'shuffle', label: 'Shuffle' }, // a new order each time it is clicked
   ],
 }
@@ -47,6 +51,8 @@ export function sortItems(items, id, seed = 0) {
       return out.sort(by(when, -1))
     case 'oldest':
       return out.sort(by(when, 1))
+    case 'color':
+      return out.sort(by((item) => (typeof item.hue === 'number' ? item.hue : null), 1))
     case 'az':
       return out.sort((a, b) => name(a).localeCompare(name(b), undefined, { sensitivity: 'base', numeric: true }))
     case 'shuffle': {
