@@ -2,8 +2,8 @@ import { useEffect, useRef, useState } from 'react'
 import { SORTS } from '../lib/sortItems.js'
 
 /**
- * The Visuals sort dropdown: a small glass button at the top right of the hero, on the
- * grid row the menu panel starts on, showing the current order. Clicking it drops a
+ * The Visuals sort dropdown: a small glass button in the top right corner of the page,
+ * its bottom edge on the first grid line, showing the current order. Clicking it drops a
  * list of the orders (src/lib/sortItems.js), one grid row each, so the list stays on
  * the lattice. Clicking elsewhere or pressing Escape closes the list (Escape with the
  * list closed still closes the tiles, as everywhere else on the page).

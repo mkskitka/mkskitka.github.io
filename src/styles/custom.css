@@ -158,17 +158,17 @@ a:hover,
 }
 
 /* Visuals sort dropdown (components/VisualsSort.jsx, orders in lib/sortItems.js).
-   A glass button at the top right of the hero, one grid row tall, its top on the
-   line the menu panel starts on and its right edge on the last vertical line
-   (--grid-panel-top / --grid-right-inset are published by GridInkBackdrop.jsx). The
-   list drops below it, one grid row per order, so everything stays on the lattice.
-   It fades in and out with the Visuals tiles. */
+   A glass button in the top right corner of the page, filling the band above the
+   first horizontal grid line (--grid-origin-y, from GridInkBackdrop.jsx) so its
+   bottom edge sits on that line; when that band is too shallow for the text it takes
+   most of a row instead. The list drops below it, one grid row per order, so the
+   rows stay on the lattice. It fades in and out with the Visuals tiles. */
 .visuals_sort {
   position: absolute;
   z-index: 3;
-  top: var(--grid-panel-top, 20px);
-  right: var(--grid-right-inset, 20px);
-  height: var(--grid-spacing-y, 1.15em);
+  top: 0;
+  right: 0;
+  height: max(var(--grid-origin-y, 0px), calc(var(--grid-spacing-y, 1.15em) * 0.8));
   font-size: clamp(0.6rem, 1.8vw, 0.76rem);
   font-weight: var(--panel-text-weight);
   letter-spacing: 0.14em;
@@ -189,6 +189,12 @@ a:hover,
   gap: 0.7em;
   width: 100%;
   height: var(--grid-spacing-y, 1.15em);
+}
+.visuals_sort_button {
+  height: 100%; /* the corner band */
+}
+.visuals_sort_button,
+.visuals_sort_option {
   margin: 0;
   padding: 0 1.1em;
   border: 0;
