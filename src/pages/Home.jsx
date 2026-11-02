@@ -11,7 +11,8 @@ import ProjectGallery from '../components/ProjectGallery.jsx'
 import ProjectBackdrop from '../components/ProjectBackdrop.jsx'
 import ProjectLock, { isUnlocked } from '../components/ProjectLock.jsx'
 import { revealSections } from '../lib/animations.js'
-import { DEFAULT_SORT, SORTS, isSort, sortItems } from '../lib/sortItems.js'
+import { DEFAULT_SORT, isSort, sortItems } from '../lib/sortItems.js'
+import VisualsSort from '../components/VisualsSort.jsx'
 
 // The site is currently just the hero, fixed to one screen with no scrolling: wheel,
 // touch and keys drive the backdrop animation instead (GridInkBackdrop SETTINGS.scroll).
@@ -36,10 +37,10 @@ import { DEFAULT_SORT, SORTS, isSort, sortItems } from '../lib/sortItems.js'
 //   /contact     the contact tiles
 // (<slug> and <id> are from src/data/projects.js and src/data/visuals.js.) The old
 // /#systems style still works and is turned into /systems.
-// The Systems and Visuals tiles can be sorted (the strip under the menu while they are
-// open; orders in src/lib/sortItems.js). A non-default order is part of the address,
-// /systems?sort=oldest, so a sorted view can be sent too; swiping through the visuals
-// follows the chosen order.
+// The Visuals tiles can be sorted (the dropdown at the top right while they are open,
+// components/VisualsSort.jsx; orders in src/lib/sortItems.js). A non-default order is
+// part of the address, /visuals?sort=color, so a sorted view can be sent too; swiping
+// through the visuals follows the chosen order.
 // Clicking SYSTEMS (to open it) sends a band of light along the grid lines, left to right;
 // clicking VISUALS pours a stream of ink/smoke into the backdrop (GridInkBackdrop SETTINGS.glow / .pour).
 // Only those menu clicks do it: coming back to the tiles from a project or visual does not.
@@ -114,7 +115,6 @@ export default function Home() {
   // Sort order per kind of tiles (src/lib/sortItems.js), and the seed behind a shuffle.
   const [sort, setSort] = useState(() => parseSort(location.pathname, location.search))
   const [shuffleSeed, setShuffleSeed] = useState(() => Math.random())
-  const PROJECT_LIST = useMemo(() => sortItems(projects, sort.systems), [sort.systems])
   const VISUAL_LIST = useMemo(() => sortItems(VISUAL_ITEMS, sort.visuals, shuffleSeed), [sort.visuals, shuffleSeed])
 
   // The open project (if any) and the tile rectangle it grew out of.
@@ -174,14 +174,13 @@ export default function Home() {
     navigate(pathFor(next, null, sort))
   }
 
-  // The sort strip: reorder the open tiles, and put the order in the address (replacing
+  // The sort dropdown: reorder the open tiles, and put the order in the address (replacing
   // it, so the back button does not step through every order tried).
-  const pickSort = (id) => (e) => {
-    e.preventDefault()
-    if (id === 'shuffle') setShuffleSeed(Math.random())
-    const next = { ...sort, [active]: id }
+  const pickSort = (id) => {
+    if (id === 'shuffle') setShuffleSeed(Math.random()) // picking it again deals a new order
+    const next = { ...sort, visuals: id }
     setSort(next)
-    navigate(pathFor(active, null, next), { replace: true })
+    navigate(pathFor('visuals', null, next), { replace: true })
   }
 
   // Visuals are shown as the piece itself: the whole image as large as it fits, no
@@ -352,39 +351,22 @@ export default function Home() {
               ))}
             </>
           ) : (
-            <>
-              {MENU.map((m) => (
-                <a
-                  key={m.id}
-                  href="#"
-                  className={`heading_primary hero_menu_text_color${active === m.id ? ' is-active' : ''}`}
-                  aria-pressed={active === m.id}
-                  onClick={pick(m.id)}
-                >
-                  {m.label}
-                </a>
-              ))}
-              {/* Sort strip: one grid row under the menu while Systems or Visuals tiles are open. */}
-              {SORTS[active] && (
-                <nav className="hero_sort" aria-label={`Sort ${MENU.find((m) => m.id === active).label.toLowerCase()}`}>
-                  {SORTS[active].map((s) => (
-                    <a
-                      key={s.id}
-                      href="#"
-                      className={`hero_sort_link${sort[active] === s.id ? ' is-active' : ''}`}
-                      aria-pressed={sort[active] === s.id}
-                      onClick={pickSort(s.id)}
-                    >
-                      {s.label}
-                    </a>
-                  ))}
-                </nav>
-              )}
-            </>
+            MENU.map((m) => (
+              <a
+                key={m.id}
+                href="#"
+                className={`heading_primary hero_menu_text_color${active === m.id ? ' is-active' : ''}`}
+                aria-pressed={active === m.id}
+                onClick={pick(m.id)}
+              >
+                {m.label}
+              </a>
+            ))
           )}
         </div>
-        <ProjectThumbs open={active === 'systems' && !project} keep={active === 'systems' && !!project} items={PROJECT_LIST} onSelect={openProject} cells={{ desktop: 2 }} columns={{ phone: 3 }} rows />
+        <ProjectThumbs open={active === 'systems' && !project} keep={active === 'systems' && !!project} onSelect={openProject} cells={{ desktop: 2 }} columns={{ phone: 3 }} rows />
         <ProjectThumbs open={active === 'visuals' && !project} keep={active === 'visuals' && !!project} focus={visualAt} items={VISUAL_LIST} label="Visuals" onSelect={openProject} bounce={visualsFresh} titles={SHOW_VISUAL_TITLES} />
+        <VisualsSort open={active === 'visuals' && !project} value={sort.visuals} onChange={pickSort} />
         <ContactTiles open={active === 'contact'} />
         {/* MK SKITKA: the bio (src/data/about.js). A project: its write-up (src/data/projects.js). */}
         <WriteUp open={active === 'home' && !project} heading={about.heading} paragraphs={about.paragraphs} align="center">

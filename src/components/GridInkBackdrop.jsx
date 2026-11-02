@@ -1162,8 +1162,7 @@ export default function GridInkBackdrop({ className = '', transparent = false, p
           let textW = 0
           const prevWidth = panel.style.width
           panel.style.width = 'max-content'
-          // (The sort strip under the menu, .hero_sort, counts too, so the panel is never narrower than it.)
-          panel.querySelectorAll('.hero_menu_text_color, .hero_sort').forEach((a) => {
+          panel.querySelectorAll('.hero_menu_text_color').forEach((a) => {
             const r = document.createRange()
             r.selectNodeContents(a)
             textW = Math.max(textW, r.getBoundingClientRect().width)
@@ -1178,6 +1177,11 @@ export default function GridInkBackdrop({ className = '', transparent = false, p
           section.style.setProperty('--hero-panel-width', `${(right - left).toFixed(2)}px`)
           section.style.setProperty('--hero-panel-pad-x', `${padX.toFixed(2)}px`)
           section.style.setProperty('--hero-panel-pad-y', `${(spacingY * PANEL_PAD_ROWS).toFixed(2)}px`)
+          // For things placed absolutely on the grid (the Visuals sort dropdown): the line
+          // the panel starts on, from the section's top edge, and how far in from the
+          // right edge the last vertical line is.
+          section.style.setProperty('--grid-panel-top', `${top.toFixed(2)}px`)
+          section.style.setProperty('--grid-right-inset', `${(cssW - lastLine).toFixed(2)}px`)
         }
       }
       // Only rebuild the simulation when the canvas size actually changed. Panel

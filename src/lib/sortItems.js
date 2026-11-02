@@ -1,20 +1,15 @@
-// Sort orders for the Systems (projects) and Visuals tiles on the home page
-// (pages/Home.jsx shows the strip under the menu; the choice is kept in the address
-// as ?sort=<id>, so a sorted view can be sent as a link).
+// Sort orders for the Visuals tiles on the home page (components/VisualsSort.jsx is
+// the dropdown; the choice is kept in the address as ?sort=<id>, so a sorted view can
+// be sent as a link). Written per kind of tiles, so the Systems tiles can get orders
+// too: add a `systems` list here and a control in pages/Home.jsx (projects carry a
+// year in `date`, from resume/resume.json, and a `title`).
 //
-// Projects carry a year (`date` in src/data/projects.js, from resume/resume.json);
-// visuals carry the Instagram post's `timestamp`, and a `hue` (0..359, from
+// Visuals carry the Instagram post's `timestamp`, and a `hue` (0..359, from
 // scripts/image-color.mjs; null for a grey image) for the colour-wheel order, which
 // runs red, orange, yellow, green, cyan, blue, violet, back to red, with the grey
 // images after. Items with no date or no hue go last.
 // Sorting is stable, so ties keep the hand-written order from the data file.
 export const SORTS = {
-  systems: [
-    { id: 'featured', label: 'Featured' }, // the order written in src/data/projects.js
-    { id: 'newest', label: 'Newest' },
-    { id: 'oldest', label: 'Oldest' },
-    { id: 'az', label: 'A–Z' },
-  ],
   visuals: [
     { id: 'newest', label: 'Newest' }, // Instagram order
     { id: 'oldest', label: 'Oldest' },
@@ -22,7 +17,7 @@ export const SORTS = {
     { id: 'shuffle', label: 'Shuffle' }, // a new order each time it is clicked
   ],
 }
-export const DEFAULT_SORT = { systems: 'featured', visuals: 'newest' }
+export const DEFAULT_SORT = { visuals: 'newest' }
 export const isSort = (kind, id) => !!SORTS[kind]?.some((s) => s.id === id)
 
 // When an item was made, in ms, or null when it says nothing usable.
