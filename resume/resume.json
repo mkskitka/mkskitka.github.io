@@ -91,8 +91,24 @@
           "bullets": [
             "Architected and built PGN, a three-room interactive rehabilitation system (LED hallway, full-body projection room, multi-sensory recharge room) installed at two sites to date, including a child’s home, with the current installation in therapy use five days a week",
             "Designed a single TouchDesigner system that configures itself per room and display type, unifying markerless motion capture, depth cameras, lidar and body and eye tracking in one pipeline",
-            "Designed and built a level and target system that lets clinicians create reproducible, game-like tests of vision and mobility, producing session data now analyzed by a data scientist",
-            "Developed every room’s real-time visuals in consultation with NYU Langone rehabilitation medicine, neurology and ophthalmology faculty, the therapists using the system, and data scientists"
+            {
+              "text": "Designed and built a level and target system that lets clinicians create reproducible, game-like tests of vision and mobility, producing session data now analyzed by a data scientist",
+              "not": [
+                "accessibility"
+              ]
+            },
+            {
+              "text": "Developed every room’s real-time visuals in consultation with NYU Langone rehabilitation medicine, neurology and ophthalmology faculty, the therapists using the system, and data scientists",
+              "not": [
+                "accessibility"
+              ]
+            },
+            {
+              "text": "Ran feedback sessions with the therapists and family using the system and with NYU Langone rehabilitation medicine, neurology and ophthalmology faculty, and turned their findings into the level and target system clinicians now use to track vision and mobility progress",
+              "only": [
+                "accessibility"
+              ]
+            }
           ]
         },
         {
@@ -100,8 +116,18 @@
           "when": "November 2025 — May 2026",
           "bullets": [
             "Audible Story House: built the audio-reactive visualizer for the listening room of Audible’s first physical pop-up, open all of May 2026 and covered by AFP and Euronews, plus a live-control web interface for brand ambassadors",
-            "Realtor.com Savings Simulator, SXSW (March 2026): produced the 16-bit game graphics for an arcade savings game",
-            "Intel, The Light Keeper (November to December 2025): built a real-time visual performance driven by dancers’ body movement for Intel’s Times Square pop-up"
+            {
+              "text": "Realtor.com Savings Simulator, SXSW (March 2026): produced the 16-bit game graphics for an arcade savings game",
+              "not": [
+                "accessibility"
+              ]
+            },
+            {
+              "text": "Intel, The Light Keeper (November to December 2025): built a real-time visual performance driven by dancers’ body movement for Intel’s Times Square pop-up",
+              "not": [
+                "teaching"
+              ]
+            }
           ]
         },
         {
@@ -114,10 +140,12 @@
               "text": "Built the live-rendered AI visuals system for artist Cezar Mocan’s End of Signal, winner of the SOLO AI ’25 award",
               "resumeOnly": true
             },
+            "Built a keyboard-accessible interface for the interactive screens at a museum (2025), giving blind, low-vision and mobility-impaired visitors access to every exhibit",
             {
               "text": "Further work: Blueberry Swamp Festival visuals (2025 and 2026), a Tapestry Electric video booth, the Drunk Elephant kiosk with Volvox Labs, and technical direction at Brooklyn Art Haus",
               "resumeOnly": true,
               "not": [
+                "accessibility",
                 "teaching"
               ]
             }
@@ -258,6 +286,10 @@
         },
         {
           "year": "2025",
+          "text": "Keyboard-accessible interface for a museum’s interactive screens, giving blind, low-vision and mobility-impaired visitors access to every exhibit"
+        },
+        {
+          "year": "2025",
           "text": "*End of Signal*, Cezar Mocan. Live-rendered AI visuals system for the installation; the project won the SOLO AI '25 award and has shown across multiple venues"
         },
         {
@@ -341,6 +373,25 @@
         "heading": "Teaching Experience",
         "jobs": [
           "Adjunct Instructor",
+          "Research Fellow"
+        ],
+        "listHeading": "Workshops & Mentoring"
+      },
+      "jobsHeading": "Professional Experience"
+    },
+    "accessibility": {
+      "_about": "For community and accessibility roles (e.g. the AI for Accessibility toolkit Community Manager post): npm run resume:accessibility. Community & Teaching leads; the NYU entry moves there; PGN is told as user feedback turned into features.",
+      "title": "Creative Technologist & Educator",
+      "profile": "Creative technologist and educator with 8 years building interactive systems and the communities around them. This year built PGN, a multi-room rehabilitation system now in therapy use five days a week, shaping its clinician-facing features through feedback sessions with the therapists and family using it and with NYU Langone rehabilitation medicine, neurology and ophthalmology faculty. Ran NYU ITP’s Coding Lab for a year, serving around 350 students, and has taught workshops and an undergraduate course on interactive systems. Four years as a software engineer on government research contracts, contributing to proposals and quarterly progress reports. Background in cognitive brain science and computer science.",
+      "sections": [
+        "profile",
+        "teaching",
+        "jobs",
+        "education"
+      ],
+      "teachingSection": {
+        "heading": "Community & Teaching",
+        "jobs": [
           "Research Fellow"
         ],
         "listHeading": "Workshops & Mentoring"
