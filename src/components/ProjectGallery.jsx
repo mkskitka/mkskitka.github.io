@@ -11,6 +11,35 @@ import { createPortal } from 'react-dom'
  * `images` is a list of { src, alt?, video? }. Projects get it from `gallery` in
  * src/data/projects.js, or from the files in their assets folder; with neither, no row is shown.
  */
+/**
+ * A video in the gallery row. It shows its poster frame and downloads nothing until it
+ * is on screen; then it plays, muted and looping, and pauses again once it is scrolled
+ * out of view. (Before this, every video in the row started downloading in full the
+ * moment the project opened, poster or not.)
+ */
+function RowVideo({ src, poster, label }) {
+  const ref = useRef(null)
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return undefined
+    const play = () => el.play()?.catch?.(() => {})
+    if (typeof IntersectionObserver === 'undefined') {
+      play()
+      return undefined
+    }
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) play()
+        else el.pause()
+      },
+      { rootMargin: '100px' },
+    )
+    io.observe(el)
+    return () => io.disconnect()
+  }, [src])
+  return <video ref={ref} src={src} poster={poster} muted loop playsInline preload="none" aria-label={label} />
+}
+
 export default function ProjectGallery({ images = [], label = 'Gallery' }) {
   const [index, setIndex] = useState(-1) // -1 = closed
   const [drag, setDrag] = useState(0) // px the open photo is pulled sideways by a swipe
@@ -64,7 +93,7 @@ export default function ProjectGallery({ images = [], label = 'Gallery' }) {
         {images.map((img, i) => (
           <button key={img.src + i} type="button" className="gallery_thumb" onClick={() => setIndex(i)} aria-label={`Open photo ${i + 1}`}>
             {img.video ? (
-              <video src={img.src} autoPlay muted loop playsInline preload="metadata" aria-label={img.alt || undefined} />
+              <RowVideo src={img.src} poster={img.poster} label={img.alt || undefined} />
             ) : (
               <img src={img.src} alt={img.alt ?? ''} loading="lazy" />
             )}

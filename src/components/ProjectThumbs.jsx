@@ -245,7 +245,9 @@ export default function ProjectThumbs({ open = false, onSelect, items = projects
         fadeTo: LX(firstCol),
         page: span * sx,
         per,
-        arrows: { y: LY(gridRows - 1), left: LX(firstCol), right: LX(cols - 1), w: sx, h: sy },
+        // The arrows sit in the first and last whole grid cells of the bottom row, at the
+        // page's edges (not beside the panel, which on a wide screen is well in from the left).
+        arrows: { y: LY(gridRows - 1), left: LX(0), right: LX(cols - 1), w: sx, h: sy },
       })
     }
 

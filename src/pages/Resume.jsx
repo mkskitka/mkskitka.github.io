@@ -109,11 +109,6 @@ export default function Resume() {
 
                 <main className="main panel">
                   <section>
-                    <h2>Profile</h2>
-                    <p>{rich(d.profile.resume)}</p>
-                  </section>
-
-                  <section>
                     <h2>Employment History</h2>
                     {d.jobs.map((j) => (
                       <div className="entry" key={j.title + j.when}>

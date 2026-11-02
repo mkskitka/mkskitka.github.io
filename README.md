@@ -18,6 +18,9 @@ The site is hosted on AWS at https://mkskitka.com: a private S3 bucket (`mk-skit
 served through CloudFront (distribution `E2L55K784TVBE6`, also reachable at
 https://d2vfx0f1xojaxw.cloudfront.net). Deploys are run from this machine, because the
 media in `src/assets` lives here. Nothing on GitHub deploys to AWS.
+Project photos and videos go in `src/assets/projects/<slug>/` at any size; `npm run media`
+(run by itself before `dev` and `build`) makes the web-sized copies in `src/assets/web/`
+that the site ships (see `src/assets/projects/README.md`).
 
 ```bash
 aws login        # once per session; the AWS CLI session expires after a while

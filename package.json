@@ -4,8 +4,11 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
+    "predev": "node scripts/media-web.mjs",
     "dev": "vite",
+    "prebuild": "node scripts/media-web.mjs",
     "build": "vite build",
+    "media": "node scripts/media-web.mjs",
     "preview": "vite preview",
     "deploy": "sh scripts/deploy-aws.sh",
     "resume": "node scripts/resume-build.mjs && sh scripts/resume-pdf.sh",

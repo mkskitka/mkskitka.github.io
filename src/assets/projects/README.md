@@ -51,4 +51,22 @@ One folder per project, named by the project's slug (the part of its URL after
 - If there is no `featured` list, the first four images in the folder (sorted by
   name, hero files skipped) are laid out automatically.
 
-Supported: png, jpg, jpeg, webp, gif, avif, mp4, webm. Keep videos under ~20 MB.
+Supported: png, jpg, jpeg, webp, gif, avif, mp4, webm. Any size: the site does not
+ship these files as they are.
+
+## Web copies (what the site actually ships)
+
+`npm run media` (scripts/media-web.mjs; it also runs by itself before `npm run dev`
+and `npm run build`) makes a web-sized copy of every file here in
+`src/assets/web/<slug>/`, and the site reads only those:
+
+- images become `.webp`, no larger than 2000 px (thumb.* 640 px); gifs are copied as
+  they are so they keep animating;
+- videos are re-encoded to H.264 no larger than 1280 px and at most 30 fps, and each
+  gets a `<name>-poster.webp` frame that shows in the gallery row before it plays;
+  a video that is already small is copied as it is;
+- `*.source.*`, `.MOV` and `.HEIC` files are skipped, so originals can live here too.
+
+Names keep their stem: `02.PNG` here is `02.webp` there, and a name in
+`src/data/projects.js` (`thumb: '02.PNG'`) still finds it. Only files newer than their
+copy are redone, so a run is quick. Needs ffmpeg (`brew install ffmpeg`).

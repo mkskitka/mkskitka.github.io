@@ -134,6 +134,7 @@ a:hover,
   --thumb-opacity: 1; /* tiles at rest (1 = solid); the hovered tile always goes solid */
   --thumb-opacity-dim: 0.45; /* the other tiles while one is hovered */
   --thumb-title-rest: 1; /* project names on the tiles at rest: 1 = always shown, 0 = only on hover / focus */
+  --thumb-title-phone: 1; /* phones (no hover): 1 = names always on the tiles, 0 = no names */
 }
 /* Windows under ~1000px tall: 2x2 blocks so all the projects still fit beside the
    menu (eight 3x3 tiles need three rows, about 11 cells tall). */
@@ -560,7 +561,9 @@ a:hover,
     opacity: 1;
   }
   .project_thumbs--scatter .project_thumb_title {
-    display: none;
+    opacity: var(--thumb-title-phone, 0);
+    font-size: 0.6rem;
+    padding: 1em 0.45em 0.4em;
   }
   .contact_tiles .contact_tile_icon {
     opacity: 1;
