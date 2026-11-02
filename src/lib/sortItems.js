@@ -7,19 +7,27 @@
 // Visuals carry the Instagram post's `timestamp` and the numbers measured from the
 // image by scripts/image-metrics.mjs (hue, light, vivid, busy, glitch). Every order
 // but Shuffle is an axis with two ends: `label` reads the default way, `flipped` the
-// other way round (picking the active order again flips it). Items missing the
-// number an order needs go last either way. Sorting is stable, so ties keep the
-// Instagram order.
+// other way round (picking the active order again flips it), and `ends` is what
+// lies to the left and to the right of the tiles on screen, written on the scroll
+// arrows. Items missing the number an order needs go last either way. Sorting is
+// stable, so ties keep the Instagram order.
+//
+// Offered in the dropdown: the list below. Measured and ready but left out for now:
+// busy (Calm → Busy), vivid (Muted → Vivid), glitch (Organic → Glitch); add a line
+// here to offer one.
 export const SORTS = {
   visuals: [
-    { id: 'newest', label: 'Newest', flipped: 'Oldest' },
-    { id: 'color', label: 'Color wheel', flipped: 'Color wheel, reversed' }, // red, orange, yellow, green, cyan, blue, violet; greys after
-    { id: 'light', label: 'Dark → Light', flipped: 'Light → Dark' },
-    { id: 'busy', label: 'Calm → Busy', flipped: 'Busy → Calm' },
-    { id: 'vivid', label: 'Muted → Vivid', flipped: 'Vivid → Muted' },
-    { id: 'glitch', label: 'Organic → Glitch', flipped: 'Glitch → Organic' },
+    { id: 'newest', label: 'Newest', flipped: 'Oldest', ends: ['newer', 'older'] },
+    { id: 'color', label: 'Color wheel', flipped: 'Color wheel, reversed', ends: ['warmer', 'cooler'] }, // red, orange, yellow, green, cyan, blue, violet; greys after
+    { id: 'light', label: 'Dark → Light', flipped: 'Light → Dark', ends: ['darker', 'lighter'] },
     { id: 'shuffle', label: 'Shuffle' }, // a new order each time it is picked
   ],
+}
+// What lies left and right of the tiles under an order, as written on the scroll
+// arrows: ['darker', 'lighter'], or null when the order has no ends (Shuffle).
+export const sortEnds = (kind, id, rev = false) => {
+  const ends = SORTS[kind]?.find((s) => s.id === id)?.ends
+  return ends ? (rev ? [ends[1], ends[0]] : ends) : null
 }
 export const DEFAULT_SORT = { visuals: 'newest', rev: false }
 export const isSort = (kind, id) => !!SORTS[kind]?.some((s) => s.id === id)

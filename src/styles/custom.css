@@ -444,12 +444,17 @@ a:hover,
 
 /* Arrows for scrollable tiles (ProjectThumbs): one grid cell at each end of the bottom
    row, which is kept free of tiles. Shown only when there is more that way; the one
-   pointing right nudges a few times when it appears, as a hint. */
+   pointing right nudges a few times when it appears, as a hint. Under a sort order
+   with two ends (Visuals), a word beside each arrow says what lies that way
+   (.project_thumbs_arrow_label: "darker" / "lighter"); the arrow itself stays in its
+   cell (min-width) and the word sits inside, toward the tiles. */
 .project_thumbs_arrow {
   position: absolute;
   z-index: 4;
-  display: grid;
-  place-items: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.2em;
   padding: 0;
   border: 0;
   background: none;
@@ -467,8 +472,18 @@ a:hover,
 .project_thumbs.is-open .project_thumbs_arrow.is-on:focus-visible {
   opacity: 1;
 }
+.project_thumbs_arrow_label {
+  font-size: clamp(0.6rem, 1.8vw, 0.76rem);
+  font-weight: var(--panel-text-weight);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  padding: 0 0.5em;
+}
 .project_thumbs_arrow svg {
-  width: min(46%, 24px);
+  flex: none;
+  width: 24px;
+  max-width: 46%;
   height: auto;
   fill: none;
   stroke: currentColor;

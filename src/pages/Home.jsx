@@ -11,7 +11,7 @@ import ProjectGallery from '../components/ProjectGallery.jsx'
 import ProjectBackdrop from '../components/ProjectBackdrop.jsx'
 import ProjectLock, { isUnlocked } from '../components/ProjectLock.jsx'
 import { revealSections } from '../lib/animations.js'
-import { DEFAULT_SORT, isSort, sortItems } from '../lib/sortItems.js'
+import { DEFAULT_SORT, isSort, sortEnds, sortItems } from '../lib/sortItems.js'
 import VisualsSort from '../components/VisualsSort.jsx'
 
 // The site is currently just the hero, fixed to one screen with no scrolling: wheel,
@@ -369,7 +369,7 @@ export default function Home() {
           )}
         </div>
         <ProjectThumbs open={active === 'systems' && !project} keep={active === 'systems' && !!project} onSelect={openProject} cells={{ desktop: 2 }} columns={{ phone: 3 }} rows />
-        <ProjectThumbs open={active === 'visuals' && !project} keep={active === 'visuals' && !!project} focus={visualAt} items={VISUAL_LIST} label="Visuals" onSelect={openProject} bounce={visualsFresh} titles={SHOW_VISUAL_TITLES} />
+        <ProjectThumbs open={active === 'visuals' && !project} keep={active === 'visuals' && !!project} focus={visualAt} items={VISUAL_LIST} label="Visuals" onSelect={openProject} bounce={visualsFresh} titles={SHOW_VISUAL_TITLES} arrowLabels={sortEnds('visuals', sort.visuals, sort.rev)} />
         <VisualsSort open={active === 'visuals' && !project} value={sort.visuals} rev={sort.rev} onChange={pickSort} />
         <ContactTiles open={active === 'contact'} />
         {/* MK SKITKA: the bio (src/data/about.js). A project: its write-up (src/data/projects.js). */}
