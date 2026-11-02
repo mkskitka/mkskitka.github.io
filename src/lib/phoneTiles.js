@@ -31,6 +31,13 @@ const SCATTER_TRIES = 200 // whole random layouts to try before falling back to 
  *                                line, so their tops are all at different heights
  * @param {boolean} [o.centerX]   slide the whole block to be centred horizontally
  *                                (rows stay on the grid, tiles may cut across columns)
+ * @param {boolean} [o.centered]  lattice only: tidy rows filled in order, a clear cell
+ *                                kept at the left and right edges, the block centred
+ *                                (to the nearest cell) across the page and down the
+ *                                free space, every tile on the grid lines
+ * @param {number} [o.columns]    centered only: this many tiles across (fewer if they
+ *                                will not fit), the edge margin allowed to go under a
+ *                                cell; pair with centerX to centre the rows by pixel
  * @returns {Array<{x:number,y:number,s:number,dx:number,dy:number}|null>}
  */
 export function phoneSpots({
@@ -47,6 +54,8 @@ export function phoneSpots({
   scatter: wantScatter = true,
   shuffle = true,
   centerX = false,
+  centered = false,
+  columns = 0,
   distinctRows = false,
 }) {
   // Grid lines sit at origin + k * spacing on each axis (origin is 0 when the grid is
@@ -136,6 +145,15 @@ export function phoneSpots({
 
   const lattice = (n) => {
     const pitch = n + PAD
+    if (centered) {
+      const perRow = columns ? Math.min(columns, Math.floor((cols + PAD) / pitch)) : Math.floor((cols - 2 + PAD) / pitch) // a clear cell at each edge
+      const maxRows = Math.floor((rows - firstRow + PAD) / pitch)
+      if (perRow < 1 || maxRows < 1 || perRow * maxRows < count) return null
+      const rowCount = Math.ceil(count / perRow)
+      const col0 = Math.floor((cols - (Math.min(perRow, count) * pitch - PAD)) / 2)
+      const row0 = firstRow + Math.floor((rows - firstRow - (rowCount * pitch - PAD)) / 2)
+      return Array.from({ length: count }, (_, k) => spot(col0 + (k % perRow) * pitch, row0 + Math.floor(k / perRow) * pitch, n))
+    }
     const slots = []
     for (let j = firstRow; j + n <= rows; j += pitch) for (let i = 0; i + n <= cols; i += pitch) slots.push([i, j])
     if (slots.length < count) return null

@@ -14,6 +14,14 @@ import { BOUNCE } from './GridInkBackdrop.jsx'
  *
  * Phones scatter their (larger) tiles under the panel instead (lib/phoneTiles.js).
  *
+ * `cells` overrides the tile size (a number, or `{ desktop, phone }`), and `rows` lays
+ * the tiles out in tidy rows on the grid (left to right, top to bottom, a clear cell
+ * between them, a clear cell at the edges, the block centred) instead of scattering them.
+ * `columns` (`{ phone }`) sizes the phone tiles so that many fit across the page (the
+ * edge margin may then be under a cell, and the rows are centred by pixel; on phones
+ * only the horizontal grid lines show, so the rows still sit on the grid).
+ * Systems uses double-size tiles in rows (three across on phones); Visuals keeps the scatter.
+ *
  * More items than MAX_PER_SCREEN: the rest are scattered over further screens' worth
  * of grid to the right, off the page. Scrolling (wheel, trackpad, swipe, left/right
  * arrows) slides all the tiles left along the grid and brings the next ones in from
@@ -68,8 +76,9 @@ const mulberry32 = (a) => () => {
 const BEAT = 60 / BOUNCE.bpm
 const BEATS = Math.max(1, Math.round((BOUNCE.seconds + 0.6) / BEAT))
 
-export default function ProjectThumbs({ open = false, onSelect, items = projects, label = 'Projects', external = false, bounce = false, titles = true, keep = false, focus = null }) {
+export default function ProjectThumbs({ open = false, onSelect, items = projects, label = 'Projects', external = false, bounce = false, titles = true, keep = false, focus = null, cells = TILE_CELLS, rows = false, columns = null }) {
   const nav = useRef(null)
+  const tileCells = typeof cells === 'number' ? { desktop: cells, phone: cells } : { ...TILE_CELLS, ...cells }
   const seed = useRef(Math.floor(Math.random() * 1e9))
   const [spots, setSpots] = useState(null) // per project: { x, y, s, dx, dy } in px, or null on phones
   // Scrolling, when there are more tiles than fit a screen: how far the tiles can slide
@@ -104,13 +113,23 @@ export default function ProjectThumbs({ open = false, onSelect, items = projects
         const originX = parseFloat(pcs.getPropertyValue('--grid-origin-x')) || 0
         // One screen's worth of tiles at a time, each screen laid out like the first and
         // placed a screen (plus a clear column) further right.
-        const per = MAX_PER_SCREEN.phone
-        const screens = Math.max(1, Math.ceil(items.length / per))
         const pcols = Math.floor((section.clientWidth - originX) / s + 1e-6)
         const screenW = (pcols + PAD) * s
         const psy = parseFloat(pcs.getPropertyValue('--grid-spacing-y')) || s
         const poy = parseFloat(pcs.getPropertyValue('--grid-origin-y')) || 0
         const prows = Math.floor((section.clientHeight - poy) / psy + 1e-6)
+        // Tile size: as asked, or (rows with `columns`) the largest that puts that many
+        // across the page with a clear cell between them and at least half a cell spare.
+        const pcolumns = rows ? columns?.phone || 0 : 0
+        const pc = pcolumns ? Math.max(1, Math.floor((pcols - 1 - (pcolumns - 1) * PAD) / pcolumns)) : tileCells.phone
+        // Rows: a screen holds as many tiles as its lattice of pc-cell blocks (a cell
+        // apart, a clear cell at each edge) has slots under the panel, the bottom row
+        // left for the arrows.
+        const pfirstRow = Math.ceil((panelBottom - poy) / psy) + 1
+        const pperRow = Math.max(1, pcolumns ? Math.min(pcolumns, Math.floor((pcols + PAD) / (pc + PAD))) : Math.floor((pcols - 2 + PAD) / (pc + PAD)))
+        const pmaxRows = Math.max(1, Math.floor((prows - 1 - pfirstRow + PAD) / (pc + PAD)))
+        const per = rows ? pperRow * pmaxRows : MAX_PER_SCREEN.phone
+        const screens = Math.max(1, Math.ceil(items.length / per))
         const rnd = mulberry32(seed.current)
         const out = []
         for (let p = 0; p < screens; p++) {
@@ -124,8 +143,13 @@ export default function ProjectThumbs({ open = false, onSelect, items = projects
             height: section.clientHeight - (screens > 1 ? psy : 0), // the bottom row is the arrows'
             panelBottom,
             rnd,
-            cells: TILE_CELLS.phone,
-            distinctRows: true, // every tile's top edge on a different grid line
+            cells: pc,
+            scatter: !rows, // rows: the centred lattice, filled in order
+            shuffle: !rows,
+            centered: rows,
+            columns: pcolumns,
+            centerX: pcolumns > 0,
+            distinctRows: !rows, // scatter: every tile's top edge on a different grid line
           })
           out.push(...placed.map((o) => o && { ...o, x: o.x + p * screenW }))
         }
@@ -135,6 +159,7 @@ export default function ProjectThumbs({ open = false, onSelect, items = projects
           snap: screenW,
           step: s,
           page: screenW,
+          per,
           // Two cells wide, so they are easy to tap.
           arrows: { y: poy + (prows - 1) * psy, left: originX, right: originX + (pcols - 2) * s, w: 2 * s, h: psy },
         })
@@ -156,19 +181,43 @@ export default function ProjectThumbs({ open = false, onSelect, items = projects
       const panelRight = panel ? panel.right - secRect.left : 0
       const firstCol = Math.ceil((panelRight - ox) / sx) + 1 // one clear column after the panel
       const cols = Math.floor((W - ox) / sx + 1e-6)
-      const rows = Math.floor((H - oy) / sy + 1e-6)
+      const gridRows = Math.floor((H - oy) / sy + 1e-6)
       const rnd = mulberry32(seed.current)
       const used = new Set()
       // Columns beside the panel = one screen. Tiles past MAX_PER_SCREEN go on the
       // screens after it, further along the same grid (off the page until scrolled to).
       const span = Math.max(1, cols - firstCol)
-      const per = MAX_PER_SCREEN.desktop
+      const dc = tileCells.desktop
+      // Rows: tiles go in order, left to right then top to bottom, in a lattice of
+      // dc-cell blocks a clear cell apart, the block of rows centred on the free height...
+      // A screen holds as many tiles as the lattice has slots.
+      const pitch = dc + PAD
+      const perRow = Math.max(1, Math.floor(span / pitch)) // a clear cell at the page's right edge too
+      const latticeRows = (free) => Math.max(1, Math.floor((free + PAD) / pitch))
+      // Everything on one screen if the lattice holds it; otherwise the bottom grid row
+      // goes to the arrows and the lattice is sized on what is left.
+      let maxRows = latticeRows(gridRows)
+      if (rows && items.length > perRow * maxRows) maxRows = latticeRows(gridRows - 1)
+      const per = rows ? perRow * maxRows : MAX_PER_SCREEN.desktop
       const screens = Math.max(1, Math.ceil(items.length / per))
-      const tileRows = screens > 1 ? rows - 1 : rows // when scrollable the bottom row is the arrows'
+      const tileRows = screens > 1 ? gridRows - 1 : gridRows // when scrollable the bottom row is the arrows'
+      const rowCount = Math.min(maxRows, Math.ceil(Math.min(per, items.length) / perRow))
+      const row0 = Math.max(0, Math.floor((tileRows - (rowCount * pitch - PAD)) / 2))
+      // ...and centred (to the nearest column) between the panel and the right edge.
+      const rowCols = Math.min(perRow, items.length) * pitch - PAD
+      const col0 = Math.max(0, Math.floor((span - rowCols) / 2))
       const out = items.map((_, n) => {
         const first = firstCol + Math.floor(n / per) * span
+        if (rows) {
+          const k = n % per
+          const i = first + col0 + (k % perRow) * pitch
+          const j = row0 + Math.floor(k / perRow) * pitch
+          const c = dc
+          const dy = j + c + 1 <= tileRows ? 0 : -sy
+          return { x: LX(i), y: LY(j), s: c * sx, sh: c * sy, cell: sx, cellY: sy, col: i, n: c, dx: 0, dy }
+        }
         // c = tile size in cells: the wanted size first, then smaller if it will not fit.
-        for (let c = TILE_CELLS.desktop; c >= 1; c--) {
+        for (let c = dc; c >= 1; c--) {
           if (span < c || tileRows < c) continue
           for (let tries = 0; tries < 500; tries++) {
             const i = first + Math.floor(rnd() * (span - c + 1))
@@ -195,7 +244,8 @@ export default function ProjectThumbs({ open = false, onSelect, items = projects
         fadeFrom: LX(firstCol - 1),
         fadeTo: LX(firstCol),
         page: span * sx,
-        arrows: { y: LY(rows - 1), left: LX(firstCol), right: LX(cols - 1), w: sx, h: sy },
+        per,
+        arrows: { y: LY(gridRows - 1), left: LX(firstCol), right: LX(cols - 1), w: sx, h: sy },
       })
     }
 
@@ -211,7 +261,7 @@ export default function ProjectThumbs({ open = false, onSelect, items = projects
       ro.disconnect()
       mo.disconnect()
     }
-  }, [items.length])
+  }, [items.length, tileCells.desktop, tileCells.phone, rows, columns?.phone])
 
   // Scrolling. Wheel / swipe / arrow keys move a target; the tiles ease toward it and,
   // once the input stops, come to rest on the grid.
@@ -347,7 +397,7 @@ export default function ProjectThumbs({ open = false, onSelect, items = projects
   // move to the screen that item's tile is on, so going back lands beside it.
   useEffect(() => {
     if (focus == null || open || max <= 0) return
-    const per = strip?.cols != null ? MAX_PER_SCREEN.desktop : MAX_PER_SCREEN.phone
+    const per = strip?.per ?? (strip?.cols != null ? MAX_PER_SCREEN.desktop : MAX_PER_SCREEN.phone)
     const to = Math.min(max, Math.floor(focus / per) * page)
     pos.current.cur = pos.current.target = to
     if (track.current) track.current.style.transform = to ? `translate3d(${-to}px, 0, 0)` : ''
@@ -432,7 +482,7 @@ export default function ProjectThumbs({ open = false, onSelect, items = projects
           if (spot && max > 0 && (spot.x < near - 2 * page || spot.x > near + 3 * page)) return null
           // Entrance order within the tile's own screen, so a tile far down a long list
           // does not wait seconds before fading in.
-          const order = i % MAX_PER_SCREEN.desktop
+          const order = i % (strip?.per ?? MAX_PER_SCREEN.desktop)
           const style = spot
             ? {
                 '--i': order,
