@@ -159,6 +159,126 @@ a:hover,
   opacity: 1;
 }
 
+/* Visuals sort dropdown (components/VisualsSort.jsx, orders in lib/sortItems.js).
+   A glass button in the top right corner of the page, filling the band above the
+   first horizontal grid line (--grid-origin-y, from GridInkBackdrop.jsx) so its
+   bottom edge sits on that line; when that band is too shallow for the text it takes
+   most of a row instead. The list drops below it, one grid row per order, so the
+   rows stay on the lattice. It fades in and out with the Visuals tiles. */
+.visuals_sort {
+  position: absolute;
+  z-index: 3;
+  top: 0;
+  right: 0;
+  height: max(var(--grid-origin-y, 0px), calc(var(--grid-spacing-y, 1.15em) * 0.8));
+  font-size: clamp(0.6rem, 1.8vw, 0.76rem);
+  font-weight: var(--panel-text-weight);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #fff;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.35s ease;
+}
+.visuals_sort.is-shown {
+  opacity: 1;
+  pointer-events: auto;
+}
+.visuals_sort_button,
+.visuals_sort_option {
+  display: flex;
+  align-items: center;
+  gap: 0.7em;
+  width: 100%;
+  height: var(--grid-spacing-y, 1.15em);
+}
+.visuals_sort_button {
+  height: 100%; /* the corner band */
+}
+.visuals_sort_button,
+.visuals_sort_option {
+  margin: 0;
+  padding: 0 1.1em;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  white-space: nowrap;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.visuals_sort_button {
+  background-color: var(--glass-tint);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+}
+.visuals_sort_prefix {
+  opacity: var(--menu-dim);
+}
+.visuals_sort_chevron {
+  width: 1.1em;
+  height: 1.1em;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.6;
+  transition: transform 0.25s ease;
+}
+.visuals_sort.is-open .visuals_sort_chevron {
+  transform: rotate(180deg);
+}
+.visuals_sort_list {
+  display: none;
+  position: absolute;
+  top: 100%;
+  right: 0;
+  min-width: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  background-color: var(--glass-tint);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+}
+.visuals_sort.is-open .visuals_sort_list {
+  display: block;
+}
+.visuals_sort_option {
+  opacity: var(--menu-dim);
+  transition: opacity 0.2s ease, color 0.2s ease;
+}
+/* The active row's hint: picking it again flips the order (or deals a new shuffle). */
+.visuals_sort_flip {
+  width: 1.1em;
+  height: 1.1em;
+  margin-left: auto;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.55;
+}
+.visuals_sort_option.is-active:hover .visuals_sort_flip {
+  opacity: 1;
+}
+.visuals_sort_option.is-active {
+  opacity: 1;
+}
+@media (hover: hover) {
+  .visuals_sort_button:hover .visuals_sort_value,
+  .visuals_sort_option:not(.is-active):hover {
+    color: var(--_colors---core-accent-color--accent-primary-hover, #fff);
+  }
+  .visuals_sort_option:not(.is-active):hover {
+    opacity: 0.8;
+  }
+}
+
 /* The grid of tiles. Hidden until SYSTEMS is selected; tiles fade and rise in one
    after another, and fade out together when it closes. */
 .project_thumbs {
@@ -326,12 +446,17 @@ a:hover,
 
 /* Arrows for scrollable tiles (ProjectThumbs): one grid cell at each end of the bottom
    row, which is kept free of tiles. Shown only when there is more that way; the one
-   pointing right nudges a few times when it appears, as a hint. */
+   pointing right nudges a few times when it appears, as a hint. Under a sort order
+   with two ends (Visuals), a word beside each arrow says what lies that way
+   (.project_thumbs_arrow_label: "darker" / "lighter"); the arrow itself stays in its
+   cell (min-width) and the word sits inside, toward the tiles. */
 .project_thumbs_arrow {
   position: absolute;
   z-index: 4;
-  display: grid;
-  place-items: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.2em;
   padding: 0;
   border: 0;
   background: none;
@@ -349,8 +474,18 @@ a:hover,
 .project_thumbs.is-open .project_thumbs_arrow.is-on:focus-visible {
   opacity: 1;
 }
+.project_thumbs_arrow_label {
+  font-size: clamp(0.6rem, 1.8vw, 0.76rem);
+  font-weight: var(--panel-text-weight);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  padding: 0 0.5em;
+}
 .project_thumbs_arrow svg {
-  width: min(46%, 24px);
+  flex: none;
+  width: 24px;
+  max-width: 46%;
   height: auto;
   fill: none;
   stroke: currentColor;

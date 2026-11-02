@@ -29,7 +29,9 @@ import { BOUNCE } from './GridInkBackdrop.jsx'
  * menu panel, and they always come to rest on the grid lines.
  * To show there is more: the bottom grid row is kept free of tiles and holds an arrow
  * at each end (shown only when there is more that way; a click moves one screen), and
- * each time the tiles open they slide in from the right.
+ * each time the tiles open they slide in from the right. `arrowLabels` (['darker',
+ * 'lighter']) writes next to each arrow what lies that way under the current sort
+ * order (Visuals; lib/sortItems.js).
  *
  * `bounce` (Visuals): each time the tiles open they hop on the beat for as long as the
  * backdrop's lines bounce (GridInkBackdrop SETTINGS.bounce), each by its own amount.
@@ -76,7 +78,7 @@ const mulberry32 = (a) => () => {
 const BEAT = 60 / BOUNCE.bpm
 const BEATS = Math.max(1, Math.round((BOUNCE.seconds + 0.6) / BEAT))
 
-export default function ProjectThumbs({ open = false, onSelect, items = projects, label = 'Projects', external = false, bounce = false, titles = true, keep = false, focus = null, cells = TILE_CELLS, rows = false, columns = null }) {
+export default function ProjectThumbs({ open = false, onSelect, items = projects, label = 'Projects', external = false, bounce = false, titles = true, keep = false, focus = null, cells = TILE_CELLS, rows = false, columns = null, arrowLabels = null }) {
   const nav = useRef(null)
   const tileCells = typeof cells === 'number' ? { desktop: cells, phone: cells } : { ...TILE_CELLS, ...cells }
   const seed = useRef(Math.floor(Math.random() * 1e9))
@@ -553,19 +555,25 @@ export default function ProjectThumbs({ open = false, onSelect, items = projects
         [-1, 1].map((dir) => {
           const on = open && !!(ends & (dir < 0 ? 1 : 2))
           const a = strip.arrows
+          const text = arrowLabels?.[dir < 0 ? 0 : 1]
+          // The arrow keeps its cell; a label makes the button grow inward from that cell
+          // (the right one is anchored by its right edge for that).
+          const place = dir < 0 ? { left: a.left } : { right: `calc(100% - ${a.right + a.w}px)` }
           return (
             <button
               key={dir}
               type="button"
               className={`project_thumbs_arrow${on ? ' is-on' : ''}`}
-              style={{ left: dir < 0 ? a.left : a.right, top: a.y, width: a.w, height: a.h, '--dir': dir }}
-              aria-label={dir < 0 ? `Previous ${label.toLowerCase()}` : `More ${label.toLowerCase()}`}
+              style={{ ...place, top: a.y, minWidth: a.w, height: a.h, '--dir': dir }}
+              aria-label={`${dir < 0 ? 'Previous' : 'More'} ${label.toLowerCase()}${text ? ` (${text})` : ''}`}
               tabIndex={on ? 0 : -1}
               onClick={() => goBy.current?.(dir)}
             >
+              {text && dir > 0 && <span className="project_thumbs_arrow_label">{text}</span>}
               <svg viewBox="0 0 24 24" aria-hidden="true">
                 <path d={dir < 0 ? 'M14.5 5.5 8 12l6.5 6.5' : 'M9.5 5.5 16 12l-6.5 6.5'} />
               </svg>
+              {text && dir < 0 && <span className="project_thumbs_arrow_label">{text}</span>}
             </button>
           )
         })}

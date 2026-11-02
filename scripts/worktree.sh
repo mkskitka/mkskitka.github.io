@@ -6,8 +6,8 @@
 #   scripts/worktree.sh <name> --remove   remove that worktree (branch is kept)
 #   scripts/worktree.sh --list
 #
-# Each worktree is a full checkout with its own node_modules and its own dev server
-# port, printed at the end. Merge finished work back into main from the main checkout:
+# Each worktree is a full checkout with its own node_modules, a copy of the untracked
+# site media in src/assets, and its own dev server port, printed at the end. Merge finished work back into main from the main checkout:
 #   git merge wt/<name>
 set -euo pipefail
 ROOT="$(git -C "$(dirname "$0")/.." rev-parse --show-toplevel)"
@@ -28,6 +28,10 @@ if [[ -d "$DIR" ]]; then echo "exists: $DIR"; else
     git -C "$ROOT" worktree add -b "$BRANCH" "$DIR" main
   fi
   (cd "$DIR" && npm install --no-fund --no-audit >/dev/null 2>&1 && echo "installed dependencies")
+  # src/assets (project photos, videos, thumbnails) is not in git, so a fresh checkout
+  # has none of it and the project tiles fall back to the generic screenshots. Copy it
+  # from the main checkout.
+  rsync -a "$ROOT/src/assets/" "$DIR/src/assets/" && echo "copied src/assets from the main checkout"
 fi
 # a port per worktree so several dev servers can run at once
 PORT=$(( 5180 + $(ls "$WT_DIR" | sort | grep -nx "$NAME" | cut -d: -f1) ))
