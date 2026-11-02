@@ -5,8 +5,12 @@
     "url": "https://www.instagram.com/reel/Dd-DxDqIAxG/",
     "image": "/images/instagram/18133416142679933.jpg",
     "timestamp": "2026-10-01T23:13:43+0000",
-    "color": "#7c3a3c",
-    "hue": 358
+    "color": "#803a3c",
+    "hue": 358,
+    "light": 0.252,
+    "vivid": 0.066,
+    "busy": 0.369,
+    "glitch": 0.297
   },
   {
     "id": "ig-18090871003916821",
@@ -14,8 +18,12 @@
     "url": "https://www.instagram.com/reel/DWmk_rwCF1_/",
     "image": "/images/instagram/18090871003916821.jpg",
     "timestamp": "2026-04-01T20:40:30+0000",
-    "color": "#164375",
-    "hue": 212
+    "color": "#154a85",
+    "hue": 211,
+    "light": 0.254,
+    "vivid": 0.098,
+    "busy": 0.558,
+    "glitch": 0.356
   },
   {
     "id": "ig-17902343793226023",
@@ -23,8 +31,12 @@
     "url": "https://www.instagram.com/p/DVe4ruEiJ1l/",
     "image": "/images/instagram/17902343793226023.jpg",
     "timestamp": "2026-03-05T00:26:43+0000",
-    "color": "#6d4746",
-    "hue": 0
+    "color": "#6c4646",
+    "hue": 0,
+    "light": 0.373,
+    "vivid": 0.137,
+    "busy": 0.449,
+    "glitch": 0.411
   },
   {
     "id": "ig-17963011281005045",
@@ -33,7 +45,11 @@
     "image": "/images/instagram/17963011281005045.jpg",
     "timestamp": "2025-11-29T19:41:03+0000",
     "color": "#623c25",
-    "hue": 23
+    "hue": 23,
+    "light": 0.222,
+    "vivid": 0.184,
+    "busy": 0.141,
+    "glitch": 0.192
   },
   {
     "id": "ig-17976841454791616",
@@ -42,7 +58,11 @@
     "image": "/images/instagram/17976841454791616.jpg",
     "timestamp": "2025-11-27T16:57:57+0000",
     "color": "#07090a",
-    "hue": null
+    "hue": null,
+    "light": 0.033,
+    "vivid": 0.015,
+    "busy": 0.109,
+    "glitch": 0.214
   },
   {
     "id": "ig-17908281618263971",
@@ -51,7 +71,11 @@
     "image": "/images/instagram/17908281618263971.jpg",
     "timestamp": "2025-11-17T18:14:44+0000",
     "color": "#070707",
-    "hue": null
+    "hue": null,
+    "light": 0.028,
+    "vivid": 0,
+    "busy": 0.122,
+    "glitch": 0.333
   },
   {
     "id": "ig-17954780268041524",
@@ -60,7 +84,11 @@
     "image": "/images/instagram/17954780268041524.jpg",
     "timestamp": "2025-11-06T23:28:36+0000",
     "color": "#110f12",
-    "hue": null
+    "hue": null,
+    "light": 0.061,
+    "vivid": 0.011,
+    "busy": 0.121,
+    "glitch": 0.153
   },
   {
     "id": "ig-18293854333262079",
@@ -68,8 +96,12 @@
     "url": "https://www.instagram.com/reel/DQs1ZwpDN_K/",
     "image": "/images/instagram/18293854333262079.jpg",
     "timestamp": "2025-11-06T03:52:42+0000",
-    "color": "#2121bf",
-    "hue": 240
+    "color": "#1f21c2",
+    "hue": 239,
+    "light": 0.253,
+    "vivid": 0.563,
+    "busy": 0.143,
+    "glitch": 0.31
   },
   {
     "id": "ig-18018301313610259",
@@ -77,8 +109,12 @@
     "url": "https://www.instagram.com/reel/DQppLzYgTRs/",
     "image": "/images/instagram/18018301313610259.jpg",
     "timestamp": "2025-11-04T22:07:05+0000",
-    "color": "#804c42",
-    "hue": 10
+    "color": "#824d43",
+    "hue": 9,
+    "light": 0.084,
+    "vivid": 0.045,
+    "busy": 0.085,
+    "glitch": 0.157
   },
   {
     "id": "ig-18373501381155273",
@@ -87,7 +123,11 @@
     "image": "/images/instagram/18373501381155273.jpg",
     "timestamp": "2025-11-03T22:46:07+0000",
     "color": "#511927",
-    "hue": 345
+    "hue": 345,
+    "light": 0.169,
+    "vivid": 0.132,
+    "busy": 0.086,
+    "glitch": 0.156
   },
   {
     "id": "ig-18030022250540972",
@@ -96,7 +136,11 @@
     "image": "/images/instagram/18030022250540972.jpg",
     "timestamp": "2025-11-03T22:07:33+0000",
     "color": "#71706f",
-    "hue": null
+    "hue": null,
+    "light": 0.44,
+    "vivid": 0.029,
+    "busy": 0.159,
+    "glitch": 0.043
   },
   {
     "id": "ig-18301187329257650",
@@ -105,7 +149,11 @@
     "image": "/images/instagram/18301187329257650.jpg",
     "timestamp": "2025-11-03T21:57:59+0000",
     "color": "#4f4e4f",
-    "hue": null
+    "hue": null,
+    "light": 0.308,
+    "vivid": 0.06,
+    "busy": 0.198,
+    "glitch": 0.074
   },
   {
     "id": "ig-18044905826445383",
@@ -113,8 +161,12 @@
     "url": "https://www.instagram.com/p/DQmvrvhgXo0/",
     "image": "/images/instagram/18044905826445383.jpg",
     "timestamp": "2025-11-03T19:04:48+0000",
-    "color": "#5a80ae",
-    "hue": 213
+    "color": "#587faf",
+    "hue": 213,
+    "light": 0.515,
+    "vivid": 0.186,
+    "busy": 0.794,
+    "glitch": 0.282
   },
   {
     "id": "ig-18034021616711277",
@@ -122,8 +174,12 @@
     "url": "https://www.instagram.com/p/DPy6OguEd6z/",
     "image": "/images/instagram/18034021616711277.jpg",
     "timestamp": "2025-10-14T15:56:26+0000",
-    "color": "#693252",
-    "hue": 325
+    "color": "#6f3455",
+    "hue": 326,
+    "light": 0.14,
+    "vivid": 0.062,
+    "busy": 0.355,
+    "glitch": 0.47
   },
   {
     "id": "ig-18074953838044789",
@@ -132,7 +188,11 @@
     "image": "/images/instagram/18074953838044789.jpg",
     "timestamp": "2025-09-04T17:50:38+0000",
     "color": "#1a1819",
-    "hue": null
+    "hue": null,
+    "light": 0.095,
+    "vivid": 0.01,
+    "busy": 0.23,
+    "glitch": 0.294
   },
   {
     "id": "ig-18066357194468281",
@@ -141,7 +201,11 @@
     "image": "/images/instagram/18066357194468281.jpg",
     "timestamp": "2025-09-03T02:51:44+0000",
     "color": "#1a181a",
-    "hue": null
+    "hue": null,
+    "light": 0.096,
+    "vivid": 0.011,
+    "busy": 0.144,
+    "glitch": 0.232
   },
   {
     "id": "ig-17970183626926911",
@@ -150,7 +214,11 @@
     "image": "/images/instagram/17970183626926911.jpg",
     "timestamp": "2025-08-26T23:20:15+0000",
     "color": "#3a1a7c",
-    "hue": 260
+    "hue": 260,
+    "light": 0.142,
+    "vivid": 0.282,
+    "busy": 0.052,
+    "glitch": 0.126
   },
   {
     "id": "ig-18283269985262040",
@@ -158,8 +226,12 @@
     "url": "https://www.instagram.com/reel/DM_te2ItZUm/",
     "image": "/images/instagram/18283269985262040.jpg",
     "timestamp": "2025-08-06T01:42:16+0000",
-    "color": "#494c4f",
-    "hue": null
+    "color": "#669abc",
+    "hue": 204,
+    "light": 0.297,
+    "vivid": 0.051,
+    "busy": 0.365,
+    "glitch": 0.392
   },
   {
     "id": "ig-17958580934962293",
@@ -167,8 +239,12 @@
     "url": "https://www.instagram.com/p/DMb0TBFN5jN/",
     "image": "/images/instagram/17958580934962293.jpg",
     "timestamp": "2025-07-23T03:07:54+0000",
-    "color": "#826659",
-    "hue": 19
+    "color": "#816658",
+    "hue": 19,
+    "light": 0.814,
+    "vivid": 0.048,
+    "busy": 0.211,
+    "glitch": 0.277
   },
   {
     "id": "ig-17965400165933231",
@@ -176,8 +252,12 @@
     "url": "https://www.instagram.com/p/DMbYaVWMr-Y/",
     "image": "/images/instagram/17965400165933231.jpg",
     "timestamp": "2025-07-22T23:04:14+0000",
-    "color": "#c78465",
-    "hue": 19
+    "color": "#c78364",
+    "hue": 19,
+    "light": 0.667,
+    "vivid": 0.088,
+    "busy": 0.604,
+    "glitch": 0.461
   },
   {
     "id": "ig-17983066784848019",
@@ -185,8 +265,12 @@
     "url": "https://www.instagram.com/reel/DMbWVG-siXc/",
     "image": "/images/instagram/17983066784848019.jpg",
     "timestamp": "2025-07-22T22:48:06+0000",
-    "color": "#640d44",
-    "hue": 322
+    "color": "#640d43",
+    "hue": 323,
+    "light": 0.047,
+    "vivid": 0.109,
+    "busy": 0.084,
+    "glitch": 0.311
   },
   {
     "id": "ig-18090286714589172",
@@ -194,8 +278,12 @@
     "url": "https://www.instagram.com/p/DMbVvhQsYCi/",
     "image": "/images/instagram/18090286714589172.jpg",
     "timestamp": "2025-07-22T22:40:54+0000",
-    "color": "#921265",
-    "hue": 321
+    "color": "#911265",
+    "hue": 321,
+    "light": 0.291,
+    "vivid": 0.39,
+    "busy": 0.448,
+    "glitch": 0.406
   },
   {
     "id": "ig-17964882290944509",
@@ -203,8 +291,12 @@
     "url": "https://www.instagram.com/reel/DMJL3Oyymwt/",
     "image": "/images/instagram/17964882290944509.jpg",
     "timestamp": "2025-07-15T21:28:45+0000",
-    "color": "#6455a7",
-    "hue": 251
+    "color": "#6454a8",
+    "hue": 251,
+    "light": 0.106,
+    "vivid": 0.078,
+    "busy": 0.171,
+    "glitch": 0.365
   },
   {
     "id": "ig-18099429583597892",
@@ -212,8 +304,12 @@
     "url": "https://www.instagram.com/reel/DMJCM85yRIB/",
     "image": "/images/instagram/18099429583597892.jpg",
     "timestamp": "2025-07-15T20:04:47+0000",
-    "color": "#b96b4e",
-    "hue": 16
+    "color": "#b6694d",
+    "hue": 16,
+    "light": 0.149,
+    "vivid": 0.117,
+    "busy": 0.142,
+    "glitch": 0.408
   },
   {
     "id": "ig-17854049445436506",
@@ -221,8 +317,12 @@
     "url": "https://www.instagram.com/reel/DMI-HSNy9qi/",
     "image": "/images/instagram/17854049445436506.jpg",
     "timestamp": "2025-07-15T19:29:39+0000",
-    "color": "#21390a",
-    "hue": 91
+    "color": "#21390b",
+    "hue": 91,
+    "light": 0.244,
+    "vivid": 0.106,
+    "busy": 0.283,
+    "glitch": 0.291
   },
   {
     "id": "ig-18178991350330978",
@@ -230,8 +330,12 @@
     "url": "https://www.instagram.com/reel/DL3uExit64w/",
     "image": "/images/instagram/18178991350330978.jpg",
     "timestamp": "2025-07-09T02:42:03+0000",
-    "color": "#304562",
-    "hue": 215
+    "color": "#324a68",
+    "hue": 214,
+    "light": 0.231,
+    "vivid": 0.112,
+    "busy": 0.434,
+    "glitch": 0.334
   },
   {
     "id": "ig-18069345553847859",
@@ -239,8 +343,12 @@
     "url": "https://www.instagram.com/reel/DL3q2RDNVyG/",
     "image": "/images/instagram/18069345553847859.jpg",
     "timestamp": "2025-07-09T02:13:11+0000",
-    "color": "#d8975c",
-    "hue": 29
+    "color": "#d9975c",
+    "hue": 29,
+    "light": 0.474,
+    "vivid": 0.377,
+    "busy": 0.267,
+    "glitch": 0.198
   },
   {
     "id": "ig-18342448756091836",
@@ -248,8 +356,12 @@
     "url": "https://www.instagram.com/reel/DJrpujeOCCC/",
     "image": "/images/instagram/18342448756091836.jpg",
     "timestamp": "2025-05-15T17:09:30+0000",
-    "color": "#45435f",
-    "hue": 245
+    "color": "#44425d",
+    "hue": 245,
+    "light": 0.316,
+    "vivid": 0.11,
+    "busy": 0.348,
+    "glitch": 0.359
   },
   {
     "id": "ig-18327380125164348",
@@ -258,7 +370,11 @@
     "image": "/images/instagram/18327380125164348.jpg",
     "timestamp": "2025-05-14T20:49:55+0000",
     "color": "#1c1c1c",
-    "hue": null
+    "hue": null,
+    "light": 0.108,
+    "vivid": 0,
+    "busy": 0.372,
+    "glitch": 0.286
   },
   {
     "id": "ig-18087764638622633",
@@ -266,8 +382,12 @@
     "url": "https://www.instagram.com/p/DI0AbpGNBCP/",
     "image": "/images/instagram/18087764638622633.jpg",
     "timestamp": "2025-04-24T02:30:08+0000",
-    "color": "#c8b0cc",
-    "hue": 292
+    "color": "#c9b0cd",
+    "hue": 292,
+    "light": 0.626,
+    "vivid": 0.106,
+    "busy": 0.287,
+    "glitch": 0.315
   },
   {
     "id": "ig-18145970797343977",
@@ -276,7 +396,11 @@
     "image": "/images/instagram/18145970797343977.jpg",
     "timestamp": "2025-04-23T21:51:32+0000",
     "color": "#ba7c7b",
-    "hue": 1
+    "hue": 1,
+    "light": 0.538,
+    "vivid": 0.242,
+    "busy": 0.081,
+    "glitch": 0.248
   },
   {
     "id": "ig-17978815208692097",
@@ -284,8 +408,12 @@
     "url": "https://www.instagram.com/reel/DIXASeBSRLv/",
     "image": "/images/instagram/17978815208692097.jpg",
     "timestamp": "2025-04-12T20:12:40+0000",
-    "color": "#cbb7a3",
-    "hue": 30
+    "color": "#cbb7a2",
+    "hue": 30,
+    "light": 0.55,
+    "vivid": 0.073,
+    "busy": 0.418,
+    "glitch": 0.257
   },
   {
     "id": "ig-18063609886973716",
@@ -293,8 +421,12 @@
     "url": "https://www.instagram.com/p/DIULEsrxCCu/",
     "image": "/images/instagram/18063609886973716.jpg",
     "timestamp": "2025-04-11T17:47:25+0000",
-    "color": "#ced989",
-    "hue": 68
+    "color": "#b6d779",
+    "hue": 81,
+    "light": 0.278,
+    "vivid": 0.097,
+    "busy": 0.255,
+    "glitch": 0.298
   },
   {
     "id": "ig-18061969145058166",
@@ -302,8 +434,12 @@
     "url": "https://www.instagram.com/reel/DHZpp6HM7xp/",
     "image": "/images/instagram/18061969145058166.jpg",
     "timestamp": "2025-03-20T00:21:48+0000",
-    "color": "#bf996e",
-    "hue": 32
+    "color": "#c0996e",
+    "hue": 32,
+    "light": 0.36,
+    "vivid": 0.148,
+    "busy": 0.429,
+    "glitch": 0.428
   },
   {
     "id": "ig-18359029963120045",
@@ -312,7 +448,11 @@
     "image": "/images/instagram/18359029963120045.jpg",
     "timestamp": "2025-03-17T23:08:31+0000",
     "color": "#79191b",
-    "hue": 358
+    "hue": 358,
+    "light": 0.194,
+    "vivid": 0.142,
+    "busy": 0.172,
+    "glitch": 0.501
   },
   {
     "id": "ig-18070582234675818",
@@ -320,8 +460,12 @@
     "url": "https://www.instagram.com/reel/DG6_6kLtYsD/",
     "image": "/images/instagram/18070582234675818.jpg",
     "timestamp": "2025-03-08T02:40:34+0000",
-    "color": "#24726c",
-    "hue": 175
+    "color": "#24746d",
+    "hue": 175,
+    "light": 0.072,
+    "vivid": 0.055,
+    "busy": 0.183,
+    "glitch": 0.287
   },
   {
     "id": "ig-18391252612110700",
@@ -329,8 +473,12 @@
     "url": "https://www.instagram.com/reel/DG4uTgLNd_B/",
     "image": "/images/instagram/18391252612110700.jpg",
     "timestamp": "2025-03-07T05:26:30+0000",
-    "color": "#335d39",
-    "hue": 129
+    "color": "#33603a",
+    "hue": 129,
+    "light": 0.147,
+    "vivid": 0.066,
+    "busy": 0.337,
+    "glitch": 0.223
   },
   {
     "id": "ig-18026425154359586",
@@ -338,8 +486,12 @@
     "url": "https://www.instagram.com/reel/DGtj23PS8l4/",
     "image": "/images/instagram/18026425154359586.jpg",
     "timestamp": "2025-03-02T21:25:37+0000",
-    "color": "#080707",
-    "hue": null
+    "color": "#070707",
+    "hue": null,
+    "light": 0.027,
+    "vivid": 0.021,
+    "busy": 0.161,
+    "glitch": 0.225
   },
   {
     "id": "ig-18016132259692531",
@@ -347,8 +499,12 @@
     "url": "https://www.instagram.com/reel/DGoLATNRAIS/",
     "image": "/images/instagram/18016132259692531.jpg",
     "timestamp": "2025-02-28T19:11:03+0000",
-    "color": "#205c24",
-    "hue": 124
+    "color": "#216025",
+    "hue": 124,
+    "light": 0.148,
+    "vivid": 0.11,
+    "busy": 0.346,
+    "glitch": 0.223
   },
   {
     "id": "ig-18060036409764976",
@@ -356,8 +512,12 @@
     "url": "https://www.instagram.com/reel/DFCMey9MJ4Z/",
     "image": "/images/instagram/18060036409764976.jpg",
     "timestamp": "2025-01-20T04:39:32+0000",
-    "color": "#df39d7",
-    "hue": 303
+    "color": "#e53adc",
+    "hue": 303,
+    "light": 0.109,
+    "vivid": 0.133,
+    "busy": 0.167,
+    "glitch": 0.386
   },
   {
     "id": "ig-18045776870227152",
@@ -366,7 +526,11 @@
     "image": "/images/instagram/18045776870227152.jpg",
     "timestamp": "2025-01-20T04:28:56+0000",
     "color": "#637d9b",
-    "hue": 212
+    "hue": 212,
+    "light": 0.172,
+    "vivid": 0.079,
+    "busy": 0.211,
+    "glitch": 0.341
   },
   {
     "id": "ig-18039440129098756",
@@ -375,7 +539,11 @@
     "image": "/images/instagram/18039440129098756.jpg",
     "timestamp": "2025-01-20T02:57:47+0000",
     "color": "#2c295f",
-    "hue": 243
+    "hue": 243,
+    "light": 0.176,
+    "vivid": 0.203,
+    "busy": 0.019,
+    "glitch": 0.5
   },
   {
     "id": "ig-17955561617886882",
@@ -383,8 +551,12 @@
     "url": "https://www.instagram.com/reel/DEvN76vyRq2/",
     "image": "/images/instagram/17955561617886882.jpg",
     "timestamp": "2025-01-12T19:46:53+0000",
-    "color": "#58452a",
-    "hue": 35
+    "color": "#5d492c",
+    "hue": 36,
+    "light": 0.155,
+    "vivid": 0.09,
+    "busy": 0.326,
+    "glitch": 0.189
   },
   {
     "id": "ig-17872148328179708",
@@ -392,8 +564,12 @@
     "url": "https://www.instagram.com/reel/DEtKhUTMbaQ/",
     "image": "/images/instagram/17872148328179708.jpg",
     "timestamp": "2025-01-12T00:38:24+0000",
-    "color": "#245db3",
-    "hue": 216
+    "color": "#245db2",
+    "hue": 216,
+    "light": 0.143,
+    "vivid": 0.176,
+    "busy": 0.205,
+    "glitch": 0.375
   },
   {
     "id": "ig-17929832738883854",
@@ -402,7 +578,11 @@
     "image": "/images/instagram/17929832738883854.jpg",
     "timestamp": "2025-01-11T21:12:37+0000",
     "color": "#b0b0b0",
-    "hue": null
+    "hue": null,
+    "light": 0.689,
+    "vivid": 0,
+    "busy": 0.199,
+    "glitch": 0.51
   },
   {
     "id": "ig-18074403742649508",
@@ -410,8 +590,12 @@
     "url": "https://www.instagram.com/reel/DEspiL-S6R6/",
     "image": "/images/instagram/18074403742649508.jpg",
     "timestamp": "2025-01-11T19:51:29+0000",
-    "color": "#2d2b2e",
-    "hue": null
+    "color": "#2d2b2d",
+    "hue": null,
+    "light": 0.17,
+    "vivid": 0.011,
+    "busy": 0.194,
+    "glitch": 0.435
   },
   {
     "id": "ig-18123296830409582",
@@ -420,7 +604,11 @@
     "image": "/images/instagram/18123296830409582.jpg",
     "timestamp": "2025-01-11T04:12:22+0000",
     "color": "#4c312f",
-    "hue": 5
+    "hue": 5,
+    "light": 0.084,
+    "vivid": 0.043,
+    "busy": 0.086,
+    "glitch": 0.339
   },
   {
     "id": "ig-18055262599965992",
@@ -428,8 +616,12 @@
     "url": "https://www.instagram.com/reel/DEq6OhHtmIB/",
     "image": "/images/instagram/18055262599965992.jpg",
     "timestamp": "2025-01-11T03:39:30+0000",
-    "color": "#1b1a29",
-    "hue": 244
+    "color": "#1e1c2f",
+    "hue": 244,
+    "light": 0.203,
+    "vivid": 0.045,
+    "busy": 0.266,
+    "glitch": 0.313
   },
   {
     "id": "ig-18051854231056797",
@@ -437,8 +629,12 @@
     "url": "https://www.instagram.com/reel/DDbDkNjNDvX/",
     "image": "/images/instagram/18051854231056797.jpg",
     "timestamp": "2024-12-11T03:21:14+0000",
-    "color": "#693f3f",
-    "hue": 359
+    "color": "#693f40",
+    "hue": 359,
+    "light": 0.327,
+    "vivid": 0.148,
+    "busy": 0.195,
+    "glitch": 0.432
   },
   {
     "id": "ig-18048399602037563",
@@ -446,8 +642,12 @@
     "url": "https://www.instagram.com/reel/DDYmt_As2as/",
     "image": "/images/instagram/18048399602037563.jpg",
     "timestamp": "2024-12-10T04:29:20+0000",
-    "color": "#cb7e6e",
-    "hue": 10
+    "color": "#cd7f6f",
+    "hue": 10,
+    "light": 0.25,
+    "vivid": 0.166,
+    "busy": 0.241,
+    "glitch": 0.352
   },
   {
     "id": "ig-18029861972396417",
@@ -455,8 +655,12 @@
     "url": "https://www.instagram.com/reel/DDYOrUdNbu1/",
     "image": "/images/instagram/18029861972396417.jpg",
     "timestamp": "2024-12-10T00:59:13+0000",
-    "color": "#304268",
-    "hue": 221
+    "color": "#304269",
+    "hue": 221,
+    "light": 0.185,
+    "vivid": 0.098,
+    "busy": 0.258,
+    "glitch": 0.228
   },
   {
     "id": "ig-18024268337549736",
@@ -464,8 +668,12 @@
     "url": "https://www.instagram.com/reel/DDWGiswMbLe/",
     "image": "/images/instagram/18024268337549736.jpg",
     "timestamp": "2024-12-09T05:09:46+0000",
-    "color": "#1f24a0",
-    "hue": 238
+    "color": "#2025a2",
+    "hue": 238,
+    "light": 0.08,
+    "vivid": 0.237,
+    "busy": 0.103,
+    "glitch": 0.32
   },
   {
     "id": "ig-18051103499057253",
@@ -473,8 +681,12 @@
     "url": "https://www.instagram.com/reel/DDWFTkDMbyn/",
     "image": "/images/instagram/18051103499057253.jpg",
     "timestamp": "2024-12-09T05:00:10+0000",
-    "color": "#19151d",
-    "hue": null
+    "color": "#1c1933",
+    "hue": 246,
+    "light": 0.087,
+    "vivid": 0.044,
+    "busy": 0.212,
+    "glitch": 0.179
   },
   {
     "id": "ig-18065390701695588",
@@ -483,7 +695,11 @@
     "image": "/images/instagram/18065390701695588.jpg",
     "timestamp": "2024-12-07T22:09:32+0000",
     "color": "#1d1b1e",
-    "hue": null
+    "hue": null,
+    "light": 0.109,
+    "vivid": 0.011,
+    "busy": 0.283,
+    "glitch": 0.494
   },
   {
     "id": "ig-18049743932011443",
@@ -492,7 +708,11 @@
     "image": "/images/instagram/18049743932011443.jpg",
     "timestamp": "2024-12-05T21:38:58+0000",
     "color": "#0f0c10",
-    "hue": null
+    "hue": null,
+    "light": 0.052,
+    "vivid": 0.02,
+    "busy": 0.164,
+    "glitch": 0.201
   },
   {
     "id": "ig-18058966270883689",
@@ -500,8 +720,12 @@
     "url": "https://www.instagram.com/reel/DDJFUEjt7LT/",
     "image": "/images/instagram/18058966270883689.jpg",
     "timestamp": "2024-12-04T03:49:11+0000",
-    "color": "#100f10",
-    "hue": null
+    "color": "#0f0f10",
+    "hue": null,
+    "light": 0.06,
+    "vivid": 0.008,
+    "busy": 0.19,
+    "glitch": 0.243
   },
   {
     "id": "ig-18258034666257604",
@@ -509,8 +733,12 @@
     "url": "https://www.instagram.com/reel/DDGhU4-tmM6/",
     "image": "/images/instagram/18258034666257604.jpg",
     "timestamp": "2024-12-03T03:57:00+0000",
-    "color": "#cfac9b",
-    "hue": 20
+    "color": "#d0ad9c",
+    "hue": 20,
+    "light": 0.63,
+    "vivid": 0.139,
+    "busy": 0.297,
+    "glitch": 0.194
   },
   {
     "id": "ig-18066570433740322",
@@ -519,7 +747,11 @@
     "image": "/images/instagram/18066570433740322.jpg",
     "timestamp": "2024-12-03T01:53:22+0000",
     "color": "#979c9e",
-    "hue": null
+    "hue": null,
+    "light": 0.607,
+    "vivid": 0.062,
+    "busy": 0.322,
+    "glitch": 0.263
   },
   {
     "id": "ig-18191331973305361",
@@ -528,7 +760,11 @@
     "image": "/images/instagram/18191331973305361.jpg",
     "timestamp": "2024-11-26T18:50:11+0000",
     "color": "#9d9aa2",
-    "hue": null
+    "hue": null,
+    "light": 0.608,
+    "vivid": 0.057,
+    "busy": 0.334,
+    "glitch": 0.288
   },
   {
     "id": "ig-17867340003253680",
@@ -536,8 +772,12 @@
     "url": "https://www.instagram.com/reel/DCyBRbuMDJ_/",
     "image": "/images/instagram/17867340003253680.jpg",
     "timestamp": "2024-11-25T04:50:51+0000",
-    "color": "#364062",
-    "hue": 226
+    "color": "#364163",
+    "hue": 226,
+    "light": 0.218,
+    "vivid": 0.079,
+    "busy": 0.121,
+    "glitch": 0.231
   },
   {
     "id": "ig-18083745979540580",
@@ -545,8 +785,12 @@
     "url": "https://www.instagram.com/reel/DCxk4NhNPWP/",
     "image": "/images/instagram/18083745979540580.jpg",
     "timestamp": "2024-11-25T00:43:12+0000",
-    "color": "#829cba",
-    "hue": 212
+    "color": "#839fbe",
+    "hue": 211,
+    "light": 0.453,
+    "vivid": 0.097,
+    "busy": 0.654,
+    "glitch": 0.267
   },
   {
     "id": "ig-18108568249436358",
@@ -555,7 +799,11 @@
     "image": "/images/instagram/18108568249436358.jpg",
     "timestamp": "2024-11-22T15:41:30+0000",
     "color": "#c88771",
-    "hue": 15
+    "hue": 15,
+    "light": 0.467,
+    "vivid": 0.161,
+    "busy": 0.243,
+    "glitch": 0.227
   },
   {
     "id": "ig-17946709541905245",
@@ -564,7 +812,11 @@
     "image": "/images/instagram/17946709541905245.jpg",
     "timestamp": "2024-11-21T23:30:55+0000",
     "color": "#b76965",
-    "hue": 3
+    "hue": 3,
+    "light": 0.48,
+    "vivid": 0.273,
+    "busy": 0.174,
+    "glitch": 0.286
   },
   {
     "id": "ig-18139108765364318",
@@ -572,8 +824,12 @@
     "url": "https://www.instagram.com/reel/DCnDs48u7iD/",
     "image": "/images/instagram/18139108765364318.jpg",
     "timestamp": "2024-11-20T22:41:55+0000",
-    "color": "#927555",
-    "hue": 32
+    "color": "#947756",
+    "hue": 32,
+    "light": 0.479,
+    "vivid": 0.129,
+    "busy": 0.18,
+    "glitch": 0.394
   },
   {
     "id": "ig-18335178193145475",
@@ -582,7 +838,11 @@
     "image": "/images/instagram/18335178193145475.jpg",
     "timestamp": "2024-11-18T22:10:12+0000",
     "color": "#7e7e7e",
-    "hue": null
+    "hue": null,
+    "light": 0.493,
+    "vivid": 0,
+    "busy": 0.093,
+    "glitch": 0.218
   },
   {
     "id": "ig-18111506398438853",
@@ -591,7 +851,11 @@
     "image": "/images/instagram/18111506398438853.jpg",
     "timestamp": "2024-11-18T20:53:38+0000",
     "color": "#7e7e7e",
-    "hue": null
+    "hue": null,
+    "light": 0.495,
+    "vivid": 0,
+    "busy": 0.081,
+    "glitch": 0.113
   },
   {
     "id": "ig-18063063619709395",
@@ -600,7 +864,11 @@
     "image": "/images/instagram/18063063619709395.jpg",
     "timestamp": "2024-10-15T15:31:31+0000",
     "color": "#312fa5",
-    "hue": 241
+    "hue": 241,
+    "light": 0.206,
+    "vivid": 0.428,
+    "busy": 0.088,
+    "glitch": 0.176
   },
   {
     "id": "ig-18022362512221512",
@@ -609,7 +877,11 @@
     "image": "/images/instagram/18022362512221512.jpg",
     "timestamp": "2024-10-08T17:02:34+0000",
     "color": "#3a37c0",
-    "hue": 241
+    "hue": 241,
+    "light": 0.255,
+    "vivid": 0.53,
+    "busy": 0.028,
+    "glitch": 0.073
   },
   {
     "id": "ig-17965894367671358",
@@ -617,8 +889,12 @@
     "url": "https://www.instagram.com/p/DAztf5-NxMS/",
     "image": "/images/instagram/17965894367671358.jpg",
     "timestamp": "2024-10-07T03:33:32+0000",
-    "color": "#b7375f",
-    "hue": 341
+    "color": "#b73660",
+    "hue": 341,
+    "light": 0.363,
+    "vivid": 0.349,
+    "busy": 0.278,
+    "glitch": 0.165
   },
   {
     "id": "ig-18024780149415185",
@@ -627,7 +903,11 @@
     "image": "/images/instagram/18024780149415185.jpg",
     "timestamp": "2024-10-03T03:14:03+0000",
     "color": "#2c2929",
-    "hue": null
+    "hue": null,
+    "light": 0.164,
+    "vivid": 0.014,
+    "busy": 0.261,
+    "glitch": 0.257
   },
   {
     "id": "ig-18107050918425212",
@@ -636,7 +916,11 @@
     "image": "/images/instagram/18107050918425212.jpg",
     "timestamp": "2024-10-03T02:52:27+0000",
     "color": "#433e3e",
-    "hue": null
+    "hue": null,
+    "light": 0.248,
+    "vivid": 0.019,
+    "busy": 0.356,
+    "glitch": 0.235
   },
   {
     "id": "ig-18376433062097114",
@@ -645,7 +929,11 @@
     "image": "/images/instagram/18376433062097114.jpg",
     "timestamp": "2024-10-03T00:16:16+0000",
     "color": "#47464f",
-    "hue": null
+    "hue": null,
+    "light": 0.278,
+    "vivid": 0.037,
+    "busy": 0.417,
+    "glitch": 0.178
   },
   {
     "id": "ig-17966758751716724",
@@ -654,7 +942,11 @@
     "image": "/images/instagram/17966758751716724.jpg",
     "timestamp": "2024-06-25T01:43:03+0000",
     "color": "#5c482e",
-    "hue": 34
+    "hue": 34,
+    "light": 0.432,
+    "vivid": 0.111,
+    "busy": 0.345,
+    "glitch": 0.257
   },
   {
     "id": "ig-18054502603716148",
@@ -662,8 +954,12 @@
     "url": "https://www.instagram.com/p/C8P07KSv3pl/",
     "image": "/images/instagram/18054502603716148.jpg",
     "timestamp": "2024-06-15T19:00:11+0000",
-    "color": "#eda14c",
-    "hue": 32
+    "color": "#eea24c",
+    "hue": 32,
+    "light": 0.513,
+    "vivid": 0.357,
+    "busy": 0.447,
+    "glitch": 0.233
   },
   {
     "id": "ig-18048792607742819",
@@ -671,8 +967,12 @@
     "url": "https://www.instagram.com/p/C8LEBR8AF9s/",
     "image": "/images/instagram/18048792607742819.jpg",
     "timestamp": "2024-06-13T22:35:53+0000",
-    "color": "#9babbe",
-    "hue": 213
+    "color": "#99a8bc",
+    "hue": 213,
+    "light": 0.504,
+    "vivid": 0.098,
+    "busy": 0.371,
+    "glitch": 0.337
   },
   {
     "id": "ig-18273182749225531",
@@ -681,7 +981,11 @@
     "image": "/images/instagram/18273182749225531.jpg",
     "timestamp": "2024-06-11T20:56:02+0000",
     "color": "#454442",
-    "hue": null
+    "hue": null,
+    "light": 0.265,
+    "vivid": 0.015,
+    "busy": 0.488,
+    "glitch": 0.307
   },
   {
     "id": "ig-18437120845003165",
@@ -690,7 +994,11 @@
     "image": "/images/instagram/18437120845003165.jpg",
     "timestamp": "2024-06-11T17:44:28+0000",
     "color": "#ebe7e4",
-    "hue": null
+    "hue": null,
+    "light": 0.909,
+    "vivid": 0.03,
+    "busy": 0.225,
+    "glitch": 0.249
   },
   {
     "id": "ig-17929283015858279",
@@ -698,8 +1006,12 @@
     "url": "https://www.instagram.com/reel/C7xQG4EgEUs/",
     "image": "/images/instagram/17929283015858279.jpg",
     "timestamp": "2024-06-03T22:01:32+0000",
-    "color": "#879836",
-    "hue": 71
+    "color": "#889a36",
+    "hue": 71,
+    "light": 0.487,
+    "vivid": 0.239,
+    "busy": 0.449,
+    "glitch": 0.328
   },
   {
     "id": "ig-18054279358549669",
@@ -708,7 +1020,11 @@
     "image": "/images/instagram/18054279358549669.jpg",
     "timestamp": "2024-04-30T20:28:14+0000",
     "color": "#f3f4f2",
-    "hue": null
+    "hue": null,
+    "light": 0.956,
+    "vivid": 0.013,
+    "busy": 0.213,
+    "glitch": 0.279
   },
   {
     "id": "ig-17992869056572037",
@@ -717,7 +1033,11 @@
     "image": "/images/instagram/17992869056572037.jpg",
     "timestamp": "2024-02-20T14:51:14+0000",
     "color": "#5a4d5b",
-    "hue": null
+    "hue": null,
+    "light": 0.317,
+    "vivid": 0.074,
+    "busy": 0.271,
+    "glitch": 0.379
   },
   {
     "id": "ig-17941523873685017",
@@ -725,8 +1045,12 @@
     "url": "https://www.instagram.com/reel/C3kk-rFr7EQ/",
     "image": "/images/instagram/17941523873685017.jpg",
     "timestamp": "2024-02-20T13:50:09+0000",
-    "color": "#daa13e",
-    "hue": 38
+    "color": "#daa13d",
+    "hue": 38,
+    "light": 0.325,
+    "vivid": 0.311,
+    "busy": 0.302,
+    "glitch": 0.184
   },
   {
     "id": "ig-18031693324770959",
@@ -734,8 +1058,12 @@
     "url": "https://www.instagram.com/p/C2be83aghz3/",
     "image": "/images/instagram/18031693324770959.jpg",
     "timestamp": "2024-01-23T04:30:42+0000",
-    "color": "#5369db",
-    "hue": 230
+    "color": "#5268db",
+    "hue": 230,
+    "light": 0.64,
+    "vivid": 0.357,
+    "busy": 0.251,
+    "glitch": 0.167
   },
   {
     "id": "ig-18006623249255754",
@@ -743,8 +1071,12 @@
     "url": "https://www.instagram.com/reel/C2bcyFmgEp8/",
     "image": "/images/instagram/18006623249255754.jpg",
     "timestamp": "2024-01-23T04:13:49+0000",
-    "color": "#2e3f83",
-    "hue": 228
+    "color": "#2d3f85",
+    "hue": 228,
+    "light": 0.142,
+    "vivid": 0.165,
+    "busy": 0.246,
+    "glitch": 0.164
   },
   {
     "id": "ig-17960946443570308",
@@ -752,8 +1084,12 @@
     "url": "https://www.instagram.com/p/C04U9vVr1Kr/",
     "image": "/images/instagram/17960946443570308.jpg",
     "timestamp": "2023-12-15T16:18:38+0000",
-    "color": "#ead05d",
-    "hue": 49
+    "color": "#ebd05c",
+    "hue": 49,
+    "light": 0.462,
+    "vivid": 0.254,
+    "busy": 0.237,
+    "glitch": 0.266
   },
   {
     "id": "ig-17958169412581535",
@@ -761,8 +1097,12 @@
     "url": "https://www.instagram.com/p/C0hxJRArnW2/",
     "image": "/images/instagram/17958169412581535.jpg",
     "timestamp": "2023-12-06T22:02:20+0000",
-    "color": "#192393",
-    "hue": 235
+    "color": "#172193",
+    "hue": 235,
+    "light": 0.11,
+    "vivid": 0.113,
+    "busy": 0.216,
+    "glitch": 0.369
   },
   {
     "id": "ig-18051380752490461",
@@ -770,8 +1110,12 @@
     "url": "https://www.instagram.com/reel/Cxwbf32rQBz/",
     "image": "/images/instagram/18051380752490461.jpg",
     "timestamp": "2023-09-29T01:08:12+0000",
-    "color": "#4b1280",
-    "hue": 271
+    "color": "#4c1280",
+    "hue": 271,
+    "light": 0.139,
+    "vivid": 0.407,
+    "busy": 0.09,
+    "glitch": 0.218
   },
   {
     "id": "ig-17997125789178162",
@@ -779,8 +1123,12 @@
     "url": "https://www.instagram.com/reel/CxbJoRSroPH/",
     "image": "/images/instagram/17997125789178162.jpg",
     "timestamp": "2023-09-20T18:48:41+0000",
-    "color": "#e88a56",
-    "hue": 22
+    "color": "#e98b57",
+    "hue": 21,
+    "light": 0.507,
+    "vivid": 0.488,
+    "busy": 0.35,
+    "glitch": 0.345
   },
   {
     "id": "ig-17909020823816894",
@@ -788,8 +1136,12 @@
     "url": "https://www.instagram.com/p/Cw5TgqurJJA/",
     "image": "/images/instagram/17909020823816894.jpg",
     "timestamp": "2023-09-07T15:19:35+0000",
-    "color": "#9d6657",
-    "hue": 13
+    "color": "#9e6757",
+    "hue": 13,
+    "light": 0.404,
+    "vivid": 0.142,
+    "busy": 0.488,
+    "glitch": 0.368
   },
   {
     "id": "ig-18031768276533862",
@@ -797,8 +1149,12 @@
     "url": "https://www.instagram.com/p/Cu3Fb4-rWTv/",
     "image": "/images/instagram/18031768276533862.jpg",
     "timestamp": "2023-07-19T01:35:20+0000",
-    "color": "#1e3f4f",
-    "hue": 199
+    "color": "#234a5d",
+    "hue": 199,
+    "light": 0.071,
+    "vivid": 0.041,
+    "busy": 0.236,
+    "glitch": 0.184
   },
   {
     "id": "ig-18182112526256392",
@@ -806,8 +1162,12 @@
     "url": "https://www.instagram.com/reel/Cq_-l40M2Yy/",
     "image": "/images/instagram/18182112526256392.jpg",
     "timestamp": "2023-04-14T02:25:06+0000",
-    "color": "#8f443f",
-    "hue": 4
+    "color": "#8f4540",
+    "hue": 4,
+    "light": 0.416,
+    "vivid": 0.18,
+    "busy": 0.235,
+    "glitch": 0.348
   },
   {
     "id": "ig-17977020760788204",
@@ -816,7 +1176,11 @@
     "image": "/images/instagram/17977020760788204.jpg",
     "timestamp": "2022-12-27T22:43:29+0000",
     "color": "#2a2f35",
-    "hue": null
+    "hue": null,
+    "light": 0.183,
+    "vivid": 0.052,
+    "busy": 0.378,
+    "glitch": 0.288
   },
   {
     "id": "ig-17976106465865477",
@@ -825,7 +1189,11 @@
     "image": "/images/instagram/17976106465865477.jpg",
     "timestamp": "2022-11-20T12:22:06+0000",
     "color": "#6f6c6f",
-    "hue": null
+    "hue": null,
+    "light": 0.427,
+    "vivid": 0.018,
+    "busy": 0.294,
+    "glitch": 0.248
   },
   {
     "id": "ig-18327114910045430",
@@ -834,7 +1202,11 @@
     "image": "/images/instagram/18327114910045430.jpg",
     "timestamp": "2022-10-21T01:12:29+0000",
     "color": "#5d66dd",
-    "hue": 236
+    "hue": 236,
+    "light": 0.362,
+    "vivid": 0.387,
+    "busy": 0.169,
+    "glitch": 0.321
   },
   {
     "id": "ig-17963937928966009",
@@ -842,8 +1214,12 @@
     "url": "https://www.instagram.com/reel/CjxBGJwAbyv/",
     "image": "/images/instagram/17963937928966009.jpg",
     "timestamp": "2022-10-16T07:17:37+0000",
-    "color": "#047f93",
-    "hue": 188
+    "color": "#05879e",
+    "hue": 189,
+    "light": 0.057,
+    "vivid": 0.096,
+    "busy": 0.264,
+    "glitch": 0.293
   },
   {
     "id": "ig-17973713161707376",
@@ -851,8 +1227,12 @@
     "url": "https://www.instagram.com/reel/CiBrPMKjsFR/",
     "image": "/images/instagram/17973713161707376.jpg",
     "timestamp": "2022-09-03T01:31:22+0000",
-    "color": "#3976a3",
-    "hue": 206
+    "color": "#3674a2",
+    "hue": 206,
+    "light": 0.337,
+    "vivid": 0.128,
+    "busy": 0.388,
+    "glitch": 0.336
   },
   {
     "id": "ig-17908770791527550",
@@ -860,8 +1240,12 @@
     "url": "https://www.instagram.com/reel/ChpTBuqAJjp/",
     "image": "/images/instagram/17908770791527550.jpg",
     "timestamp": "2022-08-24T14:17:07+0000",
-    "color": "#5140f4",
-    "hue": 246
+    "color": "#513ff4",
+    "hue": 246,
+    "light": 0.464,
+    "vivid": 0.555,
+    "busy": 0.359,
+    "glitch": 0.339
   },
   {
     "id": "ig-18179611813230876",
@@ -869,8 +1253,12 @@
     "url": "https://www.instagram.com/reel/ChijhSlD8v-/",
     "image": "/images/instagram/18179611813230876.jpg",
     "timestamp": "2022-08-21T23:28:27+0000",
-    "color": "#1f15ab",
-    "hue": 244
+    "color": "#2115ad",
+    "hue": 245,
+    "light": 0.08,
+    "vivid": 0.253,
+    "busy": 0.099,
+    "glitch": 0.25
   },
   {
     "id": "ig-17976041401630573",
@@ -878,8 +1266,12 @@
     "url": "https://www.instagram.com/reel/Chigw9cjN-0/",
     "image": "/images/instagram/17976041401630573.jpg",
     "timestamp": "2022-08-21T23:08:02+0000",
-    "color": "#292624",
-    "hue": null
+    "color": "#282624",
+    "hue": null,
+    "light": 0.151,
+    "vivid": 0.026,
+    "busy": 0.249,
+    "glitch": 0.353
   },
   {
     "id": "ig-17866242683751644",
@@ -887,8 +1279,12 @@
     "url": "https://www.instagram.com/p/CgI7pbyAiEf/",
     "image": "/images/instagram/17866242683751644.jpg",
     "timestamp": "2022-07-18T04:05:13+0000",
-    "color": "#9d6318",
-    "hue": 34
+    "color": "#9e6418",
+    "hue": 34,
+    "light": 0.4,
+    "vivid": 0.218,
+    "busy": 0.196,
+    "glitch": 0.38
   },
   {
     "id": "ig-17913150791593226",
@@ -897,7 +1293,11 @@
     "image": "/images/instagram/17913150791593226.jpg",
     "timestamp": "2022-07-18T02:27:44+0000",
     "color": "#080808",
-    "hue": null
+    "hue": null,
+    "light": 0.03,
+    "vivid": 0,
+    "busy": 0.059,
+    "glitch": 0.5
   },
   {
     "id": "ig-18211149034198291",
@@ -905,8 +1305,12 @@
     "url": "https://www.instagram.com/p/CfVcST2gTS7/",
     "image": "/images/instagram/18211149034198291.jpg",
     "timestamp": "2022-06-28T04:09:54+0000",
-    "color": "#9c8269",
-    "hue": 30
+    "color": "#9e8369",
+    "hue": 29,
+    "light": 0.483,
+    "vivid": 0.152,
+    "busy": 0.243,
+    "glitch": 0.299
   },
   {
     "id": "ig-18302138659026888",
@@ -915,7 +1319,11 @@
     "image": "/images/instagram/18302138659026888.jpg",
     "timestamp": "2022-06-24T17:05:14+0000",
     "color": "#cd2a02",
-    "hue": 12
+    "hue": 12,
+    "light": 0.109,
+    "vivid": 0.244,
+    "busy": 0.101,
+    "glitch": 0.287
   },
   {
     "id": "ig-17924204300409106",
@@ -923,8 +1331,12 @@
     "url": "https://www.instagram.com/p/CfIRYaerTH6/",
     "image": "/images/instagram/17924204300409106.jpg",
     "timestamp": "2022-06-23T01:24:30+0000",
-    "color": "#9345ca",
-    "hue": 275
+    "color": "#9345cb",
+    "hue": 275,
+    "light": 0.384,
+    "vivid": 0.297,
+    "busy": 0.261,
+    "glitch": 0.14
   },
   {
     "id": "ig-18063667459313997",
@@ -933,7 +1345,11 @@
     "image": "/images/instagram/18063667459313997.jpg",
     "timestamp": "2022-06-22T04:05:41+0000",
     "color": "#40463c",
-    "hue": null
+    "hue": null,
+    "light": 0.266,
+    "vivid": 0.055,
+    "busy": 0.112,
+    "glitch": 0.283
   },
   {
     "id": "ig-17963324647702757",
@@ -941,8 +1357,12 @@
     "url": "https://www.instagram.com/p/CfCSBQQFb1u/",
     "image": "/images/instagram/17963324647702757.jpg",
     "timestamp": "2022-06-20T17:34:38+0000",
-    "color": "#77abe6",
-    "hue": 211
+    "color": "#77ace6",
+    "hue": 211,
+    "light": 0.743,
+    "vivid": 0.276,
+    "busy": 0.172,
+    "glitch": 0.447
   },
   {
     "id": "ig-17861627627750295",
@@ -951,7 +1371,11 @@
     "image": "/images/instagram/17861627627750295.jpg",
     "timestamp": "2022-06-20T01:37:33+0000",
     "color": "#825b45",
-    "hue": 22
+    "hue": 22,
+    "light": 0.43,
+    "vivid": 0.123,
+    "busy": 0.323,
+    "glitch": 0.263
   },
   {
     "id": "ig-17924631443298041",
@@ -960,7 +1384,11 @@
     "image": "/images/instagram/17924631443298041.jpg",
     "timestamp": "2022-06-19T21:22:15+0000",
     "color": "#c9c9c9",
-    "hue": null
+    "hue": null,
+    "light": 0.788,
+    "vivid": 0,
+    "busy": 0.153,
+    "glitch": 0.86
   },
   {
     "id": "ig-17935956194230982",
@@ -969,7 +1397,11 @@
     "image": "/images/instagram/17935956194230982.jpg",
     "timestamp": "2022-06-14T23:55:37+0000",
     "color": "#6c6a6e",
-    "hue": null
+    "hue": null,
+    "light": 0.418,
+    "vivid": 0.041,
+    "busy": 0.134,
+    "glitch": 0.307
   },
   {
     "id": "ig-17880716378665059",
@@ -978,7 +1410,11 @@
     "image": "/images/instagram/17880716378665059.jpg",
     "timestamp": "2022-05-23T23:22:47+0000",
     "color": "#302e2d",
-    "hue": null
+    "hue": null,
+    "light": 0.182,
+    "vivid": 0.047,
+    "busy": 0.207,
+    "glitch": 0.327
   },
   {
     "id": "ig-18165268309239679",
@@ -986,8 +1422,12 @@
     "url": "https://www.instagram.com/tv/Cd6wv1EFSIM/",
     "image": "/images/instagram/18165268309239679.jpg",
     "timestamp": "2022-05-23T22:59:05+0000",
-    "color": "#f87962",
-    "hue": 9
+    "color": "#f97963",
+    "hue": 9,
+    "light": 0.545,
+    "vivid": 0.533,
+    "busy": 0.155,
+    "glitch": 0.543
   },
   {
     "id": "ig-18162050974241578",
@@ -995,8 +1435,12 @@
     "url": "https://www.instagram.com/tv/Cd6vpobFDcM/",
     "image": "/images/instagram/18162050974241578.jpg",
     "timestamp": "2022-05-23T22:51:23+0000",
-    "color": "#5880b3",
-    "hue": 214
+    "color": "#5a82b5",
+    "hue": 214,
+    "light": 0.531,
+    "vivid": 0.156,
+    "busy": 0.395,
+    "glitch": 0.33
   },
   {
     "id": "ig-17942394085769179",
@@ -1004,8 +1448,12 @@
     "url": "https://www.instagram.com/p/Ca3PJQ1Fyem/",
     "image": "/images/instagram/17942394085769179.jpg",
     "timestamp": "2022-03-09T00:32:17+0000",
-    "color": "#a8516d",
-    "hue": 341
+    "color": "#a8506d",
+    "hue": 340,
+    "light": 0.408,
+    "vivid": 0.271,
+    "busy": 0.449,
+    "glitch": 0.184
   },
   {
     "id": "ig-17932744108917668",
@@ -1013,8 +1461,12 @@
     "url": "https://www.instagram.com/tv/Ca3OdgaFOUN/",
     "image": "/images/instagram/17932744108917668.jpg",
     "timestamp": "2022-03-09T00:27:52+0000",
-    "color": "#371be3",
-    "hue": 249
+    "color": "#3117e5",
+    "hue": 248,
+    "light": 0.343,
+    "vivid": 0.416,
+    "busy": 0.377,
+    "glitch": 0.535
   },
   {
     "id": "ig-17898931268477726",
@@ -1022,8 +1474,12 @@
     "url": "https://www.instagram.com/p/CVbolGNluHC/",
     "image": "/images/instagram/17898931268477726.jpg",
     "timestamp": "2021-10-25T00:38:50+0000",
-    "color": "#d8c8b2",
-    "hue": 35
+    "color": "#d9c8b2",
+    "hue": 35,
+    "light": 0.711,
+    "vivid": 0.146,
+    "busy": 0.111,
+    "glitch": 0.149
   },
   {
     "id": "ig-17951327194558783",
@@ -1031,8 +1487,12 @@
     "url": "https://www.instagram.com/p/CVLeCQZlJNF/",
     "image": "/images/instagram/17951327194558783.jpg",
     "timestamp": "2021-10-18T17:58:51+0000",
-    "color": "#f7aeb7",
-    "hue": 353
+    "color": "#f695a1",
+    "hue": 353,
+    "light": 0.777,
+    "vivid": 0.102,
+    "busy": 0.399,
+    "glitch": 0.337
   },
   {
     "id": "ig-17944604392602488",
@@ -1040,8 +1500,12 @@
     "url": "https://www.instagram.com/p/CVGpM15lldB/",
     "image": "/images/instagram/17944604392602488.jpg",
     "timestamp": "2021-10-16T21:00:12+0000",
-    "color": "#1b2785",
-    "hue": 233
+    "color": "#142180",
+    "hue": 233,
+    "light": 0.451,
+    "vivid": 0.089,
+    "busy": 0.447,
+    "glitch": 0.448
   },
   {
     "id": "ig-17932804033680843",
@@ -1050,7 +1514,11 @@
     "image": "/images/instagram/17932804033680843.jpg",
     "timestamp": "2021-10-16T19:39:42+0000",
     "color": "#d8dbdd",
-    "hue": null
+    "hue": null,
+    "light": 0.856,
+    "vivid": 0.019,
+    "busy": 0.168,
+    "glitch": 0.305
   },
   {
     "id": "ig-17896443005259767",
@@ -1059,7 +1527,11 @@
     "image": "/images/instagram/17896443005259767.jpg",
     "timestamp": "2021-10-10T19:52:26+0000",
     "color": "#e4e4e4",
-    "hue": null
+    "hue": null,
+    "light": 0.892,
+    "vivid": 0,
+    "busy": 0.1,
+    "glitch": 0.145
   },
   {
     "id": "ig-17948968309551671",
@@ -1067,8 +1539,12 @@
     "url": "https://www.instagram.com/p/CUdHJyolvB0/",
     "image": "/images/instagram/17948968309551671.jpg",
     "timestamp": "2021-09-30T17:53:50+0000",
-    "color": "#bdb86a",
-    "hue": 56
+    "color": "#bcb767",
+    "hue": 56,
+    "light": 0.729,
+    "vivid": 0.064,
+    "busy": 0.389,
+    "glitch": 0.641
   },
   {
     "id": "ig-17871110156587531",
@@ -1077,7 +1553,11 @@
     "image": "/images/instagram/17871110156587531.jpg",
     "timestamp": "2021-09-26T23:07:13+0000",
     "color": "#0b0a0a",
-    "hue": null
+    "hue": null,
+    "light": 0.04,
+    "vivid": 0.004,
+    "busy": 0.224,
+    "glitch": 0.446
   },
   {
     "id": "ig-17872751975558701",
@@ -1085,8 +1565,12 @@
     "url": "https://www.instagram.com/p/CUTXz3jljz5/",
     "image": "/images/instagram/17872751975558701.jpg",
     "timestamp": "2021-09-26T23:06:59+0000",
-    "color": "#050404",
-    "hue": null
+    "color": "#040404",
+    "hue": null,
+    "light": 0.016,
+    "vivid": 0.006,
+    "busy": 0.113,
+    "glitch": 0.271
   },
   {
     "id": "ig-17864457797296208",
@@ -1094,8 +1578,12 @@
     "url": "https://www.instagram.com/p/CKEgrxZF2sQ/",
     "image": "/images/instagram/17864457797296208.jpg",
     "timestamp": "2021-01-15T15:21:58+0000",
-    "color": "#d88f61",
-    "hue": 23
+    "color": "#db8f5f",
+    "hue": 23,
+    "light": 0.476,
+    "vivid": 0.3,
+    "busy": 0.425,
+    "glitch": 0.425
   },
   {
     "id": "ig-17859615788343283",
@@ -1104,7 +1592,11 @@
     "image": "/images/instagram/17859615788343283.jpg",
     "timestamp": "2021-01-02T03:48:32+0000",
     "color": "#4c1d08",
-    "hue": 18
+    "hue": 18,
+    "light": 0.108,
+    "vivid": 0.132,
+    "busy": 0.034,
+    "glitch": 0.506
   },
   {
     "id": "ig-17885901343895324",
@@ -1112,8 +1604,12 @@
     "url": "https://www.instagram.com/p/CJeZawvFGgJ/",
     "image": "/images/instagram/17885901343895324.jpg",
     "timestamp": "2020-12-31T20:07:20+0000",
-    "color": "#3b3a38",
-    "hue": null
+    "color": "#3b3a37",
+    "hue": null,
+    "light": 0.228,
+    "vivid": 0.024,
+    "busy": 0.561,
+    "glitch": 0.557
   },
   {
     "id": "ig-17842677440419017",
@@ -1121,8 +1617,12 @@
     "url": "https://www.instagram.com/p/CFs-RkAFHBl/",
     "image": "/images/instagram/17842677440419017.jpg",
     "timestamp": "2020-09-29T01:56:14+0000",
-    "color": "#781768",
-    "hue": 310
+    "color": "#7c186c",
+    "hue": 310,
+    "light": 0.128,
+    "vivid": 0.126,
+    "busy": 0.118,
+    "glitch": 0.379
   },
   {
     "id": "ig-17854107050206694",
@@ -1131,7 +1631,11 @@
     "image": "/images/instagram/17854107050206694.jpg",
     "timestamp": "2020-09-14T00:50:28+0000",
     "color": "#dedede",
-    "hue": null
+    "hue": null,
+    "light": 0.872,
+    "vivid": 0,
+    "busy": 0.304,
+    "glitch": 0.414
   },
   {
     "id": "ig-18160304098041761",
@@ -1139,8 +1643,12 @@
     "url": "https://www.instagram.com/p/CFGOS2eF_Z7/",
     "image": "/images/instagram/18160304098041761.jpg",
     "timestamp": "2020-09-14T00:42:47+0000",
-    "color": "#3b3a41",
-    "hue": null
+    "color": "#3c3a41",
+    "hue": null,
+    "light": 0.231,
+    "vivid": 0.031,
+    "busy": 0.363,
+    "glitch": 0.725
   },
   {
     "id": "ig-17855887775183538",
@@ -1148,8 +1656,12 @@
     "url": "https://www.instagram.com/p/CFGMJsblLlV/",
     "image": "/images/instagram/17855887775183538.jpg",
     "timestamp": "2020-09-14T00:24:04+0000",
-    "color": "#d9ccbd",
-    "hue": 33
+    "color": "#d9ccbc",
+    "hue": 32,
+    "light": 0.725,
+    "vivid": 0.106,
+    "busy": 0.216,
+    "glitch": 0.24
   },
   {
     "id": "ig-17851589012261346",
@@ -1157,8 +1669,12 @@
     "url": "https://www.instagram.com/p/CFGLSR2F7Bi/",
     "image": "/images/instagram/17851589012261346.jpg",
     "timestamp": "2020-09-14T00:16:30+0000",
-    "color": "#9b3fbd",
-    "hue": 284
+    "color": "#9b3cbf",
+    "hue": 284,
+    "light": 0.43,
+    "vivid": 0.221,
+    "busy": 0.506,
+    "glitch": 0.2
   },
   {
     "id": "ig-18122190196186052",
@@ -1167,7 +1683,11 @@
     "image": "/images/instagram/18122190196186052.jpg",
     "timestamp": "2020-09-13T23:58:54+0000",
     "color": "#514f4e",
-    "hue": null
+    "hue": null,
+    "light": 0.311,
+    "vivid": 0.032,
+    "busy": 0.655,
+    "glitch": 0.433
   },
   {
     "id": "ig-17937148387354870",
@@ -1175,8 +1695,12 @@
     "url": "https://www.instagram.com/p/B-dmm6tl_Ku/",
     "image": "/images/instagram/17937148387354870.jpg",
     "timestamp": "2020-04-02T02:58:01+0000",
-    "color": "#dcc2a5",
-    "hue": 32
+    "color": "#ddc3a6",
+    "hue": 32,
+    "light": 0.756,
+    "vivid": 0.214,
+    "busy": 0.331,
+    "glitch": 0.271
   },
   {
     "id": "ig-18061286290201097",
@@ -1185,7 +1709,11 @@
     "image": "/images/instagram/18061286290201097.jpg",
     "timestamp": "2020-03-31T02:40:09+0000",
     "color": "#a8a8a8",
-    "hue": null
+    "hue": null,
+    "light": 0.66,
+    "vivid": 0,
+    "busy": 0.286,
+    "glitch": 0.257
   },
   {
     "id": "ig-18086871982166649",
@@ -1194,7 +1722,11 @@
     "image": "/images/instagram/18086871982166649.jpg",
     "timestamp": "2020-03-23T03:05:07+0000",
     "color": "#3d3840",
-    "hue": null
+    "hue": null,
+    "light": 0.226,
+    "vivid": 0.051,
+    "busy": 0.254,
+    "glitch": 0.363
   },
   {
     "id": "ig-17870919022590635",
@@ -1203,7 +1735,11 @@
     "image": "/images/instagram/17870919022590635.jpg",
     "timestamp": "2020-02-08T20:43:18+0000",
     "color": "#7e7e7b",
-    "hue": null
+    "hue": null,
+    "light": 0.494,
+    "vivid": 0.055,
+    "busy": 0.505,
+    "glitch": 0.471
   },
   {
     "id": "ig-17850909391857270",
@@ -1212,7 +1748,11 @@
     "image": "/images/instagram/17850909391857270.jpg",
     "timestamp": "2020-02-06T05:36:58+0000",
     "color": "#111211",
-    "hue": null
+    "hue": null,
+    "light": 0.069,
+    "vivid": 0.004,
+    "busy": 0.024,
+    "glitch": 0.413
   },
   {
     "id": "ig-18085022875157254",
@@ -1221,7 +1761,11 @@
     "image": "/images/instagram/18085022875157254.jpg",
     "timestamp": "2020-02-04T04:22:48+0000",
     "color": "#4f5250",
-    "hue": null
+    "hue": null,
+    "light": 0.318,
+    "vivid": 0.038,
+    "busy": 0.438,
+    "glitch": 0.541
   },
   {
     "id": "ig-18123669322009387",
@@ -1230,7 +1774,11 @@
     "image": "/images/instagram/18123669322009387.jpg",
     "timestamp": "2020-01-10T04:49:45+0000",
     "color": "#af713f",
-    "hue": 27
+    "hue": 27,
+    "light": 0.338,
+    "vivid": 0.309,
+    "busy": 0.307,
+    "glitch": 0.229
   },
   {
     "id": "ig-17865295972575476",
@@ -1238,8 +1786,12 @@
     "url": "https://www.instagram.com/p/B51NeSWFxQ5/",
     "image": "/images/instagram/17865295972575476.jpg",
     "timestamp": "2019-12-09T00:23:11+0000",
-    "color": "#aa8b66",
-    "hue": 33
+    "color": "#ad8d67",
+    "hue": 33,
+    "light": 0.424,
+    "vivid": 0.21,
+    "busy": 0.554,
+    "glitch": 0.344
   },
   {
     "id": "ig-17932218862326600",
@@ -1247,8 +1799,12 @@
     "url": "https://www.instagram.com/p/B51NPUnlzEp/",
     "image": "/images/instagram/17932218862326600.jpg",
     "timestamp": "2019-12-09T00:21:21+0000",
-    "color": "#55173c",
-    "hue": 325
+    "color": "#57183d",
+    "hue": 325,
+    "light": 0.512,
+    "vivid": 0.128,
+    "busy": 0.334,
+    "glitch": 0.422
   },
   {
     "id": "ig-18042705418200099",
@@ -1256,8 +1812,12 @@
     "url": "https://www.instagram.com/p/B4eAvF6FzUW/",
     "image": "/images/instagram/18042705418200099.jpg",
     "timestamp": "2019-11-05T03:38:09+0000",
-    "color": "#8fc1dd",
-    "hue": 202
+    "color": "#8dc3e0",
+    "hue": 201,
+    "light": 0.136,
+    "vivid": 0.053,
+    "busy": 0.232,
+    "glitch": 0.44
   },
   {
     "id": "ig-17883294259448296",
@@ -1266,7 +1826,11 @@
     "image": "/images/instagram/17883294259448296.jpg",
     "timestamp": "2019-11-04T02:51:47+0000",
     "color": "#615757",
-    "hue": null
+    "hue": null,
+    "light": 0.35,
+    "vivid": 0.039,
+    "busy": 0.342,
+    "glitch": 0.489
   },
   {
     "id": "ig-17899005961378102",
@@ -1274,8 +1838,12 @@
     "url": "https://www.instagram.com/p/B353Dill_Eo/",
     "image": "/images/instagram/17899005961378102.jpg",
     "timestamp": "2019-10-22T02:40:43+0000",
-    "color": "#906344",
-    "hue": 24
+    "color": "#936545",
+    "hue": 24,
+    "light": 0.383,
+    "vivid": 0.277,
+    "busy": 0.537,
+    "glitch": 0.264
   },
   {
     "id": "ig-18113004823004833",
@@ -1283,8 +1851,12 @@
     "url": "https://www.instagram.com/p/B33maadIbcD/",
     "image": "/images/instagram/18113004823004833.jpg",
     "timestamp": "2019-10-21T05:37:13+0000",
-    "color": "#bd8660",
-    "hue": 25
+    "color": "#bd865f",
+    "hue": 25,
+    "light": 0.651,
+    "vivid": 0.278,
+    "busy": 0.288,
+    "glitch": 0.378
   },
   {
     "id": "ig-18039800428206633",
@@ -1292,8 +1864,12 @@
     "url": "https://www.instagram.com/p/B33XjAglY3q/",
     "image": "/images/instagram/18039800428206633.jpg",
     "timestamp": "2019-10-21T03:26:55+0000",
-    "color": "#9a6a4b",
-    "hue": 24
+    "color": "#9b6a4b",
+    "hue": 24,
+    "light": 0.394,
+    "vivid": 0.279,
+    "busy": 0.242,
+    "glitch": 0.292
   },
   {
     "id": "ig-17919474940339815",
@@ -1302,7 +1878,11 @@
     "image": "/images/instagram/17919474940339815.jpg",
     "timestamp": "2019-10-16T03:34:24+0000",
     "color": "#7e5c47",
-    "hue": 23
+    "hue": 22,
+    "light": 0.247,
+    "vivid": 0.083,
+    "busy": 0.316,
+    "glitch": 0.315
   },
   {
     "id": "ig-18058887829194752",
@@ -1311,7 +1891,11 @@
     "image": "/images/instagram/18058887829194752.jpg",
     "timestamp": "2019-10-16T03:22:47+0000",
     "color": "#d3ccd0",
-    "hue": null
+    "hue": null,
+    "light": 0.807,
+    "vivid": 0.026,
+    "busy": 0.142,
+    "glitch": 0.301
   },
   {
     "id": "ig-17895517882399758",
@@ -1319,8 +1903,12 @@
     "url": "https://www.instagram.com/p/B3nsw8qlrM2/",
     "image": "/images/instagram/17895517882399758.jpg",
     "timestamp": "2019-10-15T01:24:35+0000",
-    "color": "#dcbca9",
-    "hue": 22
+    "color": "#dbbaa7",
+    "hue": 22,
+    "light": 0.84,
+    "vivid": 0.108,
+    "busy": 0.193,
+    "glitch": 0.319
   },
   {
     "id": "ig-17864399995502242",
@@ -1329,7 +1917,11 @@
     "image": "/images/instagram/17864399995502242.jpg",
     "timestamp": "2019-10-01T03:27:27+0000",
     "color": "#be9341",
-    "hue": 40
+    "hue": 40,
+    "light": 0.707,
+    "vivid": 0.223,
+    "busy": 0.079,
+    "glitch": 0.518
   },
   {
     "id": "ig-17891801581402191",
@@ -1338,7 +1930,11 @@
     "image": "/images/instagram/17891801581402191.jpg",
     "timestamp": "2019-09-23T03:57:25+0000",
     "color": "#ede3ec",
-    "hue": 305
+    "hue": 305,
+    "light": 0.906,
+    "vivid": 0.038,
+    "busy": 0.128,
+    "glitch": 0.46
   },
   {
     "id": "ig-17853078034567495",
@@ -1346,8 +1942,12 @@
     "url": "https://www.instagram.com/p/B2vUgLjlK9O/",
     "image": "/images/instagram/17853078034567495.jpg",
     "timestamp": "2019-09-23T03:55:24+0000",
-    "color": "#e3cfc4",
-    "hue": 22
+    "color": "#e2cec5",
+    "hue": 19,
+    "light": 0.903,
+    "vivid": 0.068,
+    "busy": 0.085,
+    "glitch": 0.448
   },
   {
     "id": "ig-17845004038648352",
@@ -1355,8 +1955,12 @@
     "url": "https://www.instagram.com/p/B2iSGiSlX4O/",
     "image": "/images/instagram/17845004038648352.jpg",
     "timestamp": "2019-09-18T02:23:53+0000",
-    "color": "#d4c2ae",
-    "hue": 31
+    "color": "#d6c3b0",
+    "hue": 31,
+    "light": 0.734,
+    "vivid": 0.142,
+    "busy": 0.301,
+    "glitch": 0.241
   },
   {
     "id": "ig-17870546983399283",
@@ -1364,8 +1968,12 @@
     "url": "https://www.instagram.com/p/By3giXnl0FR/",
     "image": "/images/instagram/17870546983399283.jpg",
     "timestamp": "2019-06-18T22:08:30+0000",
-    "color": "#a88869",
-    "hue": 29
+    "color": "#a8886a",
+    "hue": 29,
+    "light": 0.561,
+    "vivid": 0.137,
+    "busy": 0.529,
+    "glitch": 0.347
   },
   {
     "id": "ig-17953188010231436",
@@ -1373,8 +1981,12 @@
     "url": "https://www.instagram.com/p/BtPpeexFNoE/",
     "image": "/images/instagram/17953188010231436.jpg",
     "timestamp": "2019-01-30T04:00:01+0000",
-    "color": "#c1843d",
-    "hue": 32
+    "color": "#c5883e",
+    "hue": 33,
+    "light": 0.361,
+    "vivid": 0.268,
+    "busy": 0.396,
+    "glitch": 0.291
   },
   {
     "id": "ig-17928407719267668",
@@ -1382,8 +1994,12 @@
     "url": "https://www.instagram.com/p/BtPpYq8FXJg/",
     "image": "/images/instagram/17928407719267668.jpg",
     "timestamp": "2019-01-30T03:59:13+0000",
-    "color": "#9c7b53",
-    "hue": 33
+    "color": "#9c7c53",
+    "hue": 33,
+    "light": 0.383,
+    "vivid": 0.23,
+    "busy": 0.232,
+    "glitch": 0.281
   },
   {
     "id": "ig-17918034460136079",
@@ -1392,7 +2008,11 @@
     "image": "/images/instagram/17918034460136079.jpg",
     "timestamp": "2018-05-05T01:54:16+0000",
     "color": "#885331",
-    "hue": 24
+    "hue": 23,
+    "light": 0.419,
+    "vivid": 0.281,
+    "busy": 0.442,
+    "glitch": 0.217
   },
   {
     "id": "ig-17936340712007784",
@@ -1400,8 +2020,12 @@
     "url": "https://www.instagram.com/p/Bhb3DUHBalr/",
     "image": "/images/instagram/17936340712007784.jpg",
     "timestamp": "2018-04-11T15:32:48+0000",
-    "color": "#abc4d9",
-    "hue": 207
+    "color": "#a5c1d6",
+    "hue": 207,
+    "light": 0.859,
+    "vivid": 0.082,
+    "busy": 0.248,
+    "glitch": 0.43
   },
   {
     "id": "ig-17923834741107417",
@@ -1409,7 +2033,11 @@
     "url": "https://www.instagram.com/p/BhX51ERhA3j/",
     "image": "/images/instagram/17923834741107417.jpg",
     "timestamp": "2018-04-10T02:40:06+0000",
-    "color": "#cfcecb",
-    "hue": null
+    "color": "#cfcecc",
+    "hue": null,
+    "light": 0.808,
+    "vivid": 0.013,
+    "busy": 0.035,
+    "glitch": 0.389
   }
 ]

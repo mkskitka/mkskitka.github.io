@@ -39,8 +39,8 @@ import VisualsSort from '../components/VisualsSort.jsx'
 // /#systems style still works and is turned into /systems.
 // The Visuals tiles can be sorted (the dropdown at the top right while they are open,
 // components/VisualsSort.jsx; orders in src/lib/sortItems.js). A non-default order is
-// part of the address, /visuals?sort=color, so a sorted view can be sent too; swiping
-// through the visuals follows the chosen order.
+// part of the address, /visuals?sort=color (&rev=1 when flipped), so a sorted view can
+// be sent too; swiping through the visuals follows the chosen order.
 // Clicking SYSTEMS (to open it) sends a band of light along the grid lines, left to right;
 // clicking VISUALS pours a stream of ink/smoke into the backdrop (GridInkBackdrop SETTINGS.glow / .pour).
 // Only those menu clicks do it: coming back to the tiles from a project or visual does not.
@@ -75,14 +75,17 @@ const pathFor = (active, project, sort = DEFAULT_SORT) => {
   if (project) return project.kind === 'visual' ? `/visuals/${project.slug}` : `/projects/${project.slug}`
   const path = MENU.find((m) => m.id === active)?.path ?? '/'
   const order = sort[active]
-  return order && order !== DEFAULT_SORT[active] ? `${path}?sort=${order}` : path
+  if (!order || (order === DEFAULT_SORT[active] && !sort.rev)) return path
+  return `${path}?sort=${order}${sort.rev ? '&rev=1' : ''}`
 }
-// The sort orders an address asks for: the default for each kind, overridden by ?sort= for
-// the kind the address opens.
+// The sort order an address asks for: the default, unless the address opens a kind of
+// tiles that can be sorted and names an order for it.
 const parseSort = (pathname, search) => {
   const { active } = parsePath(pathname)
-  const want = new URLSearchParams(search).get('sort')
-  return active && isSort(active, want) ? { ...DEFAULT_SORT, [active]: want } : { ...DEFAULT_SORT }
+  const params = new URLSearchParams(search)
+  const want = params.get('sort')
+  if (!active || !isSort(active, want)) return { ...DEFAULT_SORT }
+  return { ...DEFAULT_SORT, [active]: want, rev: params.get('rev') === '1' && want !== 'shuffle' }
 }
 const parsePath = (pathname) => {
   const menu = MENU.find((m) => m.path === pathname.replace(/\/$/, '') || m.path === pathname)
@@ -115,7 +118,7 @@ export default function Home() {
   // Sort order per kind of tiles (src/lib/sortItems.js), and the seed behind a shuffle.
   const [sort, setSort] = useState(() => parseSort(location.pathname, location.search))
   const [shuffleSeed, setShuffleSeed] = useState(() => Math.random())
-  const VISUAL_LIST = useMemo(() => sortItems(VISUAL_ITEMS, sort.visuals, shuffleSeed), [sort.visuals, shuffleSeed])
+  const VISUAL_LIST = useMemo(() => sortItems(VISUAL_ITEMS, sort.visuals, { seed: shuffleSeed, rev: sort.rev }), [sort.visuals, sort.rev, shuffleSeed])
 
   // The open project (if any) and the tile rectangle it grew out of.
   const [project, setProject] = useState(null)
@@ -175,10 +178,11 @@ export default function Home() {
   }
 
   // The sort dropdown: reorder the open tiles, and put the order in the address (replacing
-  // it, so the back button does not step through every order tried).
+  // it, so the back button does not step through every order tried). Picking the active
+  // order again flips it end for end; picking Shuffle again deals a new order.
   const pickSort = (id) => {
-    if (id === 'shuffle') setShuffleSeed(Math.random()) // picking it again deals a new order
-    const next = { ...sort, visuals: id }
+    if (id === 'shuffle') setShuffleSeed(Math.random())
+    const next = { ...sort, visuals: id, rev: id !== 'shuffle' && id === sort.visuals ? !sort.rev : false }
     setSort(next)
     navigate(pathFor('visuals', null, next), { replace: true })
   }
@@ -231,7 +235,7 @@ export default function Home() {
     // A sent link, or back / forward, naming an order.
     if (!want.item) {
       const order = parseSort(location.pathname, location.search)
-      if (want.active && order[want.active] !== sort[want.active]) setSort(order)
+      if (want.active && (order[want.active] !== sort[want.active] || order.rev !== sort.rev)) setSort(order)
     }
     if (want.item) {
       if (project?.slug !== want.item.slug && locked?.project.slug !== want.item.slug) openProject(want.item)
@@ -366,7 +370,7 @@ export default function Home() {
         </div>
         <ProjectThumbs open={active === 'systems' && !project} keep={active === 'systems' && !!project} onSelect={openProject} cells={{ desktop: 2 }} columns={{ phone: 3 }} rows />
         <ProjectThumbs open={active === 'visuals' && !project} keep={active === 'visuals' && !!project} focus={visualAt} items={VISUAL_LIST} label="Visuals" onSelect={openProject} bounce={visualsFresh} titles={SHOW_VISUAL_TITLES} />
-        <VisualsSort open={active === 'visuals' && !project} value={sort.visuals} onChange={pickSort} />
+        <VisualsSort open={active === 'visuals' && !project} value={sort.visuals} rev={sort.rev} onChange={pickSort} />
         <ContactTiles open={active === 'contact'} />
         {/* MK SKITKA: the bio (src/data/about.js). A project: its write-up (src/data/projects.js). */}
         <WriteUp open={active === 'home' && !project} heading={about.heading} paragraphs={about.paragraphs} align="center">

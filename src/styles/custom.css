@@ -249,6 +249,21 @@ a:hover,
   opacity: var(--menu-dim);
   transition: opacity 0.2s ease, color 0.2s ease;
 }
+/* The active row's hint: picking it again flips the order (or deals a new shuffle). */
+.visuals_sort_flip {
+  width: 1.1em;
+  height: 1.1em;
+  margin-left: auto;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.55;
+}
+.visuals_sort_option.is-active:hover .visuals_sort_flip {
+  opacity: 1;
+}
 .visuals_sort_option.is-active {
   opacity: 1;
 }
