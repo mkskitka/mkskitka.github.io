@@ -40,7 +40,18 @@
       "items": [
         "ComfyUI",
         "Stable Diffusion, custom-trained models",
-        "Midjourney",
+        {
+          "text": "Midjourney",
+          "not": [
+            "ai"
+          ]
+        },
+        {
+          "text": "Midjourney, Flora",
+          "only": [
+            "ai"
+          ]
+        },
         "Claude, Gemini and OpenAI APIs"
       ]
     },
@@ -130,7 +141,14 @@
             {
               "text": "[Realtor.com Savings Simulator](https://mkskitka.com/projects/realtor-savings-simulator), SXSW (March 2026): produced the 16-bit game graphics for an arcade savings game",
               "not": [
-                "accessibility"
+                "accessibility",
+                "ai"
+              ]
+            },
+            {
+              "text": "[Realtor.com Savings Simulator](https://mkskitka.com/projects/realtor-savings-simulator), SXSW (March 2026): produced the 16-bit game graphics for an arcade savings game with an AI image and video generation workflow (Midjourney, Gemini and Claude), alongside a graphic designer",
+              "only": [
+                "ai"
               ]
             },
             {
@@ -150,6 +168,12 @@
             {
               "text": "Built the live-rendered AI visuals system for artist Cezar Mocan’s End of Signal, winner of the SOLO AI ’25 award",
               "resumeOnly": true
+            },
+            {
+              "text": "Own work: [370 Botanic Gardens](https://mkskitka.com/projects/370-botanic-gardens) (2024), a solo installation at NYU’s Clive Davis Gallery: generative video from a Stable Diffusion model trained on photographs of the Brooklyn Botanic Garden, projected on a painted scrim and responding to the light in the gallery and on the street",
+              "only": [
+                "ai"
+              ]
             },
             {
               "text": "Built a keyboard-accessible interface for the interactive screens at a museum (2025), giving blind, low-vision and mobility-impaired visitors access to every exhibit",
@@ -422,6 +446,20 @@
         "education"
       ],
       "phone": false
+    },
+    "ai": {
+      "_about": "The generative AI version: npm run resume:ai. For creative technologist / creative lead roles at AI companies, agencies and brand labs. Generative AI skills first; AI-specific bullets carry only: [\"ai\"].",
+      "title": "Creative Technologist, Generative AI",
+      "profile": "Creative technologist with 8 years building generative and interactive media for brands, agencies and artists, and hands-on with generative AI in production since 2023. Built the generative AI video system for the Nigerian Pavilion at the 2024 Venice Biennale with Volvox Labs: over 16 hours of content plus an API that generated more across the pavilion’s seven-month run. Trains and steers custom Stable Diffusion models, builds ComfyUI pipelines and live-rendered real-time AI visuals, and works with the Claude, Gemini and OpenAI APIs. Client-facing on every project, from Audible and Intel pop-ups with Smooth Technology to a rehabilitation system designed with NYU Langone clinicians; teaches generative AI workshops at NYU. Background in cognitive brain science and computer science.",
+      "sections": [
+        "profile",
+        "jobs",
+        "education"
+      ],
+      "skillsFirst": [
+        "Generative AI",
+        "Real-Time & Creative Coding"
+      ]
     }
   }
 }

@@ -3,7 +3,7 @@
 export const about = {
   heading: 'MK Skitka',
 paragraphs: [
-    'Mary Kate "MK" Skitka is a creative technologist and visual developer with over 8 years of experience building visual systems for live events, brand activations, and installations.',
+    'Mary Kate "MK" Skitka is a creative technologist and visual developer with over 8 years of experience building visual systems for live events and installations.',
     'Her practice treats visuals and systems as a single design, from ideation to deployment. [Visuals](/visuals) are generative, environment-aware content built in TouchDesigner, ComfyUI, and Three.js. [Systems](/systems) are where that content meets its environment: LED facades, sensors, body-tracking data, and the technical design behind them.',
     'Her work has been exhibited at the Venice Biennale 2024, The Shed, and the Clive Davis Center. Clients include Audible, National Geographic, and the David Bowie estate.',
     'She teaches Immersivity Beyond the Display, an introduction to experience design with interactive systems, was a research resident at ITP NYU (2023–24), and performs and exhibits in New York City as rgb__tears.',

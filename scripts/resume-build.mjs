@@ -37,18 +37,33 @@ const yearList = (items, listPath) => `
 ${items.map((t) => `            <li><span class="year">${esc(t.year)}</span>${rich(t.text)}</li>`).join('\n')}
           </ul>`
 
-const skills = (d) => `
+// `skillsFirst` on a variant names groups to move up under the Core line (the AI
+// resume puts Generative AI first). data-list indices stay the JSON's, for the editor.
+// A skill item is a string, or { text, only, not } to show it on some variants only.
+const skills = (d, v = null, keep = (items) => items) => {
+  const order = d.skills.map((g, i) => i)
+  if (v?.skillsFirst) {
+    const rank = (i) => {
+      if (d.skills[i].inline) return -1
+      const k = v.skillsFirst.indexOf(d.skills[i].group)
+      return k < 0 ? v.skillsFirst.length : k
+    }
+    order.sort((a, b) => rank(a) - rank(b) || a - b)
+  }
+  return `
           <h2>Technical Skills</h2>
           <dl class="skills">
-${d.skills
+${order
+  .map((i) => [d.skills[i], i])
   .map(
-    (g, i) => `            <div class="skill_group${g.inline ? ' skill_inline' : ''}" data-list="skills.${i}.items" data-tag="dd">
+    ([g, i]) => `            <div class="skill_group${g.inline ? ' skill_inline' : ''}" data-list="skills.${i}.items" data-tag="dd">
               <dt data-path="skills.${i}.group">${rich(g.group)}</dt>
-${g.items.map((it) => `              <dd>${rich(it)}</dd>`).join('\n')}
+${keep(g.items).map((it) => `              <dd>${rich(bulletText(it))}</dd>`).join('\n')}
             </div>`
   )
   .join('\n')}
           </dl>`
+}
 
 // Selected Projects: each name with a `slug` links to its page on the site.
 const SITE = 'https://mkskitka.com'
@@ -169,7 +184,7 @@ const page = (d, cv, variant = null) => {
       </main>
 
       <aside class="side panel">
-        <section>${skills(d)}
+        <section>${skills(d, v, keep)}
         </section>${cv || v?.sideProjects === false ? '' : sideProjects(d)}
       </aside>
     </div>

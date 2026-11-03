@@ -20,6 +20,8 @@
     "cv:light": "node scripts/resume-build.mjs && sh scripts/resume-pdf.sh \"$HOME/Desktop/MK_Skitka_CV_$(date +%m_%d)_light.pdf\" light resume/cv.html",
     "resume:teaching": "node scripts/resume-build.mjs && sh scripts/resume-pdf.sh \"$HOME/Desktop/MK_Skitka_Resume_teaching_$(date +%m_%d).pdf\" dark resume/resume-teaching.html",
     "resume:teaching:light": "node scripts/resume-build.mjs && sh scripts/resume-pdf.sh \"$HOME/Desktop/MK_Skitka_Resume_teaching_$(date +%m_%d)_light.pdf\" light resume/resume-teaching.html",
+    "resume:ai": "node scripts/resume-build.mjs && sh scripts/resume-pdf.sh \"$HOME/Desktop/MK_Skitka_Resume_ai_$(date +%m_%d).pdf\" dark resume/resume-ai.html",
+    "resume:ai:light": "node scripts/resume-build.mjs && sh scripts/resume-pdf.sh \"$HOME/Desktop/MK_Skitka_Resume_ai_$(date +%m_%d)_light.pdf\" light resume/resume-ai.html",
     "resume:accessibility": "node scripts/resume-build.mjs && sh scripts/resume-pdf.sh \"$HOME/Desktop/MK_Skitka_Resume_accessibility_$(date +%m_%d).pdf\" dark resume/resume-accessibility.html",
     "resume:accessibility:light": "node scripts/resume-build.mjs && sh scripts/resume-pdf.sh \"$HOME/Desktop/MK_Skitka_Resume_accessibility_$(date +%m_%d)_light.pdf\" light resume/resume-accessibility.html"
   },
