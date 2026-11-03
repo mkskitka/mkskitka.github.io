@@ -37,15 +37,13 @@
   line-height: 1.55;
 }
 
-/* Back arrow and PDF link, in the hero menu's voice. */
+/* Back arrow, in the hero menu's voice. */
 .resume_nav {
   display: flex;
-  justify-content: space-between;
   align-items: baseline;
   margin: 0 0 calc(var(--cell) * 0.5);
 }
-.resume_back,
-.resume_pdf {
+.resume_back {
   color: #fff;
   text-decoration: none;
   font-weight: var(--panel-text-weight, 500);
@@ -60,11 +58,7 @@
   letter-spacing: var(--panel-text-tracking, -0.015em);
   line-height: 1;
 }
-.resume_pdf {
-  font-size: 0.85rem;
-}
-.resume_back:hover,
-.resume_pdf:hover {
+.resume_back:hover {
   opacity: 1;
 }
 

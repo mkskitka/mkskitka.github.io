@@ -50,9 +50,6 @@ export default function Resume() {
               <Link to="/about" className="resume_back" aria-label="Back to about">
                 &lt;-
               </Link>
-              <a className="resume_pdf" href="/resume.pdf" download="MK_Skitka_Resume.pdf">
-                PDF -&gt;
-              </a>
             </nav>
             <div className="resume_page" onClick={onClick} dangerouslySetInnerHTML={{ __html: page }} />
           </div>
