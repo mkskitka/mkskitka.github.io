@@ -95,6 +95,13 @@ posts, crops each one to a square in `public/images/instagram/`, writes
 `src/data/instagram.json`, commits, and redeploys. Post or archive on Instagram
 and the site follows within a day. Nothing to edit here.
 
+To take a post off the site without archiving it on Instagram, run
+`npm run visuals:review`: a page opens with each visual in turn and Keep / Remove
+buttons (arrow keys work too). Decisions are saved as you go into
+`src/data/visuals-review.json`; the site leaves out everything in its `hidden` list.
+Commit that file and deploy. The sync never touches it, so removed posts stay removed;
+picking Keep on one later puts it back.
+
 One-time setup. The Instagram account must be a Business (or Creator) account
 linked to a Facebook Page (Instagram app: Settings → Business tools and
 controls → Linked accounts → Facebook).

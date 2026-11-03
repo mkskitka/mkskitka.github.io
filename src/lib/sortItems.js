@@ -17,10 +17,17 @@
 // here to offer one.
 export const SORTS = {
   visuals: [
+    { id: 'color', label: 'Color wheel', flipped: 'Color wheel, reversed', ends: ['warmer', 'cooler'] }, // the default: red, orange, yellow, green, cyan, blue, violet; greys after
     { id: 'newest', label: 'Newest', flipped: 'Oldest', ends: ['newer', 'older'] },
-    { id: 'color', label: 'Color wheel', flipped: 'Color wheel, reversed', ends: ['warmer', 'cooler'] }, // red, orange, yellow, green, cyan, blue, violet; greys after
     { id: 'light', label: 'Dark → Light', flipped: 'Light → Dark', ends: ['darker', 'lighter'] },
     { id: 'shuffle', label: 'Shuffle' }, // a new order each time it is picked
+  ],
+  // Systems (the project tiles): by date, or only the projects carrying a tag (`tags`
+  // in src/data/projects.js), newest first. Picking the active one again flips it.
+  systems: [
+    { id: 'newest', label: 'Newest', flipped: 'Oldest', ends: ['newer', 'older'] },
+    { id: 'ai', label: 'AI', flipped: 'AI, oldest first', tag: 'ai', ends: ['newer', 'older'] },
+    { id: 'web', label: 'Web', flipped: 'Web, oldest first', tag: 'web', ends: ['newer', 'older'] },
   ],
 }
 // What lies left and right of the tiles under an order, as written on the scroll
@@ -29,7 +36,7 @@ export const sortEnds = (kind, id, rev = false) => {
   const ends = SORTS[kind]?.find((s) => s.id === id)?.ends
   return ends ? (rev ? [ends[1], ends[0]] : ends) : null
 }
-export const DEFAULT_SORT = { visuals: 'newest', rev: false }
+export const DEFAULT_SORT = { visuals: 'color', systems: 'newest', rev: false }
 export const isSort = (kind, id) => !!SORTS[kind]?.some((s) => s.id === id)
 
 // The number each order sorts by (null when the item does not have it), and which
@@ -42,6 +49,8 @@ const when = (item) => {
 }
 const KEYS = {
   newest: [when, -1],
+  ai: [when, -1], // the tag orders: only items tagged so (see below), newest first
+  web: [when, -1],
   color: [num('hue'), 1],
   light: [num('light'), 1],
   busy: [num('busy'), 1],
@@ -73,7 +82,10 @@ export function sortItems(items, id, { seed = 0, rev = false } = {}) {
   const entry = KEYS[id]
   if (!entry) return items.slice()
   const [key, dir] = entry
-  const keyed = items.filter((item) => key(item) != null).sort(by(key, rev ? -dir : dir))
-  const rest = items.filter((item) => key(item) == null)
+  // An order with a tag keeps only the items carrying it (item.tags, a list of strings).
+  const tag = Object.values(SORTS).flat().find((s) => s.id === id)?.tag
+  const pool = tag ? items.filter((item) => Array.isArray(item.tags) && item.tags.includes(tag)) : items
+  const keyed = pool.filter((item) => key(item) != null).sort(by(key, rev ? -dir : dir))
+  const rest = pool.filter((item) => key(item) == null)
   return keyed.concat(rest)
 }

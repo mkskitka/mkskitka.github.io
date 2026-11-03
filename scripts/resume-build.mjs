@@ -86,8 +86,12 @@ const header = (d, v = null, vpath = '') => `
         <p class="head_title" data-path="${v?.title ? vpath + 'title' : 'title'}">${rich(v?.title ?? d.title)}</p>
       </div>
       <div class="head_contact">
-        <span data-path="location">${rich(d.location)}</span><br>
-        <a href="tel:${esc(d.phone.replace(/\D/g, ''))}" data-path="phone">${esc(d.phone)}</a> &nbsp;·&nbsp;
+        <span data-path="location">${rich(d.location)}</span><br>${
+          v?.phone === false
+            ? ''
+            : `
+        <a href="tel:${esc(d.phone.replace(/\D/g, ''))}" data-path="phone">${esc(d.phone)}</a> &nbsp;·&nbsp;`
+        }
         <a href="mailto:${esc(d.email)}" data-path="email">${esc(d.email)}</a><br>
         <a class="head_site" href="https://${esc(d.site)}/">${esc(d.site)}</a>${
           d.linkedin ? ` &nbsp;·&nbsp; <a href="https://${esc(d.linkedin)}">LinkedIn</a>` : ''
@@ -96,8 +100,9 @@ const header = (d, v = null, vpath = '') => `
     </header>`
 
 // One page of content. `variant` names an entry in resume.json "variants": its own
-// title line, profile and section order, and optionally some jobs pulled up into a
-// teaching section. Bullets may carry only: [variants] / not: [variants].
+// title line, profile and section order, optionally some jobs pulled up into a
+// teaching section, `sideProjects: false` to drop the projects list and `phone: false`
+// to leave the phone number out. Bullets may carry only: [variants] / not: [variants].
 const page = (d, cv, variant = null) => {
   const v = variant ? d.variants?.[variant] : null
   if (variant && !v) throw new Error(`no variant "${variant}" in resume.json`)

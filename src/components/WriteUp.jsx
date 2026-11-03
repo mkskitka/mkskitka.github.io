@@ -1,4 +1,15 @@
 import { useLayoutEffect, useRef, useState } from 'react'
+import { Link } from 'react-router-dom'
+
+// [text](/path) in a paragraph becomes a link: a site route (Link) or, with http(s), an <a>.
+const rich = (text) =>
+  String(text ?? '')
+    .split(/(\[[^\]]+\]\([^)\s]+\))/)
+    .map((part, i) => {
+      const m = part.match(/^\[([^\]]+)\]\(([^)\s]+)\)$/)
+      if (!m) return part
+      return /^https?:/.test(m[2]) ? <a key={i} href={m[2]}>{m[1]}</a> : <Link key={i} to={m[2]}>{m[1]}</Link>
+    })
 
 /**
  * A glass write-up panel beside the hero menu (same frosted glass as the menu panel,
@@ -115,7 +126,7 @@ export default function WriteUp({ open = false, heading, lines = [], paragraphs 
       </div>
       <div className="writeup_body">
       {paragraphs.map((p, i) => (
-        <p key={i}>{p}</p>
+        <p key={i}>{rich(p)}</p>
       ))}
       </div>
       </div>

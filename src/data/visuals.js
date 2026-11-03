@@ -10,7 +10,10 @@
 // Each entry: `image` is the thumbnail and the full-page image, `title` is the
 // panel title when it is open, `url` (the Instagram post) is kept for a future
 // link-out. Until the first sync has run, the placeholders below are shown instead.
+// To take a post off the site without archiving it on Instagram: npm run
+// visuals:review (scripts/visuals-review.mjs).
 import instagram from './instagram.json'
+import review from './visuals-review.json'
 
 const placeholders = [
   { id: 'gem-vertahorizlines', title: 'gem vertahorizlines', url: 'https://www.instagram.com/rgb__tears/', image: '/images/Screenshot-2026-01-27-195710.png' },
@@ -23,4 +26,7 @@ const placeholders = [
   { id: 'visual-8', title: 'Visual 08', url: 'https://www.instagram.com/rgb__tears/', image: '/images/558e3f5c-c8fa-4baf-8b68-56791c0dbb15.png' },
 ]
 
-export const visuals = instagram.length ? instagram : placeholders
+// Posts taken off the site in the review tool (npm run visuals:review) are listed in
+// visuals-review.json as `hidden`; the sync never touches that file.
+const hidden = new Set(review.hidden ?? [])
+export const visuals = (instagram.length ? instagram : placeholders).filter((v) => !hidden.has(v.id))

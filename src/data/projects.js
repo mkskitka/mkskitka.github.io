@@ -18,6 +18,8 @@ import { folderImages, folderMedia, heroFor, isVideo, resolveMedia, thumbFor } f
 import resume from '../../resume/resume.json'
 // A project's year, from resume/resume.json when it is listed there (the resume, the CV
 // and the site then always agree); otherwise the `date` written below.
+// `tags` on a project (['ai'], ['web']) are what the Systems sort dropdown filters by
+// (src/lib/sortItems.js); a project without them only shows under Newest / Oldest.
 const year = (slug, fallback) => resume.projects.find((p) => p.slug === slug)?.year ?? fallback
 
 const img = (name) => `/images/${name}`
@@ -140,6 +142,7 @@ const projectList = [
     heading: ['REALTOR.COM', 'SAVINGS SIMULATOR'],
     role: 'Visualist, Technologist',
     mediums: 'Unity, Gemini, ChatGPT, Claude, Midjourney, image and video generation',
+    tags: ['ai'],
     description: 'I worked with a graphic designer to produce 16-bit style game graphics for an arcade savings simulator game at SXSW (South by Southwest).',
     // Full-width strip on top, two wide screens side by side below.
     featured: [
@@ -155,6 +158,7 @@ const projectList = [
     heading: ['AUDIBLE', 'STORY HOUSE VISUALIZER'],
     role: 'Visualist, Technologist',
     mediums: 'TouchDesigner, Audio Reactive, Projection',
+    tags: ['web'],
     // One string per paragraph: description: ['First paragraph.', 'Second paragraph.']
     description: [
       'Audible Story House was a month-long pop-up where visitors could listen to audiobooks, with a dedicated listening room in the back. I built the audio-reactive visualizer that played in that room for the length of the pop-up.',
@@ -210,6 +214,7 @@ const projectList = [
     heading: ['370', 'BOTANIC GARDENS'],
     role: 'Visualist, Technologist',
     mediums: 'Projection, Scrim, ComfyUI',
+    tags: ['ai'],
     // One string per paragraph: description: ['First paragraph.', 'Second paragraph.']
     description: [
       "A personal exploration of materiality and AI.",
@@ -230,6 +235,7 @@ const projectList = [
     heading: ["'24", 'VENICE BIENNALE'],
     role: 'Visualist, Technologist',
     mediums: '',
+    tags: ['ai'],
     // One string per paragraph: description: ['First paragraph.', 'Second paragraph.']
     description: [
       "Collaborating with Volvox Labs and artist Fatimah Tuggar, I worked on the design and development of a real-time generative AI video depicting imaginaries of the Calabash Gourd for the Creampods exhibit at the 2024 Venice Biennale. The generative video API produced days' worth of unique content for the exhibit.",
@@ -248,6 +254,7 @@ const projectList = [
     heading: ['EVIDENCE 071', '@ THE SHED'],
     role: 'Visualist, Technologist',
     mediums: 'React, Web, Data Visualization',
+    tags: ['web'],
     // One string per paragraph: description: ['First paragraph.', 'Second paragraph.']
     description: [
       "Working with artist Lizania Cruz and co-developer Matt Ross, I developed and designed a touch-screen data visualization that acts as a digital archive of Lizania's ongoing research, displaying archival material and collecting museum-goers' thoughts on Frederick Douglass's involvement in US global affairs.",
@@ -271,6 +278,7 @@ const projectList = [
     heading: ['DRUNK ELEPHANT', 'KIOSK'],
     role: 'Visualist, Technologist',
     mediums: 'TouchDesigner, React, Web, Data Visualization, Animation',
+    tags: ['web'],
     // One string per paragraph: description: ['First paragraph.', 'Second paragraph.']
     description: [
       "I worked with Volvox Labs and Drunk Elephant to update the design of an immersive hair-care quiz kiosk. Users enter information about their hair type to receive a custom hair-care smoothie recommendation.",

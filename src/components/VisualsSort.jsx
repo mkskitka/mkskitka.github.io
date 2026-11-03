@@ -11,14 +11,17 @@ import { SORTS } from '../lib/sortItems.js'
  * Every order but Shuffle runs between two ends (Dark → Light); picking the one
  * already active flips it (Light → Dark), which the flip arrows on that row say.
  *
- * `open`: the Visuals tiles are showing (the control fades with them).
+ * `kind`: which tiles it sorts, 'visuals' (default) or 'systems' (the project tiles:
+ * Newest / Oldest, or only the projects tagged AI or Web).
+ * `open`: those tiles are showing (the control fades with them).
  * `value`: the current order's id, `rev` whether it is flipped; `onChange(id)` is
  * called with the picked one (the active one again means flip).
  */
-export default function VisualsSort({ open = false, value, rev = false, onChange }) {
+export default function VisualsSort({ kind = 'visuals', open = false, value, rev = false, onChange }) {
   const root = useRef(null)
   const [listOpen, setListOpen] = useState(false)
-  const options = SORTS.visuals
+  const options = SORTS[kind]
+  const what = kind === 'systems' ? 'projects' : kind
   const current = options.find((s) => s.id === value) ?? options[0]
   const labelFor = (s, flipped) => (flipped && s.flipped ? s.flipped : s.label)
 
@@ -52,7 +55,7 @@ export default function VisualsSort({ open = false, value, rev = false, onChange
         className="visuals_sort_button"
         aria-haspopup="listbox"
         aria-expanded={listOpen}
-        aria-label={`Sort visuals: ${labelFor(current, rev)}`}
+        aria-label={`Sort ${what}: ${labelFor(current, rev)}`}
         tabIndex={open ? 0 : -1}
         onClick={() => setListOpen((o) => !o)}
       >
@@ -62,14 +65,14 @@ export default function VisualsSort({ open = false, value, rev = false, onChange
           <path d="M6 9.5 12 15.5 18 9.5" />
         </svg>
       </button>
-      <ul className="visuals_sort_list" role="listbox" aria-label="Sort visuals">
+      <ul className="visuals_sort_list" role="listbox" aria-label={`Sort ${what}`}>
         {options.map((s) => (
           <li key={s.id} role="option" aria-selected={s.id === value}>
             <button
               type="button"
               className={`visuals_sort_option${s.id === value ? ' is-active' : ''}`}
               tabIndex={open && listOpen ? 0 : -1}
-              title={s.id === value ? (s.flipped ? `Flip to ${labelFor(s, !rev)}` : 'Shuffle again') : undefined}
+              title={s.id === value ? (s.flipped ? `Flip to ${labelFor(s, !rev)}` : s.id === 'shuffle' ? 'Shuffle again' : undefined) : undefined}
               onClick={() => {
                 setListOpen(false)
                 onChange?.(s.id)

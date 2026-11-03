@@ -317,7 +317,10 @@
   }
 }
 
-/* The RESUME -> link at the foot of the about panel (pages/Home.jsx). */
+/* The RESUME -> and CONTACT -> links at the foot of the about panel (pages/Home.jsx). */
+.writeup_link + .writeup_link {
+  margin-left: 1.6em;
+}
 .writeup_link {
   display: inline-block;
   color: #fff;

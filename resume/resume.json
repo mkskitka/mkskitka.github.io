@@ -416,11 +416,12 @@
       "jobsHeading": "Professional Experience"
     },
     "site": {
-      "_about": "The version on mkskitka.com/resume (src/pages/Resume.jsx): the resume without the profile paragraph. Built to resume/resume-site.html.",
+      "_about": "The version on mkskitka.com/resume (src/pages/Resume.jsx): the resume without the profile paragraph or the phone number. Built to resume/resume-site.html.",
       "sections": [
         "jobs",
         "education"
-      ]
+      ],
+      "phone": false
     }
   }
 }

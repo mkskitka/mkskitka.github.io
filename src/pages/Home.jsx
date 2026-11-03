@@ -37,10 +37,11 @@ import VisualsSort from '../components/VisualsSort.jsx'
 //   /contact     the contact tiles
 // (<slug> and <id> are from src/data/projects.js and src/data/visuals.js.) The old
 // /#systems style still works and is turned into /systems.
-// The Visuals tiles can be sorted (the dropdown at the top right while they are open,
-// components/VisualsSort.jsx; orders in src/lib/sortItems.js). A non-default order is
-// part of the address, /visuals?sort=color (&rev=1 when flipped), so a sorted view can
-// be sent too; swiping through the visuals follows the chosen order.
+// The Visuals and Systems tiles can be sorted (the dropdown at the top right while they
+// are open, components/VisualsSort.jsx; orders in src/lib/sortItems.js: for Systems,
+// Newest / Oldest or only the AI or Web projects). A non-default order is part of the
+// address, /visuals?sort=newest or /systems?sort=ai (&rev=1 when flipped), so a sorted
+// view can be sent too; swiping through the visuals follows the chosen order.
 // Clicking SYSTEMS (to open it) sends a band of light along the grid lines, left to right;
 // clicking VISUALS pours a stream of ink/smoke into the backdrop (GridInkBackdrop SETTINGS.glow / .pour).
 // Only those menu clicks do it: coming back to the tiles from a project or visual does not.
@@ -119,6 +120,7 @@ export default function Home() {
   const [sort, setSort] = useState(() => parseSort(location.pathname, location.search))
   const [shuffleSeed, setShuffleSeed] = useState(() => Math.random())
   const VISUAL_LIST = useMemo(() => sortItems(VISUAL_ITEMS, sort.visuals, { seed: shuffleSeed, rev: sort.rev }), [sort.visuals, sort.rev, shuffleSeed])
+  const PROJECT_LIST = useMemo(() => sortItems(projects, sort.systems, { rev: sort.rev }), [sort.systems, sort.rev])
 
   // The open project (if any) and the tile rectangle it grew out of.
   const [project, setProject] = useState(null)
@@ -173,18 +175,20 @@ export default function Home() {
       if (id === active) return
     }
     const next = active === id ? null : id
+    const order = { ...sort, rev: false } // a flip belongs to the tiles it was made on
     setActive(next)
-    navigate(pathFor(next, null, sort))
+    setSort(order)
+    navigate(pathFor(next, null, order))
   }
 
   // The sort dropdown: reorder the open tiles, and put the order in the address (replacing
   // it, so the back button does not step through every order tried). Picking the active
   // order again flips it end for end; picking Shuffle again deals a new order.
-  const pickSort = (id) => {
+  const pickSort = (kind) => (id) => {
     if (id === 'shuffle') setShuffleSeed(Math.random())
-    const next = { ...sort, visuals: id, rev: id !== 'shuffle' && id === sort.visuals ? !sort.rev : false }
+    const next = { ...sort, [kind]: id, rev: id !== 'shuffle' && id === sort[kind] ? !sort.rev : false }
     setSort(next)
-    navigate(pathFor('visuals', null, next), { replace: true })
+    navigate(pathFor(kind, null, next), { replace: true })
   }
 
   // Visuals are shown as the piece itself: the whole image as large as it fits, no
@@ -368,14 +372,18 @@ export default function Home() {
             ))
           )}
         </div>
-        <ProjectThumbs open={active === 'systems' && !project} keep={active === 'systems' && !!project} onSelect={openProject} cells={{ desktop: 2 }} columns={{ phone: 3 }} rows />
+        <ProjectThumbs open={active === 'systems' && !project} keep={active === 'systems' && !!project} items={PROJECT_LIST} onSelect={openProject} cells={{ desktop: 2 }} columns={{ phone: 3 }} rows arrowLabels={sortEnds('systems', sort.systems, sort.rev)} />
+        <VisualsSort kind="systems" open={active === 'systems' && !project} value={sort.systems} rev={sort.rev} onChange={pickSort('systems')} />
         <ProjectThumbs open={active === 'visuals' && !project} keep={active === 'visuals' && !!project} focus={visualAt} items={VISUAL_LIST} label="Visuals" onSelect={openProject} bounce={visualsFresh} titles={SHOW_VISUAL_TITLES} arrowLabels={sortEnds('visuals', sort.visuals, sort.rev)} />
-        <VisualsSort open={active === 'visuals' && !project} value={sort.visuals} rev={sort.rev} onChange={pickSort} />
+        <VisualsSort open={active === 'visuals' && !project} value={sort.visuals} rev={sort.rev} onChange={pickSort('visuals')} />
         <ContactTiles open={active === 'contact'} />
         {/* MK SKITKA: the bio (src/data/about.js). A project: its write-up (src/data/projects.js). */}
         <WriteUp open={active === 'home' && !project} heading={about.heading} paragraphs={about.paragraphs} align="center">
           <Link to="/resume" className="writeup_link">
             Resume -&gt;
+          </Link>
+          <Link to="/contact" className="writeup_link">
+            Contact -&gt;
           </Link>
         </WriteUp>
         <WriteUp

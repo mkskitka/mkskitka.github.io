@@ -14,6 +14,7 @@
     "resume": "node scripts/resume-build.mjs && sh scripts/resume-pdf.sh",
     "resume:light": "node scripts/resume-build.mjs && sh scripts/resume-pdf.sh \"$HOME/Desktop/MK_Skitka_Resume_$(date +%m_%d)_light.pdf\" light",
     "resume:edit": "node scripts/resume-edit.mjs",
+    "visuals:review": "node scripts/visuals-review.mjs",
     "resume:build": "node scripts/resume-build.mjs",
     "cv": "node scripts/resume-build.mjs && sh scripts/resume-pdf.sh \"$HOME/Desktop/MK_Skitka_CV_$(date +%m_%d).pdf\" dark resume/cv.html",
     "cv:light": "node scripts/resume-build.mjs && sh scripts/resume-pdf.sh \"$HOME/Desktop/MK_Skitka_CV_$(date +%m_%d)_light.pdf\" light resume/cv.html",

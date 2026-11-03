@@ -821,6 +821,19 @@ a:hover,
   margin-bottom: 0;
 }
 /* Slim scrollbar when the panel has more than fits. */
+/* Links inside the write-up paragraphs (e.g. Visuals / Systems in the bio): a thin
+   teal underline, the same as on the resume. */
+.writeup_body a {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: rgb(45, 215, 205);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+}
+.writeup_body a:hover {
+  color: rgb(45, 215, 205);
+}
+
 .writeup,
 .writeup_main,
 .writeup_body {
