@@ -393,9 +393,9 @@ export default function Home() {
             ))
           )}
         </div>
-        <ProjectThumbs open={active === 'systems' && !project} keep={active === 'systems' && !!project} items={PROJECT_LIST} onSelect={openProject} cells={{ desktop: tweak.cells }} columns={{ phone: 3 }} rows={layout.systems === 'grid' ? tweak.rows : false} sizes={layout.systems === 'grid' ? null : { desktop: [1, 5] }} opacity={isPhone ? null : tweak.opacity} dim={isPhone ? null : tweak.dim} grow={false} arrowLabels={sortEnds('systems', sort.systems, sort.rev)} />
+        <ProjectThumbs open={active === 'systems' && !project} keep={active === 'systems' && !!project} items={PROJECT_LIST} onSelect={openProject} cells={{ desktop: tweak.cells }} columns={{ phone: 3 }} rows={layout.systems === 'grid' ? tweak.rows : false} sizes={layout.systems === 'grid' ? null : { desktop: [1, 5] }} opacity={isPhone ? null : tweak.opacity} dim={isPhone ? null : tweak.dim} grow={false} phoneRows={2} arrowLabels={sortEnds('systems', sort.systems, sort.rev)} />
         <VisualsSort kind="systems" open={active === 'systems' && !project} value={sort.systems} rev={sort.rev} onChange={pickSort('systems')} layout={layout.systems} onLayout={pickLayout('systems')} />
-        <ProjectThumbs open={active === 'visuals' && !project} keep={active === 'visuals' && !!project} focus={visualAt} items={VISUAL_LIST} label="Visuals" onSelect={openProject} bounce={visualsFresh} titles={SHOW_VISUAL_TITLES} rows={layout.visuals === 'grid'} arrowLabels={sortEnds('visuals', sort.visuals, sort.rev)} />
+        <ProjectThumbs open={active === 'visuals' && !project} keep={active === 'visuals' && !!project} focus={visualAt} items={VISUAL_LIST} label="Visuals" onSelect={openProject} bounce={visualsFresh} titles={SHOW_VISUAL_TITLES} rows={layout.visuals === 'grid'} phoneRows={3} arrowLabels={sortEnds('visuals', sort.visuals, sort.rev)} />
         <VisualsSort open={active === 'visuals' && !project} value={sort.visuals} rev={sort.rev} onChange={pickSort('visuals')} layout={layout.visuals} onLayout={pickLayout('visuals')} />
         <ContactTiles open={active === 'contact'} />
         {/* The hope_wide loop beside the menu while nothing is selected is off for now:

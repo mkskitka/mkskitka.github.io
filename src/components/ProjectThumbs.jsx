@@ -28,6 +28,7 @@ import { BOUNCE } from './GridInkBackdrop.jsx'
  * opacity at rest and the others' while one is hovered (custom.css --thumb-opacity,
  * --thumb-opacity-dim), for this set of tiles only. `grow` false turns off the hover
  * enlargement (the tile growing a cell and its image zooming), as on Systems.
+ * `phoneRows` caps the rows of tiles under the panel on phones (Systems 2, Visuals 3).
  *
  * More items than MAX_PER_SCREEN: the rest are scattered over further screens' worth
  * of grid to the right, off the page. Scrolling (wheel, trackpad, swipe, left/right
@@ -87,7 +88,7 @@ const mulberry32 = (a) => () => {
 const BEAT = 60 / BOUNCE.bpm
 const BEATS = Math.max(1, Math.round((BOUNCE.seconds + 0.6) / BEAT))
 
-export default function ProjectThumbs({ open = false, onSelect, items = projects, label = 'Projects', external = false, bounce = false, titles = true, keep = false, focus = null, cells = TILE_CELLS, rows = false, columns = null, arrowLabels = null, sizes = null, opacity = null, dim = null, grow = true }) {
+export default function ProjectThumbs({ open = false, onSelect, items = projects, label = 'Projects', external = false, bounce = false, titles = true, keep = false, focus = null, cells = TILE_CELLS, rows = false, columns = null, arrowLabels = null, sizes = null, opacity = null, dim = null, grow = true, phoneRows = null }) {
   const nav = useRef(null)
   const tileCells = typeof cells === 'number' ? { desktop: cells, phone: cells } : { ...TILE_CELLS, ...cells }
   const seed = useRef(Math.floor(Math.random() * 1e9))
@@ -144,6 +145,7 @@ export default function ProjectThumbs({ open = false, onSelect, items = projects
         const psy = parseFloat(pcs.getPropertyValue('--grid-spacing-y')) || s
         const poy = parseFloat(pcs.getPropertyValue('--grid-origin-y')) || 0
         const prows = Math.floor((section.clientHeight - poy) / psy + 1e-6)
+        const LYp = (k) => poy + k * psy
         // Tile size: as asked, or (rows with `columns`) the largest that puts that many
         // across the page with a clear cell between them and at least half a cell spare.
         const pcolumns = rows ? columns?.phone || 0 : 0
@@ -153,7 +155,11 @@ export default function ProjectThumbs({ open = false, onSelect, items = projects
         // left for the arrows.
         const pfirstRow = Math.ceil((panelBottom - poy) / psy) + 1
         const pperRow = Math.max(1, pcolumns ? Math.min(pcolumns, Math.floor((pcols + PAD) / (pc + PAD))) : Math.floor((pcols - 2 + PAD) / (pc + PAD)))
-        const pmaxRows = Math.max(1, Math.floor((prows - 1 - pfirstRow + PAD) / (pc + PAD)))
+        // `phoneRows` caps the rows of tiles under the panel (Systems 2, Visuals 3),
+        // whatever the screen's free height: the lattice gets at most that many rows,
+        // and the scatter is given only that much height to spread over.
+        const pmaxRows = Math.max(1, Math.min(phoneRows || Infinity, Math.floor((prows - 1 - pfirstRow + PAD) / (pc + PAD))))
+        const pHeight = phoneRows ? Math.min(section.clientHeight, LYp(pfirstRow + phoneRows * (pc + PAD))) : section.clientHeight
         const per = rows ? pperRow * pmaxRows : MAX_PER_SCREEN.phone
         const screens = Math.max(1, Math.ceil(items.length / per))
         const rnd = mulberry32(seed.current)
@@ -166,7 +172,7 @@ export default function ProjectThumbs({ open = false, onSelect, items = projects
             originX,
             originY: poy,
             width: section.clientWidth,
-            height: section.clientHeight - (screens > 1 ? psy : 0), // the bottom row is the arrows'
+            height: pHeight - (screens > 1 && pHeight === section.clientHeight ? psy : 0), // the bottom row is the arrows'
             panelBottom,
             rnd,
             cells: pc,
@@ -312,7 +318,7 @@ export default function ProjectThumbs({ open = false, onSelect, items = projects
       ro.disconnect()
       mo.disconnect()
     }
-  }, [items.length, tileCells.desktop, tileCells.phone, rows, columns?.phone, sizes?.desktop?.[0], sizes?.desktop?.[1]])
+  }, [items.length, tileCells.desktop, tileCells.phone, rows, columns?.phone, sizes?.desktop?.[0], sizes?.desktop?.[1], phoneRows])
   useEffect(() => {
     dull(pos.current.cur)
   }) // after every render: the tiles near the panel get their --seen as soon as they exist
