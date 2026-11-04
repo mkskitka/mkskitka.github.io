@@ -29,6 +29,9 @@ const SCATTER_TRIES = 200 // whole random layouts to try before falling back to 
  * @param {() => number} o.rnd   random source (seeded, so a resize keeps the same layout)
  * @param {boolean} [o.distinctRows] scatter only: no two tiles start on the same horizontal
  *                                line, so their tops are all at different heights
+ * @param {boolean|number} [o.centerY] slide the block down whole rows so it is centred
+ *                                between the row under the panel and the bottom
+ *                                (`height`, or this many px when a number)
  * @param {boolean} [o.centerX]   slide the whole block to be centred horizontally
  *                                (rows stay on the grid, tiles may cut across columns)
  * @param {boolean} [o.centered]  lattice only: tidy rows filled in order, a clear cell
@@ -57,6 +60,7 @@ export function phoneSpots({
   centered = false,
   columns = 0,
   distinctRows = false,
+  centerY = false,
 }) {
   // Grid lines sit at origin + k * spacing on each axis (origin is 0 when the grid is
   // fitted to the page, half a cell otherwise).
@@ -174,15 +178,28 @@ export function phoneSpots({
   for (const [n, strict] of sizes) {
     const out = wantScatter && distinctRows && strict ? scatter(n) : ((wantScatter ? (scatter(n) ?? loose(n)) : null) ?? lattice(n))
     if (!out) continue
+    // centerY: slide the whole block down by whole rows so it sits centred between the
+    // clear row under the panel and the bottom (`centerY` px, or `height` when true),
+    // still on the grid rows.
+    let placed = out
+    if (centerY && placed.length) {
+      const bottomPx = typeof centerY === 'number' ? centerY : height
+      const top = Math.min(...placed.map((o) => o.y))
+      const bottom = Math.max(...placed.map((o) => o.y + o.sh))
+      const freeTop = LY(firstRow)
+      const freeBottom = LY(Math.floor((bottomPx - originY) / sy + 1e-6))
+      const shiftRows = Math.floor((freeBottom - bottom - (top - freeTop)) / 2 / sy)
+      if (shiftRows > 0) placed = placed.map((o) => ({ ...o, y: o.y + shiftRows * sy }))
+    }
     // centerX: keep the rows on the grid but slide the whole block sideways so it is
     // centred on the page. The tiles then cut across columns, which is fine.
-    if (centerX && out.length) {
-      const left = Math.min(...out.map((o) => o.x))
-      const right = Math.max(...out.map((o) => o.x + o.s))
+    if (centerX && placed.length) {
+      const left = Math.min(...placed.map((o) => o.x))
+      const right = Math.max(...placed.map((o) => o.x + o.s))
       const shift = (width - (right - left)) / 2 - left
-      return out.map((o) => ({ ...o, x: o.x + shift }))
+      return placed.map((o) => ({ ...o, x: o.x + shift }))
     }
-    return out
+    return placed
   }
   return Array.from({ length: count }, () => null)
 }

@@ -185,6 +185,9 @@ export default function ProjectThumbs({ open = false, onSelect, items = projects
             columns: pcolumns,
             centerX: pcolumns > 0,
             distinctRows: !rows, // scatter: every tile's top edge on a different grid line
+            // The block sits centred between the panel and the screen's bottom (above
+            // the arrows' row when scrollable), even when `phoneRows` caps its height.
+            centerY: section.clientHeight - (screens > 1 ? psy : 0),
           })
           out.push(...placed.map((o) => o && { ...o, x: o.x + p * screenW }))
         }

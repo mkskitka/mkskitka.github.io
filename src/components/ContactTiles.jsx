@@ -14,7 +14,7 @@ import { usePhoneSpots } from '../lib/phoneTiles.js'
 export default function ContactTiles({ open = false }) {
   const nav = useRef(null)
   // Phones: one row of tiles, on the grid rows but centred across the page.
-  const spots = usePhoneSpots(nav, contactLinks.length, { cells: 3, scatter: false, shuffle: false, centerX: true })
+  const spots = usePhoneSpots(nav, contactLinks.length, { cells: 3, scatter: false, shuffle: false, centerX: true, centerY: true })
   const scatter = Array.isArray(spots)
   // Desktop: the row of tiles is centred in the space beside the menu panel, on the
   // grid: the same number of clear columns between the panel and the first tile as
