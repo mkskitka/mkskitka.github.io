@@ -195,7 +195,9 @@ export default function ProjectThumbs({ open = false, onSelect, items = projects
           page: screenW,
           per,
           // Two cells wide, so they are easy to tap.
-          arrows: { y: poy + (prows - 1) * psy, left: originX, right: originX + (pcols - 2) * s, w: 2 * s, h: psy },
+          // The arrows sit a cell in from each side edge (not in the very corners, which
+          // a phone's rounded screen corners cut off).
+          arrows: { y: poy + (prows - 1) * psy, left: originX + s, right: originX + (pcols - 3) * s, w: 2 * s, h: psy },
         })
         return
       }
