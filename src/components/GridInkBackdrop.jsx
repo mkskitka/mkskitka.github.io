@@ -1190,12 +1190,24 @@ export default function GridInkBackdrop({ className = '', transparent = false, p
           panel.style.width = prevWidth
           const padX = spacingX * PANEL_PAD_COLS
           const lastLine = LX(Math.floor((cssW - originX) / spacingX + 1e-6)) // last grid line on screen
-          const right = Math.min(lastLine, LX(Math.ceil((left + padX + textW + padX - originX) / spacingX))) // next line past the text
+          let right = Math.min(lastLine, LX(Math.ceil((left + padX + textW + padX - originX) / spacingX))) // next line past the text
           //    (phones: a project title wider than the screen wraps inside the panel instead; custom.css)
+          // The menu (not a project's title panel): the glass is at least square, as many
+          // columns across as it is rows tall (one row per line plus PANEL_PAD_ROWS above
+          // and below), so it reads as an even block, and the text block sits centred in
+          // it with the same glass either side. All screen sizes.
+          let padLeft = padX
+          const isMenu = !panel.querySelector('.project_back')
+          if (isMenu) {
+            const lines = panel.querySelectorAll('.hero_menu_text_color').length
+            const rowsTall = lines + 2 * PANEL_PAD_ROWS
+            right = Math.max(right, Math.min(lastLine, LX(Math.round((left - originX) / spacingX) + rowsTall)))
+            padLeft = Math.max(padX, (right - left - textW) / 2)
+          }
           section.style.setProperty('--hero-panel-top', `${(top - padTop).toFixed(2)}px`)
           section.style.setProperty('--hero-panel-left', `${left.toFixed(2)}px`)
           section.style.setProperty('--hero-panel-width', `${(right - left).toFixed(2)}px`)
-          section.style.setProperty('--hero-panel-pad-x', `${padX.toFixed(2)}px`)
+          section.style.setProperty('--hero-panel-pad-x', `${padLeft.toFixed(2)}px`)
           section.style.setProperty('--hero-panel-pad-y', `${(spacingY * PANEL_PAD_ROWS).toFixed(2)}px`)
         }
       }

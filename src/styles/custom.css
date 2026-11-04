@@ -104,7 +104,7 @@ a:hover,
 }
 .home .section.is-full-screen > .header.margin-bottom_none .heading_primary.hero_menu_text_color {
   font-size: var(--hero-menu-size);
-  line-height: var(--grid-spacing, 1.15em);
+  line-height: var(--grid-spacing-y, var(--grid-spacing, 1.15em)); /* one grid row per line (rows, not columns: they differ slightly), so the panel's edges land on lines */
   margin: 0;
   padding: 0;
   max-width: none;
@@ -725,15 +725,22 @@ a:hover,
   /* Contact tiles: regular grid beside the panel, on the grid lines. */
   .home .section.is-full-screen > .project_thumbs:not(.project_thumbs--scatter) {
     --thumb-size: calc(var(--grid-spacing, 64px) * var(--thumb-cells));
+    --thumb-size-y: calc(var(--grid-spacing-y, var(--grid-spacing, 64px)) * var(--thumb-cells)); /* rows can differ from columns by a little */
     --thumb-gap: calc(var(--grid-spacing, 64px) * var(--thumb-gap-cells));
     flex: 1 1 auto;
     min-width: 0;
     grid-template-columns: repeat(auto-fill, var(--thumb-size));
-    grid-auto-rows: var(--thumb-size);
-    gap: var(--thumb-gap);
-    margin-top: var(--hero-panel-top, 0px);
+    grid-auto-rows: var(--thumb-size-y);
+    gap: calc(var(--grid-spacing-y, var(--grid-spacing, 64px)) * var(--thumb-gap-cells)) var(--thumb-gap);
+    margin-top: var(--hero-panel-top, 0px); /* (components/ContactTiles.jsx centres the row on the grid instead) */
     margin-left: var(--thumb-gap);
     margin-right: 0;
+  }
+  /* ...and each tile fills its row exactly (the shared square aspect would stop it a
+     little short of the line when rows are taller than columns). */
+  .home .section.is-full-screen > .project_thumbs:not(.project_thumbs--scatter) .project_thumb {
+    aspect-ratio: auto;
+    height: var(--thumb-size-y);
   }
 }
 /* Phones: the glass panel keeps its size and its place on the grid in every state
