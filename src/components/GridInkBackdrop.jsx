@@ -1169,7 +1169,14 @@ export default function GridInkBackdrop({ className = '', transparent = false, p
         if (panel) {
           const phone = window.matchMedia('(max-width: 767px)').matches
           const topRow = Math.floor((padTop - originY) / spacingY) // line at or just above the section padding
-          const top = LY(Math.max(0, topRow - (phone ? PANEL_UP_ROWS_PHONE : 0)))
+          let top = LY(Math.max(0, topRow - (phone ? PANEL_UP_ROWS_PHONE : 0)))
+          // Desktop menu: centred down the page instead, on whole rows (the tiles beside
+          // it are centred the same way).
+          const menuLines = panel.querySelector('.project_back') ? 0 : panel.querySelectorAll('.hero_menu_text_color').length
+          if (!phone && menuLines) {
+            const totalRows = Math.floor((cssH - originY) / spacingY + 1e-6)
+            top = LY(Math.max(0, Math.floor((totalRows - (menuLines + 2 * PANEL_PAD_ROWS)) / 2)))
+          }
           // Fitted grid: start the panel PANEL_LEFT_COLS whole columns in from the page
           // edge. Unfitted grid: the first line already sits half a cell in, so use the
           // line nearest the stylesheet's 20px margin.
