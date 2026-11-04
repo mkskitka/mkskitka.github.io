@@ -21,6 +21,13 @@ import { BOUNCE } from './GridInkBackdrop.jsx'
  * edge margin may then be under a cell, and the rows are centred by pixel; on phones
  * only the horizontal grid lines show, so the rows still sit on the grid).
  * Systems uses double-size tiles in rows (three across on phones); Visuals keeps the scatter.
+ * `rows` true lays the tiles out in as many rows as fit; a number caps the rows at that
+ * (Systems: 1 on desktop), so a long list runs across more screens instead of growing
+ * downward. `sizes` ({ desktop: [min, max] }) gives the scatter layout tiles of mixed
+ * sizes, each drawn at random between the two. `opacity` / `dim` set the tiles'
+ * opacity at rest and the others' while one is hovered (custom.css --thumb-opacity,
+ * --thumb-opacity-dim), for this set of tiles only. `grow` false turns off the hover
+ * enlargement (the tile growing a cell and its image zooming), as on Systems.
  *
  * More items than MAX_PER_SCREEN: the rest are scattered over further screens' worth
  * of grid to the right, off the page. Scrolling (wheel, trackpad, swipe, left/right
@@ -56,11 +63,13 @@ const TILE_CELLS = { desktop: 1, phone: 2 }
 // The most tiles shown on one screen. With more than this, the rest wait off the right
 // edge and scrolling brings them in.
 const MAX_PER_SCREEN = { desktop: 10, phone: 6 }
+const SEEN_MIN = 0.12 // how visible a tile stays once it has slid behind the menu panel (1 = not dulled)
+const CLOSE_MS = 320 // how long the tiles take to fade out when closed (matches .is-closing in custom.css)
 const TAP_SLOP = 16 // px a finger may move and still count as a tap rather than a swipe
 
 // Idle hint: with the tiles open and nothing pressed, one tile hops now and then.
 const IDLE_HINT = {
-  enabled: true,
+  enabled: false, // off: no idle hop (true puts it back)
   every: 20, // seconds of nothing being pressed before a hop, and between hops
   height: 0.14, // how high the tile hops, as a fraction of its own size (0.14 = slight)
   seconds: 0.7, // how long one hop (with its small second bounce) takes
@@ -78,7 +87,7 @@ const mulberry32 = (a) => () => {
 const BEAT = 60 / BOUNCE.bpm
 const BEATS = Math.max(1, Math.round((BOUNCE.seconds + 0.6) / BEAT))
 
-export default function ProjectThumbs({ open = false, onSelect, items = projects, label = 'Projects', external = false, bounce = false, titles = true, keep = false, focus = null, cells = TILE_CELLS, rows = false, columns = null, arrowLabels = null }) {
+export default function ProjectThumbs({ open = false, onSelect, items = projects, label = 'Projects', external = false, bounce = false, titles = true, keep = false, focus = null, cells = TILE_CELLS, rows = false, columns = null, arrowLabels = null, sizes = null, opacity = null, dim = null, grow = true }) {
   const nav = useRef(null)
   const tileCells = typeof cells === 'number' ? { desktop: cells, phone: cells } : { ...TILE_CELLS, ...cells }
   const seed = useRef(Math.floor(Math.random() * 1e9))
@@ -99,6 +108,21 @@ export default function ProjectThumbs({ open = false, onSelect, items = projects
   const [ends, setEnds] = useState(0) // which arrows show: 1 = more to the left, 2 = more to the right
   const goBy = useRef(null) // (dir) => move one screen left (-1) or right (1); set while scrollable
   const wasOpen = useRef(false)
+  // Closing: for CLOSE_MS after `open` goes false the tiles stay in the layout with
+  // .is-closing, so they can fade out instead of vanishing (custom.css).
+  const [closing, setClosing] = useState(false)
+  const openBefore = useRef(open)
+  useEffect(() => {
+    if (openBefore.current && !open) {
+      setClosing(true)
+      const t = setTimeout(() => setClosing(false), CLOSE_MS)
+      openBefore.current = open
+      return () => clearTimeout(t)
+    }
+    if (open) setClosing(false)
+    openBefore.current = open
+    return undefined
+  }, [open])
 
   // Lay the tiles out on the grid. Re-run on resize and whenever the grid spacing changes.
   useLayoutEffect(() => {
@@ -200,11 +224,22 @@ export default function ProjectThumbs({ open = false, onSelect, items = projects
       // goes to the arrows and the lattice is sized on what is left.
       let maxRows = latticeRows(gridRows)
       if (rows && items.length > perRow * maxRows) maxRows = latticeRows(gridRows - 1)
-      const per = rows ? perRow * maxRows : MAX_PER_SCREEN.desktop
+      // `rows` as a number caps the rows (Systems: two), the rest going on further screens.
+      if (typeof rows === 'number') {
+        maxRows = Math.min(maxRows, rows)
+        if (items.length > perRow * maxRows) maxRows = Math.min(rows, latticeRows(gridRows - 1))
+      }
+      // A scatter of mixed sizes holds fewer per screen: about what the area allows
+      // for tiles of the average size, each with its clear cell around it.
+      const avg = sizes?.desktop ? (sizes.desktop[0] + sizes.desktop[1]) / 2 + PAD : 0
+      const per = rows ? perRow * maxRows : sizes?.desktop ? Math.max(3, Math.floor((span * Math.max(1, gridRows - 1)) / (avg * avg))) : MAX_PER_SCREEN.desktop
       const screens = Math.max(1, Math.ceil(items.length / per))
       const tileRows = screens > 1 ? gridRows - 1 : gridRows // when scrollable the bottom row is the arrows'
       const rowCount = Math.min(maxRows, Math.ceil(Math.min(per, items.length) / perRow))
-      const row0 = Math.max(0, Math.floor((tileRows - (rowCount * pitch - PAD)) / 2))
+      // The block of rows is centred on the whole page height (so it balances the menu
+      // panel, not the space above the arrows), then kept clear of the arrows' row.
+      const blockRows = rowCount * pitch - PAD
+      const row0 = Math.max(0, Math.min(tileRows - blockRows, Math.floor((gridRows - blockRows) / 2))) // a half-row tie goes up, toward the menu panel
       // ...and centred (to the nearest column) between the panel and the right edge.
       const rowCols = Math.min(perRow, items.length) * pitch - PAD
       const col0 = Math.max(0, Math.floor((span - rowCols) / 2))
@@ -212,14 +247,21 @@ export default function ProjectThumbs({ open = false, onSelect, items = projects
         const first = firstCol + Math.floor(n / per) * span
         if (rows) {
           const k = n % per
-          const i = first + col0 + (k % perRow) * pitch
-          const j = row0 + Math.floor(k / perRow) * pitch
+          // Order: with the rows capped (Systems) left to right along each row; with
+          // as many rows as fit (Visuals) down each column, then the next column, so a
+          // part-filled last screen ends in whole columns with no empty rows under them.
+          const colMajor = rows === true
+          const i = first + col0 + (colMajor ? Math.floor(k / rowCount) : k % perRow) * pitch
+          const j = row0 + (colMajor ? k % rowCount : Math.floor(k / perRow)) * pitch
           const c = dc
           const dy = j + c + 1 <= tileRows ? 0 : -sy
           return { x: LX(i), y: LY(j), s: c * sx, sh: c * sy, cell: sx, cellY: sy, col: i, n: c, dx: 0, dy }
         }
         // c = tile size in cells: the wanted size first, then smaller if it will not fit.
-        for (let c = dc; c >= 1; c--) {
+        // With `sizes` ({ desktop: [min, max] }) each tile wants its own size, drawn at
+        // random between the two (the same draw each time, from the seed).
+        const want = sizes?.desktop ? sizes.desktop[0] + Math.floor(rnd() * (sizes.desktop[1] - sizes.desktop[0] + 1)) : dc
+        for (let c = want; c >= 1; c--) {
           if (span < c || tileRows < c) continue
           for (let tries = 0; tries < 500; tries++) {
             const i = first + Math.floor(rnd() * (span - c + 1))
@@ -238,8 +280,13 @@ export default function ProjectThumbs({ open = false, onSelect, items = projects
         return null
       })
       setSpots(out)
+      // How far the tiles can scroll: to where the last tile (plus a clear cell) meets
+      // the page's right edge, on a whole column, rather than a whole screen past the
+      // last full one, so a part-filled last screen leaves no empty run at the end.
+      const lastCol = out.reduce((m, p) => (p ? Math.max(m, p.col + p.n) : m), 0)
+      const maxPx = Math.min((screens - 1) * span * sx, Math.max(0, Math.ceil((LX(lastCol) + sx - LX(cols)) / sx) * sx))
       setStrip({
-        max: (screens - 1) * span * sx,
+        max: maxPx,
         snap: sx,
         step: sx,
         cols,
@@ -265,7 +312,25 @@ export default function ProjectThumbs({ open = false, onSelect, items = projects
       ro.disconnect()
       mo.disconnect()
     }
-  }, [items.length, tileCells.desktop, tileCells.phone, rows, columns?.phone])
+  }, [items.length, tileCells.desktop, tileCells.phone, rows, columns?.phone, sizes?.desktop?.[0], sizes?.desktop?.[1]])
+  useEffect(() => {
+    dull(pos.current.cur)
+  }) // after every render: the tiles near the panel get their --seen as soon as they exist
+
+  // Desktop, when scrollable: a tile that has slid left past the menu panel's edge is
+  // dulled (its --seen, which custom.css multiplies into the media and title opacity:
+  // SEEN_MIN behind the panel, 1 fully clear of it, in between while crossing), so the
+  // menu stays readable over it and half-hidden tiles do not pull the eye.
+  const dull = (scrolled) => {
+    const edge = strip?.fadeFrom
+    if (edge == null || !track.current) return
+    for (const el of track.current.querySelectorAll('.project_thumb')) {
+      const x = parseFloat(el.style.getPropertyValue('--x')) - scrolled
+      const w = parseFloat(el.style.getPropertyValue('--s')) || 1
+      const clear = Math.min(1, Math.max(0, (x + w - edge) / w)) // the part of the tile right of the panel's edge
+      el.style.setProperty('--seen', (SEEN_MIN + (1 - SEEN_MIN) * clear).toFixed(3))
+    }
+  }
 
   // Scrolling. Wheel / swipe / arrow keys move a target; the tiles ease toward it and,
   // once the input stops, come to rest on the grid.
@@ -277,6 +342,7 @@ export default function ProjectThumbs({ open = false, onSelect, items = projects
     const p = pos.current
     const apply = () => {
       if (track.current) track.current.style.transform = p.cur ? `translate3d(${-p.cur}px, 0, 0)` : ''
+      dull(p.cur)
     }
     if (!open && keep && max > 0) {
       // Closed because one of the tiles is open: stay scrolled where we are.
@@ -405,6 +471,7 @@ export default function ProjectThumbs({ open = false, onSelect, items = projects
     const to = Math.min(max, Math.floor(focus / per) * page)
     pos.current.cur = pos.current.target = to
     if (track.current) track.current.style.transform = to ? `translate3d(${-to}px, 0, 0)` : ''
+    dull(to)
     setNear(to)
     setShift(Math.round(to / step))
   }, [focus]) // eslint-disable-line react-hooks/exhaustive-deps
@@ -471,10 +538,12 @@ export default function ProjectThumbs({ open = false, onSelect, items = projects
   return (
     <nav
       ref={nav}
-      className={`project_thumbs${scatter ? ' project_thumbs--scatter' : ''}${bouncing ? ' project_thumbs--bounce' : ''}${fade ? ' project_thumbs--fade' : ''}${open ? ' is-open' : ''}`}
+      className={`project_thumbs${scatter ? ' project_thumbs--scatter' : ''}${grow ? '' : ' project_thumbs--still'}${bouncing ? ' project_thumbs--bounce' : ''}${fade ? ' project_thumbs--fade' : ''}${open ? ' is-open' : closing ? ' is-closing' : ''}`}
       style={{
         ...(bouncing ? { '--bounce-beat': `${BEAT}s`, '--bounce-beats': BEATS } : null),
         ...(fade ? { '--fade-from': `${strip.fadeFrom}px`, '--fade-to': `${strip.fadeTo}px` } : null),
+        ...(opacity != null ? { '--thumb-opacity': opacity } : null), // tiles at rest (custom.css)
+        ...(dim != null ? { '--thumb-opacity-dim': dim } : null), // the others while one is hovered
       }}
       aria-label={label}
       aria-hidden={!open}

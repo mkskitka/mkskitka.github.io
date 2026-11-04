@@ -159,6 +159,25 @@ a:hover,
   opacity: 1;
 }
 
+/* The MK SKITKA menu item is the wide pixel logo (components/LogoWide.jsx), drawn at
+   the capital-letter height of the menu text and sitting on its baseline, so it reads
+   as one more line of the menu. It takes the text colour, so it dims and highlights
+   with the other items. */
+.hero_logo {
+  display: inline-block;
+  height: 1em;
+  width: auto;
+  vertical-align: -0.12em; /* its letters' feet on the text baseline */
+  overflow: visible;
+}
+/* The sprite field alone, after MK set in the menu font: a little lower and smaller,
+   so the sprites sit beside the letters rather than above them. */
+.hero_logo--sprites {
+  height: 0.9em;
+  margin: 0 0.18em; /* between the MK and the S */
+  vertical-align: -0.1em;
+}
+
 /* Visuals sort dropdown (components/VisualsSort.jsx, orders in lib/sortItems.js).
    A glass button in the top right corner of the page, filling the band above the
    first horizontal grid line (--grid-origin-y, from GridInkBackdrop.jsx) so its
@@ -183,6 +202,57 @@ a:hover,
 .visuals_sort.is-shown {
   opacity: 1;
   pointer-events: auto;
+}
+/* The layout icons (grid / random) sit to the left of the Sort button in the same
+   band; the Sort button and its list are one block so the list hangs from it. */
+.visuals_sort {
+  display: flex;
+  align-items: stretch;
+}
+.visuals_sort_main {
+  position: relative;
+  height: 100%;
+}
+.visuals_sort_layout {
+  display: flex;
+  align-items: stretch;
+  margin-right: 1px;
+  background-color: var(--glass-tint);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+}
+.visuals_sort_icon {
+  margin: 0;
+  padding: 0 0.8em;
+  border: 0;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+  opacity: var(--menu-dim);
+  transition: opacity 0.2s ease, color 0.2s ease;
+  touch-action: manipulation;
+}
+.visuals_sort_icon svg {
+  display: block;
+  width: 1.25em;
+  height: 1.25em;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linejoin: round;
+}
+.visuals_sort_icon.is-active {
+  opacity: 1;
+}
+.visuals_sort_icon.is-active svg {
+  fill: currentColor;
+  fill-opacity: 0.25;
+}
+@media (hover: hover) {
+  .visuals_sort_icon:not(.is-active):hover {
+    opacity: 0.8;
+    color: var(--_colors---core-accent-color--accent-primary-hover, #fff);
+  }
 }
 .visuals_sort_button,
 .visuals_sort_option {
@@ -289,7 +359,7 @@ a:hover,
   align-content: start;
   visibility: hidden;
   pointer-events: none;
-  transition: visibility 0s linear 0.25s;
+  transition: visibility 0s linear 0.32s; /* after the closing fade */
 }
 .project_thumbs.is-open {
   visibility: visible;
@@ -322,18 +392,18 @@ a:hover,
   position: absolute;
   inset: 0;
   display: block;
-  opacity: var(--thumb-opacity);
+  opacity: calc(var(--thumb-opacity) * var(--seen, 1)); /* --seen: dulled behind the menu panel (ProjectThumbs.jsx) */
   transition: opacity 0.3s ease;
 }
 /* Hover effects are for devices that can hover. On a phone a tap would otherwise leave
    the tile stuck in its hover look (and on iOS can be swallowed as "hover" instead of
    opening the tile), so everything :hover on the tiles sits inside (hover: hover). */
 .project_thumb:focus-visible .project_thumb_media {
-  opacity: 1;
+  opacity: var(--seen, 1);
 }
 @media (hover: hover) {
   .project_thumb:hover .project_thumb_media {
-    opacity: 1;
+    opacity: var(--seen, 1);
   }
 }
 .project_thumb_media img,
@@ -345,13 +415,13 @@ a:hover,
   transition: transform 0.5s ease, opacity 0.3s ease;
 }
 @media (hover: hover) {
-  .project_thumb:hover .project_thumb_media img,
-  .project_thumb:hover .project_thumb_media video {
+  .project_thumbs:not(.project_thumbs--still) .project_thumb:hover .project_thumb_media img,
+  .project_thumbs:not(.project_thumbs--still) .project_thumb:hover .project_thumb_media video {
     transform: scale(1.04);
   }
   /* Hovering one tile softens the others. */
   .project_thumbs:has(.project_thumb:hover) .project_thumb:not(:hover) .project_thumb_media {
-    opacity: var(--thumb-opacity-dim);
+    opacity: calc(var(--thumb-opacity-dim) * var(--seen, 1));
   }
 }
 /* Tiles stop short of the grid lines around them, so the backdrop's lines show whole
@@ -396,23 +466,34 @@ a:hover,
   text-transform: uppercase;
   color: #fff;
   background: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.7));
-  opacity: var(--thumb-title-rest, 0);
+  opacity: calc(var(--thumb-title-rest, 0) * var(--seen, 1));
   transition: opacity 0.25s ease;
 }
 .project_thumb:focus-visible .project_thumb_title {
-  opacity: 1;
+  opacity: var(--seen, 1);
 }
 @media (hover: hover) {
   .project_thumb:hover .project_thumb_title {
-    opacity: 1;
+    opacity: var(--seen, 1);
   }
 }
 
 /* Two grids share the space beside the panel (Systems tiles, Contact tiles); only the
    open one takes part in the layout. @starting-style gives the entrance animation its
    starting point when the grid switches from display:none. */
-.home .section.is-full-screen > .project_thumbs:not(.is-open) {
+.home .section.is-full-screen > .project_thumbs:not(.is-open):not(.is-closing) {
   display: none !important;
+}
+/* Closing (a menu item hit, or a tile opened): the tiles stay for a moment and fade
+   out together, instead of vanishing (components/ProjectThumbs.jsx, CLOSE_MS). */
+.project_thumbs.is-closing .project_thumb {
+  opacity: 0;
+  transform: none;
+  transition: opacity 0.3s ease;
+}
+.project_thumbs.is-closing .project_thumbs_arrow {
+  opacity: 0;
+  transition: opacity 0.2s ease;
 }
 @starting-style {
   .project_thumbs.is-open .project_thumb {
@@ -437,7 +518,8 @@ a:hover,
 /* Scrollable tiles on desktop slide under the menu panel: the panel is stacked above
    the tiles (z-index, in the desktop block below), so a tile scrolled past the panel's
    right edge passes behind the glass, blurred, and carries on off the left edge of the
-   page. (Earlier, everything left of the panel's right edge (--fade-from, set by
+   page. Once past the panel's edge a tile is dulled to a trace (--seen, set per tile
+   by ProjectThumbs.jsx), so the menu stays readable over it. (Earlier, everything left of the panel's right edge (--fade-from, set by
    ProjectThumbs) was cut off with a clip-path instead, so the tiles vanished at the
    panel's edge: to have that back, give .project_thumbs--fade
    `clip-path: inset(-200vh -200vw -200vh var(--fade-from, 0px))`. A gradient mask with
@@ -618,7 +700,8 @@ a:hover,
       width 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), height 0.3s cubic-bezier(0.2, 0.8, 0.2, 1),
       opacity 0.4s ease, transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
   }
-  .project_thumbs--scatter .project_thumb:focus-visible {
+  /* (.project_thumbs--still, Systems: no growing on hover or focus.) */
+  .project_thumbs--scatter:not(.project_thumbs--still) .project_thumb:focus-visible {
     left: calc(var(--x) + var(--dx) + var(--thumb-gap));
     top: calc(var(--y) + var(--dy) + var(--thumb-gap));
     width: calc(var(--s) + var(--cell, var(--s)) - 2 * var(--thumb-gap));
@@ -626,7 +709,7 @@ a:hover,
     z-index: 3;
   }
   @media (hover: hover) {
-    .project_thumbs--scatter .project_thumb:hover {
+    .project_thumbs--scatter:not(.project_thumbs--still) .project_thumb:hover {
       left: calc(var(--x) + var(--dx) + var(--thumb-gap));
       top: calc(var(--y) + var(--dy) + var(--thumb-gap));
       width: calc(var(--s) + var(--cell, var(--s)) - 2 * var(--thumb-gap));
@@ -672,7 +755,7 @@ a:hover,
   .home .section.is-full-screen > .header.margin-bottom_none .heading_primary.hero_menu_text_color.project_title_line {
     white-space: normal;
   }
-  .home .section.is-full-screen > .project_thumbs:not(.is-open) {
+  .home .section.is-full-screen > .project_thumbs:not(.is-open):not(.is-closing) {
     display: none;
   }
   /* Tiles placed on the grid (Systems, Visuals, Contact): absolute, on the lines.
@@ -1260,6 +1343,34 @@ body {
 .home--fixed .section.is-full-screen {
   height: 100%;
   min-height: 0;
+}
+
+/* The hope_wide loop beside the menu while nothing is selected (components/HomeVideo.jsx
+   places it on the grid). Fades with the same timing as the write-up panel. It plays
+   only while hovered, so it takes the pointer (no ink painting under it). */
+.home_video {
+  position: absolute;
+  z-index: 2;
+  overflow: hidden;
+  background: #000;
+  opacity: 0;
+  transform: translateY(12px);
+  pointer-events: none;
+  cursor: default;
+  transition: opacity 0.35s ease, transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.home_video.is-open {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+}
+.home_video_media {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
 /* The hero backdrop can be painted on (click / hold / drag adds ink). */

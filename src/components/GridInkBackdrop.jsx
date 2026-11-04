@@ -284,8 +284,9 @@ const SETTINGS = {
     rowStep: 1, // grid rows between one line's turn and the next (each turns this much higher)
     speed: 0.7, // how fast they travel, in page heights per second
     stagger: 0.07, // seconds between one line setting off and the next, left to right (0 = all together)
-    colors: PALETTES['mk-original'].vertical, // gradient down the page, top -> bottom: the original palette's
-    //                       vertical colours (blue -> pink), whichever grid palette is active
+    // Colour: the grid lines' own (a column part the vertical lines' colour at that
+    // height, a row part the horizontal lines' colour at that x), so they match the
+    // grid on the other pages; set in the shader, nothing to choose here.
     // What the light at the leading end looks like is set by GLOW_STYLE.contact, above SETTINGS.
     fade: 0.06, // how quickly the lines fade in and out with the page (0.02 slow, 0.3 quick)
   },
@@ -358,6 +359,9 @@ const SIM_STEPS = 2 // simulation steps per frame
 
 // For the Visuals tiles, which bounce along with the lines (components/ProjectThumbs.jsx).
 export const BOUNCE = { seconds: SETTINGS.bounce.seconds, bpm: SETTINGS.bounce.bpm, enabled: SETTINGS.bounce.enabled }
+// How long the lines take to grow across on page load (seconds): what waits for the
+// page-load animation (the home video block) reads it from here.
+export const LOAD_SECONDS = SETTINGS.horizontal.seconds
 
 const EASES = {
   linear: (t) => t,
@@ -594,7 +598,6 @@ const DISPLAY_FRAG = /* glsl */ `
   uniform vec4 uTrace[${MAX_TRACES}];
   uniform vec4 uTraceLook;   // amount 0..1, trail px, brightness, thicken px
   uniform vec2 uTraceHalo;   // halo px, halo strength
-  uniform vec3 uTraceFrom, uTraceTo; // colour at the top of the page -> at the bottom
   uniform vec2 uTip;         // tip glow on the growing horizontal lines: trail length css px, amount 0..1
   uniform vec4 uTipGlow;     // brightness, thicken px, halo px, halo strength
   // Glow styles (GLOW_STYLES): x = 1 when the light is a round glow on the leading end
@@ -784,7 +787,11 @@ const DISPLAY_FRAG = /* glsl */ `
     // Contact traces: each runs along a column from the top or bottom edge to its turn
     // row, then along that row to the side of the page. Lit near the leading end.
     if (uTraceLook.x > 0.001) {
-      vec3 tCol = mix(uTraceFrom, uTraceTo, clamp(px.y / uSize.y, 0.0, 1.0));
+      // The traces take the grid lines' own colours: a column part the vertical lines'
+      // colour at this height, a row part the horizontal lines' colour at this x, so
+      // Contact's lines match the grid on the other pages.
+      vec3 tColV = vCol; // the grid's own colours at this point (computed above)
+      vec3 tColH = hCol;
       float ta = uTraceLook.x * uLineAlpha;
       for (int i = 0; i < ${MAX_TRACES}; i++) {
         vec4 tr = uTrace[i];
@@ -820,11 +827,12 @@ const DISPLAY_FRAG = /* glsl */ `
           float hHz = exp(-abs(px.y - tr.y) / max(0.5, uTraceHalo.x * gH)) * gH * onH;
           halo = max(hV, hHz) * uTraceHalo.y * ta;
         }
-        col += tCol * halo;
+        vec3 tipCol = done < lenV ? tColV : tColH; // the light's colour: the part it is on
+        col += tipCol * halo;
         alpha = min(1.0, alpha + halo);
-        col = mix(col, min(tCol * (1.0 + uTraceLook.z * gV), vec3(1.0)), lineV);
+        col = mix(col, min(tColV * (1.0 + uTraceLook.z * gV), vec3(1.0)), lineV);
         alpha = mix(alpha, 1.0, lineV);
-        col = mix(col, min(tCol * (1.0 + uTraceLook.z * gH), vec3(1.0)), lineH);
+        col = mix(col, min(tColH * (1.0 + uTraceLook.z * gH), vec3(1.0)), lineH);
         alpha = mix(alpha, 1.0, lineH);
       }
     }
@@ -1024,8 +1032,6 @@ export default function GridInkBackdrop({ className = '', transparent = false, p
         uTrace: { value: Array.from({ length: MAX_TRACES }, () => new THREE.Vector4(0, 0, 0, 1)) },
         uTraceLook: { value: new THREE.Vector4(0, 1, glowLook('contact').brightness, glowLook('contact').thicken) },
         uTraceHalo: { value: new THREE.Vector2(glowLook('contact').halo, glowLook('contact').haloStrength) },
-        uTraceFrom: { value: c255(S.trace.colors.from) },
-        uTraceTo: { value: c255(S.trace.colors.to) },
         uBounce: { value: new THREE.Vector4(0, S.bounce.amplitude, S.bounce.waves, S.bounce.speed) },
         uBounceBeat: { value: new THREE.Vector2(S.bounce.bpm / 60, S.bounce.kick) },
         uBounceReach: { value: Math.min(2.5, Math.max(0.1, S.bounce.reach)) },

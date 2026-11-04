@@ -16,8 +16,17 @@ import { SORTS } from '../lib/sortItems.js'
  * `open`: those tiles are showing (the control fades with them).
  * `value`: the current order's id, `rev` whether it is flipped; `onChange(id)` is
  * called with the picked one (the active one again means flip).
+ * `layout` ('grid' | 'scatter') adds the two layout icons to the left of the Sort
+ * button; `onLayout(id)` is called with the picked one.
  */
-export default function VisualsSort({ kind = 'visuals', open = false, value, rev = false, onChange }) {
+// The two layout icons beside the Sort button: a grid (tiles in rows) and a scatter
+// (tiles at random spots). `layout` is the current one; `onLayout(id)` picks.
+const LAYOUTS = [
+  { id: 'grid', label: 'Grid', icon: <path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z" /> },
+  { id: 'scatter', label: 'Random positions', icon: <path d="M3 5h5v5H3zM13 3h5v5h-5zM7 14h5v5H7zM16 13h5v5h-5z" /> },
+]
+
+export default function VisualsSort({ kind = 'visuals', open = false, value, rev = false, onChange, layout = null, onLayout = null }) {
   const root = useRef(null)
   const [listOpen, setListOpen] = useState(false)
   const options = SORTS[kind]
@@ -50,6 +59,25 @@ export default function VisualsSort({ kind = 'visuals', open = false, value, rev
         setListOpen(false)
       }}
     >
+      {layout && (
+        <div className="visuals_sort_layout" role="group" aria-label={`Layout of the ${what}`}>
+          {LAYOUTS.map((l) => (
+            <button
+              key={l.id}
+              type="button"
+              className={`visuals_sort_icon${layout === l.id ? ' is-active' : ''}`}
+              aria-label={l.label}
+              aria-pressed={layout === l.id}
+              title={l.label}
+              tabIndex={open ? 0 : -1}
+              onClick={() => onLayout?.(l.id)}
+            >
+              <svg viewBox="0 0 24 24" aria-hidden="true">{l.icon}</svg>
+            </button>
+          ))}
+        </div>
+      )}
+      <div className="visuals_sort_main">
       <button
         type="button"
         className="visuals_sort_button"
@@ -88,6 +116,7 @@ export default function VisualsSort({ kind = 'visuals', open = false, value, rev
           </li>
         ))}
       </ul>
+      </div>
     </div>
   )
 }

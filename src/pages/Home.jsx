@@ -13,6 +13,7 @@ import ProjectLock, { isUnlocked } from '../components/ProjectLock.jsx'
 import { revealSections } from '../lib/animations.js'
 import { DEFAULT_SORT, isSort, sortEnds, sortItems } from '../lib/sortItems.js'
 import VisualsSort from '../components/VisualsSort.jsx'
+import LogoWide from '../components/LogoWide.jsx'
 
 // The site is currently just the hero, fixed to one screen with no scrolling: wheel,
 // touch and keys drive the backdrop animation instead (GridInkBackdrop SETTINGS.scroll).
@@ -64,6 +65,9 @@ const SHOW_VISUAL_TITLES = false
 
 // An open visual: swipe left / right (or the arrow keys) for the next / previous one.
 const VISUAL_SWIPE = 50 // px a finger must travel sideways to count as a swipe
+
+// Desktop Systems tiles (see the Systems <ProjectThumbs> below).
+const SYSTEMS_DESKTOP = { rows: 1, cells: 5, opacity: 0.85, dim: 0.45 }
 
 const MENU = [
   { id: 'home', label: 'MK SKITKA', path: '/about' },
@@ -121,6 +125,15 @@ export default function Home() {
   const [shuffleSeed, setShuffleSeed] = useState(() => Math.random())
   const VISUAL_LIST = useMemo(() => sortItems(VISUAL_ITEMS, sort.visuals, { seed: shuffleSeed, rev: sort.rev }), [sort.visuals, sort.rev, shuffleSeed])
   const PROJECT_LIST = useMemo(() => sortItems(projects, sort.systems, { rev: sort.rev }), [sort.systems, sort.rev])
+  // How each kind of tiles is laid out: 'grid' (rows on the lattice) or 'scatter'
+  // (random spots). Systems opens as a grid, Visuals scattered; the icons beside the
+  // Sort button switch.
+  const [layout, setLayout] = useState({ visuals: 'scatter', systems: 'grid' })
+  const pickLayout = (kind) => (id) => setLayout((l) => ({ ...l, [kind]: id }))
+  // Desktop Systems layout: rows of the grid, tile size in grid cells, the tiles'
+  // opacity at rest and the others' while one is hovered. Phones keep their own layout
+  // and opacity. In the random layout the tiles come in mixed sizes, 1 to 5 cells.
+  const tweak = SYSTEMS_DESKTOP
 
   // The open project (if any) and the tile rectangle it grew out of.
   const [project, setProject] = useState(null)
@@ -365,18 +378,28 @@ export default function Home() {
                 href="#"
                 className={`heading_primary hero_menu_text_color${active === m.id ? ' is-active' : ''}`}
                 aria-pressed={active === m.id}
+                aria-label={m.id === 'home' ? m.label : undefined}
                 onClick={pick(m.id)}
               >
-                {m.label}
+                {m.id === 'home' ? (
+                  <>
+                    MK
+                    <LogoWide className="hero_logo hero_logo--sprites" part="sprites" />S
+                  </>
+                ) : (
+                  m.label
+                )}
               </a>
             ))
           )}
         </div>
-        <ProjectThumbs open={active === 'systems' && !project} keep={active === 'systems' && !!project} items={PROJECT_LIST} onSelect={openProject} cells={{ desktop: 2 }} columns={{ phone: 3 }} rows arrowLabels={sortEnds('systems', sort.systems, sort.rev)} />
-        <VisualsSort kind="systems" open={active === 'systems' && !project} value={sort.systems} rev={sort.rev} onChange={pickSort('systems')} />
-        <ProjectThumbs open={active === 'visuals' && !project} keep={active === 'visuals' && !!project} focus={visualAt} items={VISUAL_LIST} label="Visuals" onSelect={openProject} bounce={visualsFresh} titles={SHOW_VISUAL_TITLES} arrowLabels={sortEnds('visuals', sort.visuals, sort.rev)} />
-        <VisualsSort open={active === 'visuals' && !project} value={sort.visuals} rev={sort.rev} onChange={pickSort('visuals')} />
+        <ProjectThumbs open={active === 'systems' && !project} keep={active === 'systems' && !!project} items={PROJECT_LIST} onSelect={openProject} cells={{ desktop: tweak.cells }} columns={{ phone: 3 }} rows={layout.systems === 'grid' ? tweak.rows : false} sizes={layout.systems === 'grid' ? null : { desktop: [1, 5] }} opacity={isPhone ? null : tweak.opacity} dim={isPhone ? null : tweak.dim} grow={false} arrowLabels={sortEnds('systems', sort.systems, sort.rev)} />
+        <VisualsSort kind="systems" open={active === 'systems' && !project} value={sort.systems} rev={sort.rev} onChange={pickSort('systems')} layout={layout.systems} onLayout={pickLayout('systems')} />
+        <ProjectThumbs open={active === 'visuals' && !project} keep={active === 'visuals' && !!project} focus={visualAt} items={VISUAL_LIST} label="Visuals" onSelect={openProject} bounce={visualsFresh} titles={SHOW_VISUAL_TITLES} rows={layout.visuals === 'grid'} arrowLabels={sortEnds('visuals', sort.visuals, sort.rev)} />
+        <VisualsSort open={active === 'visuals' && !project} value={sort.visuals} rev={sort.rev} onChange={pickSort('visuals')} layout={layout.visuals} onLayout={pickLayout('visuals')} />
         <ContactTiles open={active === 'contact'} />
+        {/* The hope_wide loop beside the menu while nothing is selected is off for now:
+            components/HomeVideo.jsx, <HomeVideo open={!active && !project} /> here. */}
         {/* MK SKITKA: the bio (src/data/about.js). A project: its write-up (src/data/projects.js). */}
         <WriteUp open={active === 'home' && !project} heading={about.heading} paragraphs={about.paragraphs} align="center">
           <Link to="/resume" className="writeup_link">

@@ -2,6 +2,7 @@ import { Routes, Route, Navigate } from 'react-router-dom'
 import Home from './pages/Home.jsx'
 import Resume from './pages/Resume.jsx'
 import ScrollToTop from './components/ScrollToTop.jsx'
+import RouteFavicon from './components/RouteFavicon.jsx'
 
 // Only the hero page is live right now. Every address is that same page with something
 // open on it (links you can send; see the top of src/pages/Home.jsx for the list). The
@@ -10,6 +11,7 @@ export default function App() {
   return (
     <>
       <ScrollToTop />
+      <RouteFavicon />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<Home />} />

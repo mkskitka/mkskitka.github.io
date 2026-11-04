@@ -190,6 +190,37 @@ const projectList = [
     ],
   },
   {
+    // Files live in src/assets/projects/end-of-signal/ (01.mp4, 02.mp4, thumb.jpg).
+    slug: 'end-of-signal',
+    date: year('end-of-signal', '2025'),
+    title: 'End of Signal',
+    heading: ['END OF SIGNAL', 'CEZAR MOCAN'],
+    role: 'Visualist, Technologist',
+    mediums: 'Live-rendered AI visuals',
+    tags: ['ai'],
+    // One string per paragraph: description: ['First paragraph.', 'Second paragraph.']
+    description: [
+      'I built the live-rendered AI visuals system for artist Cezar Mocan’s End of Signal. The installation won the SOLO AI ’25 award and has shown across multiple venues.',
+    ],
+  },
+  {
+    // Files live in src/assets/projects/video-booths/. The wedding booth's media is
+    // 01–04 and thumb.png; drop the Tapestry Electric booth's clips and photos in
+    // beside them (the gallery shows the first four by name, so name them to lead).
+    slug: 'video-booths',
+    date: year('video-booths', '2025'),
+    title: 'Video Booths',
+    heading: ['VIDEO', 'BOOTHS'],
+    role: 'Visualist, Technologist',
+    mediums: 'TouchDesigner, Kinect, web application, projection',
+    // One string per paragraph: description: ['First paragraph.', 'Second paragraph.']
+    description: [
+      'Custom video booths for events: reactive visuals that people step into, with their reel delivered to their phone afterwards.',
+      'Tapestry Electric (2025): a video booth for the gaming and performing arts company at a gaming conference.',
+      'Wedding booth (2023): I built a customized interactive photobooth with TouchDesigner, a Kinect, a web application and a projector, and worked with the newlywed couple to match the booth’s filters to the theme and palette of the wedding. Many guests were inclined to dance with the reactive visuals, resulting in fun, candid photo reels that could then be accessed and downloaded via a QR code.',
+    ],
+  },
+  {
     slug: 'blueberry-swamp-festival',
     hidden: 'true',
     date: year('blueberry-swamp-festival', '2025'),
@@ -248,6 +279,49 @@ const projectList = [
     ],
   },
   {
+    // Files live in src/assets/projects/flora-ai/ (from the old mks.computer site).
+    slug: 'flora-ai',
+    hidden: 'true', // a three-week engagement; kept off the grid (delete this line to show it)
+    date: year('flora-ai', '2024'),
+    title: 'Flora',
+    heading: ['FLORA'],
+    role: 'Workflow Design, Software Development',
+    mediums: 'Node-based AI tooling, web',
+    tags: ['ai'],
+    // One string per paragraph: description: ['First paragraph.', 'Second paragraph.']
+    description: [
+      '[Flora](https://www.florafauna.ai) is a tool for artists to seamlessly integrate AI models and workflows into their daily practice. I helped with workflow ideation and software development of this node-based visual programming language ahead of its launch.',
+    ],
+  },
+  {
+    // Files live in src/assets/projects/wild-birds/ (from the old mks.computer site).
+    slug: 'wild-birds',
+    date: year('wild-birds', '2023'),
+    title: 'Wild Birds',
+    heading: ['WILD BIRDS'],
+    role: 'Co-producer, Projection Technician',
+    mediums: 'Multi-wall projection, VJ system, live band and DJ sets',
+    // One string per paragraph: description: ['First paragraph.', 'Second paragraph.']
+    description: [
+      'Wild Birds was a two-part show series that brought together multi-wall projection, VJing and live band and DJ sets. As a co-producer on the project, I worked closely with the owners of the venue and the technical staff of Brooklyn Art Haus to set up the multi-wall projection and VJ system.',
+      'I promoted and oversaw the events, recruited VJs to perform and was in charge of space setup and design. Concluding the shows, I started work as a technical consultant and projection technician for the venue.',
+    ],
+  },
+  {
+    // Files live in src/assets/projects/devolving-spam/ (from the old mks.computer site).
+    slug: 'devolving-spam',
+    date: year('devolving-spam', '2023'),
+    title: 'Devolving Spam',
+    heading: ['DEVOLVING', 'SPAM'],
+    role: 'Artist',
+    mediums: 'TouchDesigner, real-time renders, prints',
+    // One string per paragraph: description: ['First paragraph.', 'Second paragraph.']
+    description: [
+      'Devolving Spam is an art installation created for [Spamtember](https://hudsonweekly.com/spamtember-unveils-playful-creativity-a-humorous-exploration-of-cultural-identity-at-all-street-gallery/), a month of making exercise concluding in a Spam-themed gallery exhibition. Inspired by the similarity to Campbell’s soup, I wanted to use my own work with Spam, an iconic symbol of globalization and industrialization, to contemplate contemporary generative art practices.',
+      'I created a series of nine Spam renders with TouchDesigner for the show and displayed the ongoing TouchDesigner program in real time next to the poster. Each piece is irreproducible in its original form.',
+    ],
+  },
+  {
     slug: 'evidence-71-the-shed',
     date: year('evidence-71-the-shed', '2023'),
     title: 'EVIDENCE 071 @ The Shed',
@@ -283,6 +357,51 @@ const projectList = [
     description: [
       "I worked with Volvox Labs and Drunk Elephant to update the design of an immersive hair-care quiz kiosk. Users enter information about their hair type to receive a custom hair-care smoothie recommendation.",
       "The A/V setup includes a touch-screen web application running in tandem with overhead animated visuals. I contributed to upgrading the web animations and integration testing of the installation.",
+    ],
+  },
+  {
+    // Files live in src/assets/projects/after-afghanistan/ (01.mp4, thumb.mp4 + thumb.jpg,
+    // from the old mks.computer site's aa.mov and aa.gif).
+    slug: 'after-afghanistan',
+    date: year('after-afghanistan', '2022'),
+    title: 'After Afghanistan',
+    heading: ['AFTER', 'AFGHANISTAN'],
+    role: 'Designer, Developer',
+    mediums: 'Webflow, scrollytelling, web',
+    tags: ['web'],
+    // One string per paragraph: description: ['First paragraph.', 'Second paragraph.']
+    description: [
+      'A scrollytelling website documenting the stories of Afghan refugees and their exile from home, at [afterafghanistan.org](https://www.afterafghanistan.org/). I designed and developed the website in Webflow with help from Shawn Carrie (secondary developer), Umar Farooq (journalist) and Oscar Durand (journalist).',
+      'This project was supported with a grant from the National Geographic Society.',
+    ],
+  },
+  {
+    // Files live in src/assets/projects/dreamcube/ (from the old mks.computer site).
+    slug: 'dreamcube',
+    hidden: 'true', // an ITP course project; kept off the grid (delete this line to show it)
+    date: year('dreamcube', '2022'),
+    title: 'Dreamcube',
+    heading: ['DREAMCUBE', 'LOCAL PROJECTS'],
+    role: 'Technologist, Unity Developer',
+    mediums: 'Unity, four-wall projection, motion detection',
+    // One string per paragraph: description: ['First paragraph.', 'Second paragraph.']
+    description: [
+      'An immersive out-of-order storytelling experience created in partnership with Local Projects and their [Dreamcube](https://www.localprojects.com/work/corporate-experience/dreamcube/) four-wall projection technology. My team, Zoe Cohen, Sophia Baker and Martha Janicki, created different trigger points, activated by walking through a space in the cube, that initiated a segment of narrative. Combining three different audio-visual experiences (an iMessage exchange, a diary writing and an interaction with mom), the participant is put in the shoes of an angsty teen girl going through her first heartbreak.',
+      'My role on the project included programming the detection of user movement through the space and creating the 3D environment in Unity using the custom Dreamcube package from Local Projects. I also contributed to concept ideation and installation design.',
+    ],
+  },
+  {
+    // Files live in src/assets/projects/untitled-crt/ (from the old mks.computer site).
+    slug: 'untitled-crt',
+    date: year('untitled-crt', '2022'),
+    title: 'Untitled (CRT)',
+    heading: ['UNTITLED', '(CRT)'],
+    role: 'Technologist, Installation Design',
+    mediums: 'TouchDesigner, ten CRT TVs, robotic arms, A/V',
+    // One string per paragraph: description: ['First paragraph.', 'Second paragraph.']
+    description: [
+      'Untitled (CRT) is a multi-output A/V interactive installation utilizing ten found CRT TVs. The installation is a homage to the age of old cinema and a reflection on post-modern cinematic experiences. It was displayed at the ITP NYU Spring Show in April 2022. This project was a collaboration with Shanshan Bai (ITP ’23), Xiao Jiang (ITP ’23) and the NYU Tisch Graduate Film department.',
+      'On this project I contributed to concept development, resourcing of materials (so many TVs!), TouchDesigner and A/V setup, and installation design. I additionally programmed the turning off and on of all the TVs with small robotic arms within the TouchDesigner environment as part of a two-minute audio-visual experience.',
     ],
   },
 ]
