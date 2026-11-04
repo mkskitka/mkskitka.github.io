@@ -155,9 +155,11 @@ export default function ProjectThumbs({ open = false, onSelect, items = projects
         // left for the arrows.
         const pfirstRow = Math.ceil((panelBottom - poy) / psy) + 1
         const pperRow = Math.max(1, pcolumns ? Math.min(pcolumns, Math.floor((pcols + PAD) / (pc + PAD))) : Math.floor((pcols - 2 + PAD) / (pc + PAD)))
-        // `phoneRows` caps the rows of tiles under the panel (Systems 2, Visuals 3),
+        // `phoneRows` caps the rows of tiles under the panel (Systems grid 2, Visuals 3),
         // whatever the screen's free height: the lattice gets at most that many rows,
-        // and the scatter is given only that much height to spread over.
+        // and the scatter is given only that much height to spread over. (The Systems
+        // random layout passes none: six 2x2 tiles need more than two rows to scatter,
+        // and short of room phoneTiles.js would shrink them to 1x1.)
         const pmaxRows = Math.max(1, Math.min(phoneRows || Infinity, Math.floor((prows - 1 - pfirstRow + PAD) / (pc + PAD))))
         const pHeight = phoneRows ? Math.min(section.clientHeight, LYp(pfirstRow + phoneRows * (pc + PAD))) : section.clientHeight
         const per = rows ? pperRow * pmaxRows : MAX_PER_SCREEN.phone
