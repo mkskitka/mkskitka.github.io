@@ -29,6 +29,7 @@ import { BOUNCE } from './GridInkBackdrop.jsx'
  * --thumb-opacity-dim), for this set of tiles only. `grow` false turns off the hover
  * enlargement (the tile growing a cell and its image zooming), as on Systems.
  * `phoneRows` caps the rows of tiles under the panel on phones (Systems 2, Visuals 3).
+ * `dimBehind`: the sort dropdown's list is open, so the tiles under it are dulled.
  *
  * More items than MAX_PER_SCREEN: the rest are scattered over further screens' worth
  * of grid to the right, off the page. Scrolling (wheel, trackpad, swipe, left/right
@@ -88,7 +89,7 @@ const mulberry32 = (a) => () => {
 const BEAT = 60 / BOUNCE.bpm
 const BEATS = Math.max(1, Math.round((BOUNCE.seconds + 0.6) / BEAT))
 
-export default function ProjectThumbs({ open = false, onSelect, items = projects, label = 'Projects', external = false, bounce = false, titles = true, keep = false, focus = null, cells = TILE_CELLS, rows = false, columns = null, arrowLabels = null, sizes = null, opacity = null, dim = null, grow = true, phoneRows = null }) {
+export default function ProjectThumbs({ open = false, onSelect, items = projects, label = 'Projects', external = false, bounce = false, titles = true, keep = false, focus = null, cells = TILE_CELLS, rows = false, columns = null, arrowLabels = null, sizes = null, opacity = null, dim = null, grow = true, phoneRows = null, dimBehind = false }) {
   const nav = useRef(null)
   const tileCells = typeof cells === 'number' ? { desktop: cells, phone: cells } : { ...TILE_CELLS, ...cells }
   const seed = useRef(Math.floor(Math.random() * 1e9))
@@ -325,20 +326,32 @@ export default function ProjectThumbs({ open = false, onSelect, items = projects
   }, [items.length, tileCells.desktop, tileCells.phone, rows, columns?.phone, sizes?.desktop?.[0], sizes?.desktop?.[1], phoneRows])
   useEffect(() => {
     dull(pos.current.cur)
-  }) // after every render: the tiles near the panel get their --seen as soon as they exist
+  }) // after every render: the tiles near the panel (or under the open list) get their --seen as soon as they exist
 
   // Desktop, when scrollable: a tile that has slid left past the menu panel's edge is
   // dulled (its --seen, which custom.css multiplies into the media and title opacity:
   // SEEN_MIN behind the panel, 1 fully clear of it, in between while crossing), so the
   // menu stays readable over it and half-hidden tiles do not pull the eye.
+  // With `dimBehind` (the sort dropdown's list is open) the tiles under that list are
+  // dulled too.
   const dull = (scrolled) => {
     const edge = strip?.fadeFrom
-    if (edge == null || !track.current) return
+    if (!track.current) return
+    const list = dimBehind ? document.querySelector('.visuals_sort.is-open .visuals_sort_list')?.getBoundingClientRect() : null
+    if (edge == null && !list) return
     for (const el of track.current.querySelectorAll('.project_thumb')) {
-      const x = parseFloat(el.style.getPropertyValue('--x')) - scrolled
-      const w = parseFloat(el.style.getPropertyValue('--s')) || 1
-      const clear = Math.min(1, Math.max(0, (x + w - edge) / w)) // the part of the tile right of the panel's edge
-      el.style.setProperty('--seen', (SEEN_MIN + (1 - SEEN_MIN) * clear).toFixed(3))
+      let seen = 1
+      if (edge != null) {
+        const x = parseFloat(el.style.getPropertyValue('--x')) - scrolled
+        const w = parseFloat(el.style.getPropertyValue('--s')) || 1
+        const clear = Math.min(1, Math.max(0, (x + w - edge) / w)) // the part of the tile right of the panel's edge
+        seen = SEEN_MIN + (1 - SEEN_MIN) * clear
+      }
+      if (list) {
+        const r = el.getBoundingClientRect()
+        if (r.left < list.right && r.right > list.left && r.top < list.bottom && r.bottom > list.top) seen = Math.min(seen, SEEN_MIN)
+      }
+      el.style.setProperty('--seen', seen.toFixed(3))
     }
   }
 

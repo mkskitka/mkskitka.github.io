@@ -178,18 +178,18 @@ a:hover,
   vertical-align: -0.1em;
 }
 
-/* Visuals sort dropdown (components/VisualsSort.jsx, orders in lib/sortItems.js).
-   A glass button in the top right corner of the page, filling the band above the
-   first horizontal grid line (--grid-origin-y, from GridInkBackdrop.jsx) so its
-   bottom edge sits on that line; when that band is too shallow for the text it takes
-   most of a row instead. The list drops below it, one grid row per order, so the
-   rows stay on the lattice. It fades in and out with the Visuals tiles. */
+/* Sort dropdown (components/VisualsSort.jsx, orders in lib/sortItems.js). A glass
+   button in the top right corner of the page, filling the first grid row so its bottom
+   edge sits on the first line and the controls are centred in the row. The list drops
+   below it, two orders per grid row (half a row each), so it stays on the lattice
+   without taking much height; the tiles behind it are dulled (ProjectThumbs.jsx), so
+   the options read over them. It fades in and out with the tiles. */
 .visuals_sort {
   position: absolute;
   z-index: 3;
   top: 0;
   right: 0;
-  height: max(var(--grid-origin-y, 0px), calc(var(--grid-spacing-y, 1.15em) * 0.8));
+  height: var(--grid-spacing-y, 1.15em); /* the whole first grid row, so the controls sit centred in it */
   font-size: clamp(0.6rem, 1.8vw, 0.76rem);
   font-weight: var(--panel-text-weight);
   letter-spacing: 0.14em;
@@ -260,7 +260,7 @@ a:hover,
   align-items: center;
   gap: 0.7em;
   width: 100%;
-  height: var(--grid-spacing-y, 1.15em);
+  height: calc(var(--grid-spacing-y, 1.15em) / 2); /* options: two to a grid row */
 }
 .visuals_sort_button {
   height: 100%; /* the corner band */
@@ -314,6 +314,7 @@ a:hover,
   -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
   backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
 }
+/* (The tiles behind the open list are dulled by ProjectThumbs.jsx, as behind the menu panel.) */
 .visuals_sort.is-open .visuals_sort_list {
   display: block;
 }
@@ -372,6 +373,14 @@ a:hover,
   overflow: hidden;
   aspect-ratio: 1;
   background: rgba(255, 255, 255, 0.04);
+}
+/* Systems tiles: the menu panel's frosted glass behind the image, so whatever shows
+   through it (the tiles sit at 0.85 on desktop) is the grid softened, not sharp lines. */
+.project_thumbs[aria-label='Projects'] .project_thumb {
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+}
+.project_thumb {
   opacity: 0;
   transform: translateY(12px);
   transition: opacity 0.2s ease, transform 0.2s ease;
@@ -613,6 +622,9 @@ a:hover,
   color: #fff;
   text-decoration: none;
   background: rgba(255, 255, 255, 0.06);
+  /* The same frosted glass as the menu panel, over the grid behind. */
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
   transition: opacity 0.4s ease, transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), background 0.25s ease;
 }
 .contact_tile:focus-visible {

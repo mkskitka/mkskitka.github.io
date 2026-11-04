@@ -17,7 +17,8 @@ import { SORTS } from '../lib/sortItems.js'
  * `value`: the current order's id, `rev` whether it is flipped; `onChange(id)` is
  * called with the picked one (the active one again means flip).
  * `layout` ('grid' | 'scatter') adds the two layout icons to the left of the Sort
- * button; `onLayout(id)` is called with the picked one.
+ * button; `onLayout(id)` is called with the picked one. `onListOpen(bool)` reports
+ * the list opening and closing.
  */
 // The two layout icons beside the Sort button: a grid (tiles in rows) and a scatter
 // (tiles at random spots). `layout` is the current one; `onLayout(id)` picks.
@@ -26,7 +27,7 @@ const LAYOUTS = [
   { id: 'scatter', label: 'Random positions', icon: <path d="M3 5h5v5H3zM13 3h5v5h-5zM7 14h5v5H7zM16 13h5v5h-5z" /> },
 ]
 
-export default function VisualsSort({ kind = 'visuals', open = false, value, rev = false, onChange, layout = null, onLayout = null }) {
+export default function VisualsSort({ kind = 'visuals', open = false, value, rev = false, onChange, layout = null, onLayout = null, onListOpen = null }) {
   const root = useRef(null)
   const [listOpen, setListOpen] = useState(false)
   const options = SORTS[kind]
@@ -37,6 +38,10 @@ export default function VisualsSort({ kind = 'visuals', open = false, value, rev
   useEffect(() => {
     if (!open) setListOpen(false)
   }, [open])
+  // Tell the page when the list is showing (the tiles behind it are dulled).
+  useEffect(() => {
+    onListOpen?.(listOpen && open)
+  }, [listOpen, open]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // A press anywhere outside closes the list.
   useEffect(() => {
