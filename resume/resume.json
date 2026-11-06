@@ -116,7 +116,9 @@
             {
               "text": "Designed and built a level and target system that lets clinicians create reproducible, game-like tests of vision and mobility, producing session data now analyzed by a data scientist",
               "not": [
-                "accessibility"
+                "accessibility",
+                "exhibition",
+                "experiential"
               ]
             },
             {
@@ -142,7 +144,8 @@
               "text": "[Realtor.com Savings Simulator](https://mkskitka.com/projects/realtor-savings-simulator), SXSW (March 2026): produced the 16-bit game graphics for an arcade savings game",
               "not": [
                 "accessibility",
-                "ai"
+                "ai",
+                "exhibition"
               ]
             },
             {
@@ -164,15 +167,31 @@
           "when": "2023 — Present",
           "bullets": [
             "Built a generative AI video system with Volvox Labs for Fatimah Tuggar’s [Creampods](https://mkskitka.com/projects/venice-biennale-24) in the Nigerian Pavilion at the 2024 Venice Biennale: over 16 hours of content plus an API to generate more, shown across the pavilion’s seven-month run",
-            "Designed a touch-screen data visualization and digital archive for Lizania Cruz’s [Evidence 071](https://mkskitka.com/projects/evidence-71-the-shed), shown in The Shed’s Open Call 2023",
+            {
+              "text": "Designed a touch-screen data visualization and digital archive for Lizania Cruz’s [Evidence 071](https://mkskitka.com/projects/evidence-71-the-shed), shown in The Shed’s Open Call 2023",
+              "not": [
+                "exhibition",
+                "experiential"
+              ]
+            },
+            {
+              "text": "Turned artist Lizania Cruz’s research on Frederick Douglass and US imperialism into a touch-screen data visualization and digital archive for [Evidence 071](https://mkskitka.com/projects/evidence-71-the-shed) that also collected visitors’ responses, shown in The Shed’s Open Call 2023",
+              "only": [
+                "exhibition"
+              ]
+            },
             {
               "text": "Built the live-rendered AI visuals system for artist Cezar Mocan’s End of Signal, winner of the SOLO AI ’25 award",
-              "resumeOnly": true
+              "resumeOnly": true,
+              "not": [
+                "experiential"
+              ]
             },
             {
               "text": "Own work: [370 Botanic Gardens](https://mkskitka.com/projects/370-botanic-gardens) (2024), a solo installation at NYU’s Clive Davis Gallery: generative video from a Stable Diffusion model trained on photographs of the Brooklyn Botanic Garden, projected on a painted scrim and responding to the light in the gallery and on the street",
               "only": [
-                "ai"
+                "ai",
+                "exhibition"
               ]
             },
             {
@@ -182,11 +201,37 @@
               ]
             },
             {
+              "text": "Co-produced [Wild Birds](https://mkskitka.com/projects/wild-birds) (2023), a two-part show series at Brooklyn Art Haus with multi-wall projection, VJs and live band and DJ sets: recruited the VJs, designed the space setup and oversaw the events, then worked for a time as the venue’s technical consultant and projection technician",
+              "only": [
+                "exhibition"
+              ]
+            },
+            {
+              "text": "Designed and built [After Afghanistan](https://www.afterafghanistan.org/) (2022), a scrollytelling site documenting the stories of Afghan refugees, with two journalists and a grant from the National Geographic Society",
+              "only": [
+                "exhibition"
+              ]
+            },
+            {
+              "text": "Designed and built custom [video booths](https://mkskitka.com/projects/video-booths) for events, including one for Tapestry Electric at a gaming conference (2025): reactive visuals guests step into, with their reel delivered to their phone afterwards",
+              "only": [
+                "experiential"
+              ]
+            },
+            {
+              "text": "Updated the [Drunk Elephant hair-care quiz kiosk](https://mkskitka.com/projects/DE-Kiosk) with Volvox Labs (2023), a touch-screen quiz running in tandem with overhead animated visuals: upgraded the web animations and ran integration testing for the installation",
+              "only": [
+                "experiential"
+              ]
+            },
+            {
               "text": "Further work: [Blueberry Swamp Festival](https://mkskitka.com/projects/blueberry-swamp-festival) visuals (2025 and 2026), a Tapestry Electric video booth, the [Drunk Elephant kiosk](https://mkskitka.com/projects/DE-Kiosk) with Volvox Labs, and technical direction at Brooklyn Art Haus",
               "resumeOnly": true,
               "not": [
                 "accessibility",
-                "teaching"
+                "teaching",
+                "exhibition",
+                "experiential"
               ]
             }
           ]
@@ -459,6 +504,36 @@
       ],
       "skillsFirst": [
         "Generative AI",
+        "Real-Time & Creative Coding"
+      ]
+    },
+    "exhibition": {
+      "_about": "For exhibition and experience-design roles at nonprofits and cultural organisations (written for Open Plans’ Director of Exhibition Development post): npm run resume:exhibition. Exhibition work leads: research and data turned into things people walk into, the studios and artists worked with, and projects kept to deadline. Exhibition-specific bullets carry only: [\"exhibition\"].",
+      "title": "Creative Technologist, Exhibitions & Installations",
+      "profile": "Creative technologist with 8 years of experience turning research, data and artists’ ideas into exhibitions and installations, from concept through on-site installation. Work has shown at the 2024 Venice Biennale, The Shed and NYU’s Clive Davis Gallery, and in New York pop-ups for Audible and Intel. Works in data visualization, generative video, projection, LED walls, touch screens and body-tracked interactives. Collaborates closely with the studios, artists, clinicians and researchers behind each project. Started in data visualization for policy and research: a federal lobbying visualization at MIT, then four years of tools for government research clients, managing up to 6 projects at a time to deadline. Designed and taught an undergraduate course on experience design at NYU.",
+      "sections": [
+        "profile",
+        "jobs",
+        "education"
+      ],
+      "jobsHeading": "Professional Experience",
+      "skillsFirst": [
+        "Installation & Hardware",
+        "Web & Data Visualization"
+      ]
+    },
+    "experiential": {
+      "_about": "For experiential design and brand activation work at agencies (written for TXG’s freelance Experiential Designer roster): npm run resume:experiential. Pop-ups, live events and installations lead; installation skills first. Bullets for it carry only: [\"experiential\"].",
+      "title": "Creative Technologist, Experiential Design",
+      "profile": "Creative technologist with 8 years of experience designing and building interactive environments for brand activations, live events and installations, from concept through on-site installation. Recent work with Smooth Technology includes the listening room of Audible’s first physical pop-up, a real-time dance performance for Intel’s Times Square pop-up and an arcade game for Realtor.com at SXSW. This year built PGN with Studio Elsewhere, a three-room interactive space (LED hallway, full-body projection room, multi-sensory room) now installed at two sites. Designs with the build in mind: projection, LED walls, sensors and the real-time content that runs on them. Client-facing on every project, and used to carrying several at once to deadline.",
+      "sections": [
+        "profile",
+        "jobs",
+        "education"
+      ],
+      "jobsHeading": "Professional Experience",
+      "skillsFirst": [
+        "Installation & Hardware",
         "Real-Time & Creative Coding"
       ]
     }

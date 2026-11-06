@@ -22,6 +22,11 @@
     "resume:teaching:light": "node scripts/resume-build.mjs && sh scripts/resume-pdf.sh \"$HOME/Desktop/MK_Skitka_Resume_teaching_$(date +%m_%d)_light.pdf\" light resume/resume-teaching.html",
     "resume:ai": "node scripts/resume-build.mjs && sh scripts/resume-pdf.sh \"$HOME/Desktop/MK_Skitka_Resume_ai_$(date +%m_%d).pdf\" dark resume/resume-ai.html",
     "resume:ai:light": "node scripts/resume-build.mjs && sh scripts/resume-pdf.sh \"$HOME/Desktop/MK_Skitka_Resume_ai_$(date +%m_%d)_light.pdf\" light resume/resume-ai.html",
+    "resume:exhibition": "node scripts/resume-build.mjs && sh scripts/resume-pdf.sh \"$HOME/Desktop/MK_Skitka_Resume_exhibition_$(date +%m_%d).pdf\" dark resume/resume-exhibition.html",
+    "resume:exhibition:light": "node scripts/resume-build.mjs && sh scripts/resume-pdf.sh \"$HOME/Desktop/MK_Skitka_Resume_exhibition_$(date +%m_%d)_light.pdf\" light resume/resume-exhibition.html",
+    "resume:experiential": "node scripts/resume-build.mjs && sh scripts/resume-pdf.sh \"$HOME/Desktop/MK_Skitka_Resume_experiential_$(date +%m_%d).pdf\" dark resume/resume-experiential.html",
+    "resume:experiential:light": "node scripts/resume-build.mjs && sh scripts/resume-pdf.sh \"$HOME/Desktop/MK_Skitka_Resume_experiential_$(date +%m_%d)_light.pdf\" light resume/resume-experiential.html",
+    "apply:openplans": "node scripts/resume-build.mjs && node scripts/application-pdf.mjs resume/letter-open-plans.html resume/resume-exhibition.html \"$HOME/Desktop/MK_Skitka_OpenPlans_Letter_Resume_$(date +%m_%d)_light.pdf\" light",
     "resume:accessibility": "node scripts/resume-build.mjs && sh scripts/resume-pdf.sh \"$HOME/Desktop/MK_Skitka_Resume_accessibility_$(date +%m_%d).pdf\" dark resume/resume-accessibility.html",
     "resume:accessibility:light": "node scripts/resume-build.mjs && sh scripts/resume-pdf.sh \"$HOME/Desktop/MK_Skitka_Resume_accessibility_$(date +%m_%d)_light.pdf\" light resume/resume-accessibility.html"
   },
