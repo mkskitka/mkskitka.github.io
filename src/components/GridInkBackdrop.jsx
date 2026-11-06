@@ -362,12 +362,15 @@ const DESKTOP_PIXEL_RATIO = 1.5
 // moving at the intended speed on 120 / 144 Hz monitors (uncapped, it ran 2-2.4x fast there).
 const MAX_FPS = 60
 // Adaptive quality: if frames take longer than SLOW_FRAME_MS (median over a window of
-// frames), the canvas density steps down through these ratios (each below the starting
-// cap). A weak integrated GPU settles a step or two down; a strong GPU never moves.
+// frames), the canvas density steps down to the screen's density divided by these
+// (whole numbers, so the browser scales the canvas up evenly), skipping any at or above
+// the starting cap. The line edges widen to match (uAA), so the lines keep one even
+// thickness. A weak integrated GPU settles a step or two down; a strong GPU never moves.
 // At the lowest step, if it is still slow, the glass blur behind the panels is switched
 // off too (html[data-low-gpu] in custom.css). The level found is kept for the session so
 // every page starts there. sessionStorage key: QUALITY_KEY.
-const QUALITY_RATIOS = [1, 0.75, 0.5]
+const QUALITY_DIVISORS = [2, 3, 4]
+const MIN_RATIO = 0.4
 const SLOW_FRAME_MS = 1000 / 45
 const QUALITY_WINDOW = 40 // frames per measurement
 const QUALITY_KEY = 'gridInkQuality'
@@ -596,6 +599,7 @@ const DISPLAY_FRAG = /* glsl */ `
   uniform vec2 uSpacing;     // css px, per axis
   uniform vec2 uOrigin;      // css px: the first grid line on each axis
   uniform float uWeight;
+  uniform float uAA;
   uniform vec2 uHx, uVy;     // horizontal x0,x1 and vertical y0,y1 in css px (y down)
   uniform vec3 uHFrom, uHTo, uVFrom, uVTo;
   uniform float uInkOn, uRim, uShimmer, uDensity, uSoft, uCloud, uWisps, uDrift;
@@ -728,7 +732,7 @@ const DISPLAY_FRAG = /* glsl */ `
     }
 
     // Lines. Lines sit at origin + k*spacing on each axis.
-    float aa = 0.7;
+    float aa = uAA; // edge softness in css px: at least one canvas pixel, so lines stay even at any density
     // Only the travelling band glows: a soft bell around its centre.
     float bd = (px.x - uGlowBand.x) / max(1.0, uGlowBand.y);
     float g = uGlow.x * exp(-bd * bd) * (uGlowKind.y > 0.5 ? step(px.x, uGlowBand.x) : 1.0);
@@ -967,7 +971,9 @@ export default function GridInkBackdrop({ className = '', transparent = false, p
       return undefined
     }
     const maxRatio = Math.min(phone ? S.phone.pixelRatio : DESKTOP_PIXEL_RATIO, window.devicePixelRatio || 1)
-    const ratios = [maxRatio, ...QUALITY_RATIOS.filter((r) => r < maxRatio - 0.01)]
+    const dpr = window.devicePixelRatio || 1
+    const ratios = [maxRatio, ...QUALITY_DIVISORS.map((d) => dpr / d).filter((r) => r < maxRatio - 0.01 && r >= MIN_RATIO)]
+    const aaFor = (r) => Math.max(0.7, 1 / r) // css px of edge softness = at least one canvas pixel
     let quality = 0 // index into ratios
     try { quality = Math.min(ratios.length - 1, Math.max(0, Number(sessionStorage.getItem(QUALITY_KEY)) || 0)) } catch { /* storage blocked */ }
     try { if (sessionStorage.getItem(QUALITY_KEY + 'Glass') === 'off') document.documentElement.dataset.lowGpu = '' } catch { /* storage blocked */ }
@@ -1024,6 +1030,7 @@ export default function GridInkBackdrop({ className = '', transparent = false, p
         uSpacing: { value: new THREE.Vector2(30, 30) },
         uOrigin: { value: new THREE.Vector2(15, 15) },
         uWeight: { value: S.weight },
+        uAA: { value: 0.7 },
         uHx: { value: new THREE.Vector2() },
         uVy: { value: new THREE.Vector2() },
         uHFrom: { value: c255(S.horizontal.colors.from) },
@@ -1061,6 +1068,7 @@ export default function GridInkBackdrop({ className = '', transparent = false, p
         uTipGlow: { value: new THREE.Vector4(glowLook('load').brightness, glowLook('load').thicken, glowLook('load').halo, glowLook('load').haloStrength) },
       },
     })
+    dispMat.uniforms.uAA.value = aaFor(ratios[quality])
     dispMatRef.current = dispMat
     // Dev only: try a palette live from the console, e.g.
     //   __setGridColors({ hFrom:[r,g,b], hTo:[..], vFrom:[..], vTo:[..], bg:[..] })
@@ -1688,7 +1696,7 @@ export default function GridInkBackdrop({ className = '', transparent = false, p
       // Capped at MAX_FPS (a little slack so a 60 Hz screen never drops to every other frame).
       const frameMs = 1000 / MAX_FPS - 2
       let lastDraw = -Infinity
-      // Adaptive quality (see QUALITY_RATIOS): sample the time between drawn frames and
+      // Adaptive quality (see QUALITY_DIVISORS): sample the time between drawn frames and
       // step the density down while the median stays slow. Skips a settling period after
       // starting / a change (shader compiles, layout), and ignores stalls such as a tab switch.
       let samples = []
@@ -1706,6 +1714,7 @@ export default function GridInkBackdrop({ className = '', transparent = false, p
           quality++
           renderer.setPixelRatio(ratios[quality])
           renderer.setSize(cssW, cssH, false)
+          dispMat.uniforms.uAA.value = aaFor(ratios[quality])
           el.dataset.quality = String(ratios[quality])
           try { sessionStorage.setItem(QUALITY_KEY, String(quality)) } catch { /* storage blocked */ }
           if (import.meta.env.DEV) console.info(`GridInkBackdrop: slow frames (${median.toFixed(1)} ms), density -> ${ratios[quality]}`)
