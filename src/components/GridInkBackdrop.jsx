@@ -105,10 +105,14 @@ const SETTINGS = {
   minSpacing: 22, // px
   maxSpacing: 80, // px
   // Fit the grid to the page: nudge the cell size so a whole number of cells fits the
-  // width and the height exactly, with lines landing on all four edges and no part
-  // cells anywhere. Cells end up very slightly non-square (a few percent).
+  // width exactly, with lines landing on the left and right edges.
   // false = the old grid: one square cell size, half cells at the edges.
   fitToPage: true,
+  // Square cells: the rows take the columns' size, so every cell (and every tile built
+  // from cells) is a true square; the height then ends on a part row at the bottom.
+  // false = the rows are fitted to the height too, which makes the cells a few percent
+  // taller or wider than square depending on the window.
+  squareCells: true,
 
   rowsFromText: 1.2, // row height = hero menu text size x this, so one line of text fits a row, on every screen size
   //                    (0 = use `spacing`). Phones get a smaller text size (--hero-menu-size in custom.css), so a larger
@@ -1171,7 +1175,7 @@ export default function GridInkBackdrop({ className = '', transparent = false, p
       let originY = spacing / 2
       if (S.fitToPage) {
         spacingX = cssW / Math.max(1, Math.round(cssW / spacing))
-        spacingY = cssH / Math.max(1, Math.round(cssH / spacing))
+        spacingY = S.squareCells ? spacingX : cssH / Math.max(1, Math.round(cssH / spacing))
         originX = 0
         originY = 0
       }

@@ -13,7 +13,6 @@ import ProjectLock, { isUnlocked } from '../components/ProjectLock.jsx'
 import { revealSections } from '../lib/animations.js'
 import { DEFAULT_SORT, isSort, sortEnds, sortItems } from '../lib/sortItems.js'
 import VisualsSort from '../components/VisualsSort.jsx'
-import LogoWide from '../components/LogoWide.jsx'
 
 // The site is currently just the hero, fixed to one screen with no scrolling: wheel,
 // touch and keys drive the backdrop animation instead (GridInkBackdrop SETTINGS.scroll).
@@ -67,7 +66,7 @@ const SHOW_VISUAL_TITLES = false
 const VISUAL_SWIPE = 50 // px a finger must travel sideways to count as a swipe
 
 // Desktop Systems tiles (see the Systems <ProjectThumbs> below).
-const SYSTEMS_DESKTOP = { rows: 1, cells: 5, opacity: 0.85, dim: 0.45 }
+const SYSTEMS_DESKTOP = { rows: 1, cells: 6, opacity: 0.85, dim: 0.45 } // 6x6 tiles: the same rows as the 6x6 menu panel, so they line up with it
 
 const MENU = [
   { id: 'home', label: 'MK SKITKA', path: '/about' },
@@ -383,19 +382,12 @@ export default function Home() {
                 aria-label={m.id === 'home' ? m.label : undefined}
                 onClick={pick(m.id)}
               >
-                {m.id === 'home' ? (
-                  <>
-                    MK
-                    <LogoWide className="hero_logo hero_logo--sprites" part="sprites" />S
-                  </>
-                ) : (
-                  m.label
-                )}
+                {m.label}
               </a>
             ))
           )}
         </div>
-        <ProjectThumbs open={active === 'systems' && !project} keep={active === 'systems' && !!project} items={PROJECT_LIST} onSelect={openProject} cells={{ desktop: tweak.cells }} columns={{ phone: 3 }} rows={layout.systems === 'grid' ? tweak.rows : false} sizes={layout.systems === 'grid' ? null : { desktop: [1, 5] }} opacity={isPhone ? null : tweak.opacity} dim={isPhone ? null : tweak.dim} grow={false} phoneRows={layout.systems === 'grid' ? 2 : null} dimBehind={sortListOpen.systems} arrowLabels={sortEnds('systems', sort.systems, sort.rev)} />
+        <ProjectThumbs open={active === 'systems' && !project} keep={active === 'systems' && !!project} items={PROJECT_LIST} onSelect={openProject} cells={{ desktop: tweak.cells }} columns={{ phone: 3 }} rows={layout.systems === 'grid' ? tweak.rows : false} sizes={layout.systems === 'grid' ? null : { desktop: [1, 5] }} opacity={isPhone ? null : tweak.opacity} dim={isPhone ? null : tweak.dim} grow={false} phoneRows={layout.systems === 'grid' ? 2 : null} dimBehind={sortListOpen.systems} arrowLabels={sortEnds('systems', sort.systems, sort.rev)} stepped={layout.systems === 'grid'} />
         <VisualsSort kind="systems" open={active === 'systems' && !project} value={sort.systems} rev={sort.rev} onChange={pickSort('systems')} layout={layout.systems} onLayout={pickLayout('systems')} onListOpen={onListOpen('systems')} />
         <ProjectThumbs open={active === 'visuals' && !project} keep={active === 'visuals' && !!project} focus={visualAt} items={VISUAL_LIST} label="Visuals" onSelect={openProject} bounce={visualsFresh} titles={SHOW_VISUAL_TITLES} rows={layout.visuals === 'grid'} phoneRows={3} dimBehind={sortListOpen.visuals} arrowLabels={sortEnds('visuals', sort.visuals, sort.rev)} />
         <VisualsSort open={active === 'visuals' && !project} value={sort.visuals} rev={sort.rev} onChange={pickSort('visuals')} layout={layout.visuals} onLayout={pickLayout('visuals')} onListOpen={onListOpen('visuals')} />

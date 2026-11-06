@@ -101,6 +101,11 @@ const GALLERY_MAX = 8
 // below. A blank `mediums` leaves that row out; an empty `description` shows the
 // "coming soon" placeholder.
 
+// In the Systems grid view every tile is a glass square (the Contact tiles' grey over the
+// blurred grid) with the picture drawn a little smaller inside it, so the glass frames it
+// (--thumb-frame in custom.css). `thumbGlass: true` marks a thumbnail whose background
+// has been made transparent (scripts/thumb-knockout.mjs, which keeps the original as
+// thumb.source.*): it has its own clear margins, so it is drawn at the tile's full size.
 // To take a project off the site until it is ready, add `hidden: true` to its entry
 // below. Everything about it (folder, images, text) stays in place; it just is not
 // listed or reachable. Remove the flag to bring it back.
@@ -113,6 +118,7 @@ const GALLERY_MAX = 8
 const projectList = [
   {
     slug: 'pgn-immersive-mobility-rehab',
+    thumbGlass: true,
     date: year('pgn-immersive-mobility-rehab', '2026'),
     title: 'PGN - Immersive Mobility Rehab',
     heading: ['PGN', 'IMMERSIVE MOBILITY REHAB'],
@@ -137,6 +143,7 @@ const projectList = [
   },
   {
     slug: 'realtor-savings-simulator',
+    thumbGlass: true,
     date: year('realtor-savings-simulator', '2026'),
     title: 'Realtor.com Savings Simulator',
     heading: ['REALTOR.COM', 'SAVINGS SIMULATOR'],
@@ -323,6 +330,7 @@ const projectList = [
   },
   {
     slug: 'evidence-71-the-shed',
+    thumbGlass: true,
     date: year('evidence-71-the-shed', '2023'),
     title: 'EVIDENCE 071 @ The Shed',
     heading: ['EVIDENCE 071', '@ THE SHED'],

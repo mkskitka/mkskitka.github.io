@@ -30,6 +30,11 @@ import { BOUNCE } from './GridInkBackdrop.jsx'
  * enlargement (the tile growing a cell and its image zooming), as on Systems.
  * `phoneRows` caps the rows of tiles under the panel on phones (Systems 2, Visuals 3).
  * `dimBehind`: the sort dropdown's list is open, so the tiles under it are dulled.
+ * `stepped` (Systems grid view, desktop): the wheel moves the tiles one tile at a time.
+ * Each step lands the next tile exactly where the first one stood when the tiles
+ * opened, and they then hold there for STEPPED.hold ms before the wheel can move them
+ * again, so they lock into place between moves rather than sliding freely. The arrow
+ * keys step one tile too; the end arrows still move a screen. Phones keep their swipe.
  *
  * More items than MAX_PER_SCREEN: the rest are scattered over further screens' worth
  * of grid to the right, off the page. Scrolling (wheel, trackpad, swipe, left/right
@@ -65,6 +70,19 @@ const TILE_CELLS = { desktop: 1, phone: 2 }
 // The most tiles shown on one screen. With more than this, the rest wait off the right
 // edge and scrolling brings them in.
 const MAX_PER_SCREEN = { desktop: 10, phone: 6 }
+// `stepped` scrolling: one swipe moves one tile, never more. `pull` is how much wheel
+// travel (px) a swipe needs to count; after its step the tiles hold in place for `hold`
+// ms, during which the wheel is ignored altogether, and after it the rest of the same
+// swipe is still ignored: a trackpad flick keeps sending ever smaller events as it
+// coasts (down to about 1px every few ms, and on until the pad is touched again, with
+// no pause). The next swipe is told from that coasting by its size: the coasting only
+// ever gets smaller, so an event of at least `swipe` px that is more than `above` times
+// the smallest event seen since the step can only be a new swipe (measured on real
+// trackpad data: coasting settles at 1-3px, a swipe reaches 30-80px within a few
+// events). A pause of `gap` ms or a change of direction counts as a new swipe too. A
+// gesture keeps the axis (up/down or sideways) it started on, so a slanted swipe is not
+// read as a change of direction.
+const STEPPED = { pull: 150, hold: 350, gap: 250, swipe: 8, above: 4 }
 const SEEN_MIN = 0.12 // how visible a tile stays once it has slid behind the menu panel (1 = not dulled)
 const CLOSE_MS = 320 // how long the tiles take to fade out when closed (matches .is-closing in custom.css)
 const TAP_SLOP = 16 // px a finger may move and still count as a tap rather than a swipe
@@ -89,7 +107,7 @@ const mulberry32 = (a) => () => {
 const BEAT = 60 / BOUNCE.bpm
 const BEATS = Math.max(1, Math.round((BOUNCE.seconds + 0.6) / BEAT))
 
-export default function ProjectThumbs({ open = false, onSelect, items = projects, label = 'Projects', external = false, bounce = false, titles = true, keep = false, focus = null, cells = TILE_CELLS, rows = false, columns = null, arrowLabels = null, sizes = null, opacity = null, dim = null, grow = true, phoneRows = null, dimBehind = false }) {
+export default function ProjectThumbs({ open = false, onSelect, items = projects, label = 'Projects', external = false, bounce = false, titles = true, keep = false, focus = null, cells = TILE_CELLS, rows = false, columns = null, arrowLabels = null, sizes = null, opacity = null, dim = null, grow = true, phoneRows = null, dimBehind = false, stepped = false }) {
   const nav = useRef(null)
   const tileCells = typeof cells === 'number' ? { desktop: cells, phone: cells } : { ...TILE_CELLS, ...cells }
   const seed = useRef(Math.floor(Math.random() * 1e9))
@@ -364,6 +382,10 @@ export default function ProjectThumbs({ open = false, onSelect, items = projects
   const snap = strip?.snap ?? 1
   const step = strip?.step ?? 1
   const page = strip?.page ?? snap
+  // Stepped scrolling (desktop rows): the tiles' x positions in order, so a step can
+  // land the next tile where the first one stood.
+  const stops = stepped && strip && spots ? spots.filter(Boolean).map((t) => t.x).sort((a, b) => a - b) : null
+  const stopsKey = stops ? stops.join() : ''
   useEffect(() => {
     const p = pos.current
     const apply = () => {
@@ -391,6 +413,7 @@ export default function ProjectThumbs({ open = false, onSelect, items = projects
     let raf = 0
     let last = 0
     let idle = 0
+    let hold = 0 // stepped: the timer for the hold after a step
     const tick = (now) => {
       const dt = Math.min(0.05, Math.max(0.001, (now - last) / 1000))
       last = now
@@ -422,9 +445,68 @@ export default function ProjectThumbs({ open = false, onSelect, items = projects
     go(Math.round(p.target / snap) * snap) // after a resize: still on the grid, still in range
     goBy.current = (dir) => go(Math.round((p.target + dir * page) / snap) * snap)
 
+    // Stepped: one tile along (dir 1) or back (-1), to where the first tile stood at
+    // the start. From somewhere between tiles (after a screen move), the next tile
+    // that way.
+    const stepTo = (dir) => {
+      if (!stops?.length) return
+      const at = p.target + stops[0] // the x of whatever tile stands at the first tile's place
+      let k = stops.findIndex((x) => Math.abs(x - at) < 1)
+      if (k < 0) {
+        const after = stops.findIndex((x) => x > at)
+        k = dir > 0 ? (after < 0 ? stops.length : after) - 1 : after < 0 ? stops.length : after
+      }
+      go(stops[Math.min(stops.length - 1, Math.max(0, k + dir))] - stops[0])
+    }
+    // Stepped: wheel travel adds up until it asks for a step; then the tiles hold, and
+    // the rest of the gesture is ignored, so a flick's coasting can't take a second step.
+    let pull = 0
+    let lastAt = 0
+    let prev = 0 // the last event's delta
+    let axis = 'y' // the axis the current gesture started on
+    let done = false // this gesture has had its step
+    let holding = false
+    let floor = Infinity // the smallest event since the step: where the coasting has got down to
+    const stepHold = (dir) => {
+      stepTo(dir)
+      holding = true
+      hold = setTimeout(() => {
+        holding = false
+      }, STEPPED.hold)
+    }
     const onWheel = (e) => {
       const unit = e.deltaMode === 1 ? 32 : e.deltaMode === 2 ? window.innerWidth : 1
-      go(p.target + (Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY) * unit)
+      if (stops) {
+        const now = performance.now()
+        const paused = now - lastAt > STEPPED.gap
+        if (paused) axis = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? 'x' : 'y' // the gesture keeps its first axis
+        const delta = (axis === 'x' ? e.deltaX : e.deltaY) * unit
+        if (Math.abs(delta) < 0.5) return // the tail end of a coast: nothing to read
+        const a = Math.abs(delta)
+        if (done) {
+          const fresh = !holding && (paused || (prev && Math.sign(delta) !== Math.sign(prev)) || (a >= STEPPED.swipe && a > floor * STEPPED.above))
+          if (!fresh) {
+            floor = Math.min(floor, a)
+            lastAt = now
+            prev = delta
+            return
+          }
+          done = false
+          pull = 0
+        }
+        lastAt = now
+        prev = delta
+        pull += delta
+        if (Math.abs(pull) < STEPPED.pull) return
+        const dir = pull > 0 ? 1 : -1
+        pull = 0
+        done = true
+        floor = Infinity
+        stepHold(dir)
+        return
+      }
+      const delta = (Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY) * unit
+      go(p.target + delta)
       clearTimeout(idle)
       idle = setTimeout(rest, 160)
     }
@@ -458,7 +540,9 @@ export default function ProjectThumbs({ open = false, onSelect, items = projects
     }
     const onKey = (e) => {
       if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return
-      go((Math.round(p.target / snap) + (e.key === 'ArrowRight' ? 1 : -1)) * snap)
+      const dir = e.key === 'ArrowRight' ? 1 : -1
+      if (stops) return stepTo(dir)
+      go((Math.round(p.target / snap) + dir) * snap)
     }
     // A tile reached with the Tab key while it is off the page: bring it on.
     const onFocus = (e) => {
@@ -479,6 +563,7 @@ export default function ProjectThumbs({ open = false, onSelect, items = projects
     return () => {
       cancelAnimationFrame(raf)
       clearTimeout(idle)
+      clearTimeout(hold)
       window.removeEventListener('wheel', onWheel)
       window.removeEventListener('touchstart', onTouchStart)
       window.removeEventListener('touchmove', onTouchMove)
@@ -487,7 +572,8 @@ export default function ProjectThumbs({ open = false, onSelect, items = projects
       window.removeEventListener('keydown', onKey)
       el?.removeEventListener('focusin', onFocus)
     }
-  }, [open, keep, max, snap, step, page, strip?.fadeTo])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, keep, max, snap, step, page, stopsKey, strip?.fadeTo])
 
   // While closed with an item open: if the open item changes (swiped to the next one),
   // move to the screen that item's tile is on, so going back lands beside it.
@@ -610,7 +696,7 @@ export default function ProjectThumbs({ open = false, onSelect, items = projects
               href={external ? p.url : `/projects/${p.slug}`}
               target={external ? '_blank' : undefined}
               rel={external ? 'noreferrer' : undefined}
-              className="project_thumb"
+              className={`project_thumb${rows ? ' project_thumb--grid' : ''}${rows && p.thumbGlass ? ' project_thumb--glass' : ''}`}
               aria-label={titles ? undefined : p.title}
               style={style}
               tabIndex={open ? 0 : -1}

@@ -143,6 +143,7 @@ a:hover,
   --thumb-opacity-dim: 0.45; /* the other tiles while one is hovered */
   --thumb-title-rest: 1; /* project names on the tiles at rest: 1 = always shown, 0 = only on hover / focus */
   --thumb-title-phone: 1; /* phones (no hover): 1 = names always on the tiles, 0 = no names */
+  --thumb-frame: 22%; /* Systems grid view: how far a picture sits in from its tile's edges, so the glass shows around it (0 = edge to edge) */
 }
 /* Windows under ~1000px tall: 2x2 blocks so all the projects still fit beside the
    menu (eight 3x3 tiles need three rows, about 11 cells tall). */
@@ -165,25 +166,6 @@ a:hover,
 .home .section.is-full-screen > .header.margin-bottom_none .heading_primary.hero_menu_text_color.is-active {
   color: #fff;
   opacity: 1;
-}
-
-/* The MK SKITKA menu item is the wide pixel logo (components/LogoWide.jsx), drawn at
-   the capital-letter height of the menu text and sitting on its baseline, so it reads
-   as one more line of the menu. It takes the text colour, so it dims and highlights
-   with the other items. */
-.hero_logo {
-  display: inline-block;
-  height: 1em;
-  width: auto;
-  vertical-align: -0.12em; /* its letters' feet on the text baseline */
-  overflow: visible;
-}
-/* The sprite field alone, after MK set in the menu font: a little lower and smaller,
-   so the sprites sit beside the letters rather than above them. */
-.hero_logo--sprites {
-  height: 0.9em;
-  margin: 0 0.18em; /* between the MK and the S */
-  vertical-align: -0.1em;
 }
 
 /* Sort dropdown (components/VisualsSort.jsx, orders in lib/sortItems.js). A glass
@@ -440,6 +422,16 @@ a:hover,
   .project_thumbs:has(.project_thumb:hover) .project_thumb:not(:hover) .project_thumb_media {
     opacity: calc(var(--thumb-opacity-dim) * var(--seen, 1));
   }
+}
+/* Systems grid view: every tile is a glass square (the Contact tiles' grey) and the
+   picture sits a little smaller inside it, framed by the glass. A thumbnail with a
+   transparent background (`thumbGlass` in src/data/projects.js) has its own clear
+   margins, so it keeps the tile's full size. */
+.project_thumbs[aria-label='Projects'] .project_thumb--grid {
+  background: rgba(255, 255, 255, 0.06);
+}
+.project_thumbs[aria-label='Projects'] .project_thumb--grid:not(.project_thumb--glass) .project_thumb_media {
+  inset: var(--thumb-frame, 10%);
 }
 /* Tiles stop short of the grid lines around them, so the backdrop's lines show whole
    along every edge instead of being half covered by the image. --thumb-gap is how far
