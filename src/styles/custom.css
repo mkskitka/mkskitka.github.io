@@ -65,6 +65,14 @@ a:hover,
   -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
   backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
 }
+/* Weak GPU: GridInkBackdrop sets html[data-low-gpu] when the backdrop is still slow at its
+   lowest density. Blurring an animated canvas means re-blurring it every frame, so the
+   glass goes plain (the tint is clear and the blur only 4px, so it looks nearly the same). */
+:root[data-low-gpu] * {
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
 /* The list inside the Systems panel had its own blur; one pane is enough. */
 .section.systems_menu .project_wheel_list {
   -webkit-backdrop-filter: none;

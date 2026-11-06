@@ -324,7 +324,7 @@ const SETTINGS = {
   // as a few specks; more drops that soak further fill it like the desktop does.
   phone: {
     maxWidth: 767,
-    pixelRatio: 1.5, // canvas density cap on phones (desktop: 2). Phone screens are 2-3x; the noise shader
+    pixelRatio: 1.5, // canvas density cap on phones (desktop: DESKTOP_PIXEL_RATIO). Phone screens are 2-3x; the noise shader
     //                  runs per pixel every frame, so 1.5 cuts that work by half or more without visibly softening the lines
     ink: {
       drops: 2,
@@ -355,6 +355,22 @@ const MAX_DROPS = 16
 const MAX_TRACES = 64 // Contact traces, both groups together (the shader loops over this many)
 const MAX_PUFFS = 8 // Visuals pour puffs
 const SIM_SCALE = .1 // simulation resolution relative to the page (lower = cheaper, blockier edges)
+// Canvas density cap on desktop (phones: SETTINGS.phone.pixelRatio). The display shader runs per
+// pixel every frame, so 2x on a retina / 4K screen is 4x the work of 1x; 1.5 keeps the lines crisp.
+const DESKTOP_PIXEL_RATIO = 1.5
+// Frame-rate cap. The simulation advances a fixed 1/60 s per frame, so this also keeps the ink
+// moving at the intended speed on 120 / 144 Hz monitors (uncapped, it ran 2-2.4x fast there).
+const MAX_FPS = 60
+// Adaptive quality: if frames take longer than SLOW_FRAME_MS (median over a window of
+// frames), the canvas density steps down through these ratios (each below the starting
+// cap). A weak integrated GPU settles a step or two down; a strong GPU never moves.
+// At the lowest step, if it is still slow, the glass blur behind the panels is switched
+// off too (html[data-low-gpu] in custom.css). The level found is kept for the session so
+// every page starts there. sessionStorage key: QUALITY_KEY.
+const QUALITY_RATIOS = [1, 0.75, 0.5]
+const SLOW_FRAME_MS = 1000 / 45
+const QUALITY_WINDOW = 40 // frames per measurement
+const QUALITY_KEY = 'gridInkQuality'
 const SIM_STEPS = 2 // simulation steps per frame
 
 // For the Visuals tiles, which bounce along with the lines (components/ProjectThumbs.jsx).
@@ -944,12 +960,19 @@ export default function GridInkBackdrop({ className = '', transparent = false, p
     // ground rather than taking the page down.
     let renderer
     try {
-      renderer = new THREE.WebGLRenderer({ antialias: false, alpha: true, premultipliedAlpha: true, powerPreference: 'high-performance' })
+      // 'default' lets the browser pick the GPU; 'high-performance' forced the discrete card on.
+      renderer = new THREE.WebGLRenderer({ antialias: false, alpha: true, premultipliedAlpha: true, powerPreference: 'default' })
     } catch (err) {
       console.warn('GridInkBackdrop: WebGL unavailable, showing a plain backdrop.', err)
       return undefined
     }
-    renderer.setPixelRatio(Math.min(phone ? S.phone.pixelRatio : 2, window.devicePixelRatio || 1))
+    const maxRatio = Math.min(phone ? S.phone.pixelRatio : DESKTOP_PIXEL_RATIO, window.devicePixelRatio || 1)
+    const ratios = [maxRatio, ...QUALITY_RATIOS.filter((r) => r < maxRatio - 0.01)]
+    let quality = 0 // index into ratios
+    try { quality = Math.min(ratios.length - 1, Math.max(0, Number(sessionStorage.getItem(QUALITY_KEY)) || 0)) } catch { /* storage blocked */ }
+    try { if (sessionStorage.getItem(QUALITY_KEY + 'Glass') === 'off') document.documentElement.dataset.lowGpu = '' } catch { /* storage blocked */ }
+    renderer.setPixelRatio(ratios[quality])
+    el.dataset.quality = String(ratios[quality])
     renderer.setClearColor(0x000000, 0)
     renderer.domElement.style.display = 'block'
     el.appendChild(renderer.domElement)
@@ -1658,14 +1681,61 @@ export default function GridInkBackdrop({ className = '', transparent = false, p
 
     resize()
     let raf = 0
+    let io = null
     if (still) {
       for (let i = 0; i < 400; i++) step(i / 60) // one finished stain, no motion
     } else {
-      const loop = () => {
+      // Capped at MAX_FPS (a little slack so a 60 Hz screen never drops to every other frame).
+      const frameMs = 1000 / MAX_FPS - 2
+      let lastDraw = -Infinity
+      // Adaptive quality (see QUALITY_RATIOS): sample the time between drawn frames and
+      // step the density down while the median stays slow. Skips a settling period after
+      // starting / a change (shader compiles, layout), and ignores stalls such as a tab switch.
+      let samples = []
+      let settleUntil = 0
+      let glassOff = document.documentElement.dataset.lowGpu !== undefined
+      const adapt = (gap, now) => {
+        if (now < settleUntil || gap > 250) return
+        samples.push(gap)
+        if (samples.length < QUALITY_WINDOW) return
+        samples.sort((a, b) => a - b)
+        const median = samples[samples.length >> 1]
+        samples = []
+        if (median <= SLOW_FRAME_MS) return
+        if (quality < ratios.length - 1) {
+          quality++
+          renderer.setPixelRatio(ratios[quality])
+          renderer.setSize(cssW, cssH, false)
+          el.dataset.quality = String(ratios[quality])
+          try { sessionStorage.setItem(QUALITY_KEY, String(quality)) } catch { /* storage blocked */ }
+          if (import.meta.env.DEV) console.info(`GridInkBackdrop: slow frames (${median.toFixed(1)} ms), density -> ${ratios[quality]}`)
+        } else if (!glassOff) {
+          glassOff = true
+          document.documentElement.dataset.lowGpu = ''
+          try { sessionStorage.setItem(QUALITY_KEY + 'Glass', 'off') } catch { /* storage blocked */ }
+          if (import.meta.env.DEV) console.info(`GridInkBackdrop: still slow (${median.toFixed(1)} ms), glass blur off`)
+        } else return
+        settleUntil = now + 1000
+      }
+      const loop = (now) => {
+        raf = requestAnimationFrame(loop)
+        const gap = now - lastDraw
+        if (gap < frameMs) return
+        lastDraw = now
         step(clock())
+        adapt(gap, now)
+      }
+      const start = () => {
+        if (raf) return
+        samples = []
+        settleUntil = performance.now() + 1500
         raf = requestAnimationFrame(loop)
       }
-      raf = requestAnimationFrame(loop)
+      const stop = () => { cancelAnimationFrame(raf); raf = 0 }
+      // Only run while the backdrop is on screen (the browser already pauses hidden tabs).
+      io = new IntersectionObserver(([entry]) => (entry.isIntersecting ? start() : stop()))
+      io.observe(el)
+      start()
     }
 
     const ro = new ResizeObserver(() => resize())
@@ -1677,6 +1747,7 @@ export default function GridInkBackdrop({ className = '', transparent = false, p
 
     return () => {
       cancelAnimationFrame(raf)
+      io?.disconnect()
       lock.active = false
       window.removeEventListener('wheel', stopScroll)
       window.removeEventListener('touchmove', stopScroll)
@@ -1701,6 +1772,9 @@ export default function GridInkBackdrop({ className = '', transparent = false, p
       dispMat.dispose()
       quad.geometry.dispose()
       renderer.dispose()
+      // Release the WebGL context now rather than whenever the browser gets round to it,
+      // so GPU memory doesn't pile up while moving between pages.
+      renderer.forceContextLoss()
       renderer.domElement.remove()
     }
   }, [])

@@ -20,9 +20,10 @@
 import { execFileSync } from 'node:child_process'
 import { existsSync, mkdirSync, readdirSync, statSync, copyFileSync, rmSync, unlinkSync, utimesSync } from 'node:fs'
 import { basename, extname, join, resolve } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import sharp from 'sharp'
 
-const ROOT = resolve(new URL('..', import.meta.url).pathname)
+const ROOT = resolve(fileURLToPath(new URL('..', import.meta.url)))
 const SRC = join(ROOT, 'src/assets/projects')
 const OUT = join(ROOT, 'src/assets/web')
 
