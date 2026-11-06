@@ -149,6 +149,23 @@ const SETTINGS = {
     ease: 'linear',
   },
 
+  // Column lights (Systems grid view, desktop): when a tile locks into place, the
+  // vertical grid lines along its columns (its two edges and the ones behind it) draw
+  // themselves in from the tile's top edge down to its bottom edge, and when the tiles
+  // move again they draw back out, quickly. components/ProjectThumbs.jsx sends the
+  // columns (a 'grid:columns' event on the section: { x, y0, y1 } in css px for each
+  // line; an empty list = none).
+  columnLights: {
+    enabled: false, // off for now; true brings the edge lines back
+    extent: 'tile', // 'tile': only beside and behind the tile, its top edge to its bottom | 'page': the whole page height
+    edgesOnly: true, // true: just the two lines bordering the tile | false: the lines behind it too
+    color: null, // null = each line takes the horizontal lines' colour where it crosses them (the
+    //              red -> teal gradient at that x, so the two edges differ a little) | [r, g, b] = one fixed colour
+    inSeconds: 0.45, // how long a line takes to draw in (top to bottom, easing out)
+    outSeconds: 0.15, // how long it takes to draw back out (bottom to top)
+    stagger: 0.04, // seconds between one column starting and the next, left to right
+  },
+
   // Depth: make the grid read as bevelled tiles. Each cell's face is lifted a touch
   // above the ground and its edges fall away toward the lines, with light from the
   // top-left (top/left edges brighter, bottom/right edges darker). Only cells that
@@ -357,6 +374,7 @@ const PANEL_LEFT_COLS = 1 // clear grid columns between the page edge and the me
 
 const MAX_DROPS = 16
 const MAX_TRACES = 64 // Contact traces, both groups together (the shader loops over this many)
+const MAX_COLUMNS = 14 // column lights at once (two 6-cell tiles' worth)
 const MAX_PUFFS = 8 // Visuals pour puffs
 const SIM_SCALE = .1 // simulation resolution relative to the page (lower = cheaper, blockier edges)
 // Canvas density cap on desktop (phones: SETTINGS.phone.pixelRatio). The display shader runs per
@@ -370,14 +388,17 @@ const MAX_FPS = 60
 // (whole numbers, so the browser scales the canvas up evenly), skipping any at or above
 // the starting cap. The line edges widen to match (uAA), so the lines keep one even
 // thickness. A weak integrated GPU settles a step or two down; a strong GPU never moves.
-// At the lowest step, if it is still slow, the glass blur behind the panels is switched
-// off too (html[data-low-gpu] in custom.css). The level found is kept for the session so
-// every page starts there. sessionStorage key: QUALITY_KEY.
+// At the lowest step, if it is still slow for GLASS_OFF_AFTER measurements in a row, the
+// glass blur behind the panels is switched off too (html[data-low-gpu] in custom.css),
+// and comes back once frames have been quick again for as many. The density level found
+// is kept for the session so every page starts there (sessionStorage key: QUALITY_KEY);
+// the glass is not, so a reload always tries it again.
 const QUALITY_DIVISORS = [2, 3, 4]
 const MIN_RATIO = 0.4
 const SLOW_FRAME_MS = 1000 / 45
 const QUALITY_WINDOW = 40 // frames per measurement
 const QUALITY_KEY = 'gridInkQuality'
+const GLASS_OFF_AFTER = 3 // slow measurements in a row (at the lowest density) before the glass blur goes off; the same number of quick ones brings it back
 const SIM_STEPS = 2 // simulation steps per frame
 
 // For the Visuals tiles, which bounce along with the lines (components/ProjectThumbs.jsx).
@@ -635,6 +656,11 @@ const DISPLAY_FRAG = /* glsl */ `
   uniform float uBounceReach; // furthest a line can travel, in rows (the line loop covers up to 2.5)
   uniform sampler2D uSmoke;  // the Visuals smoke, shaded like the ink
   uniform float uInkAlpha;   // 1 = ink visible, 0 = hidden (the project image covers the smoke; the lines stay on top)
+  // Column lights: x, top y, bottom y (css px) and how far down from the top the line
+  // is drawn (0..1; 0 = off), and their colour.
+  uniform vec4 uColumns[${MAX_COLUMNS}];
+  uniform vec3 uColumnsColor;
+  uniform float uColumnsMatch; // 1 = the horizontal lines' colour at that x instead of uColumnsColor
   ${NOISE_GLSL}
   // How far horizontal line k is pushed (roughly -1..1, before amplitude) at x (0..1 across the page).
   float bounceRow(float k, float x, float t) {
@@ -767,8 +793,20 @@ const DISPLAY_FRAG = /* glsl */ `
     float dv = min(fv, 1.0 - fv) * uSpacing.x;
     float vMask = step(uVy.x, px.y) * step(px.y, uVy.y);
     float vLine = (1.0 - smoothstep(wt * 0.5 - aa, wt * 0.5 + aa, dv)) * vMask;
+    // Column lights: vertical lines on given columns, each drawn down to its own depth,
+    // in their own colour.
+    float cLine = 0.0;
+    for (int i = 0; i < ${MAX_COLUMNS}; i++) {
+      if (uColumnsMatch < 0.0) break; // none lit: nothing to do (set from the JS each frame)
+      vec4 c = uColumns[i];
+      if (c.w <= 0.001) continue;
+      float dc = abs(px.x - c.x);
+      float cl = (1.0 - smoothstep(wt * 0.5 - aa, wt * 0.5 + aa, dc)) * step(c.y, px.y) * step(px.y, c.y + c.w * (c.z - c.y));
+      cLine = max(cLine, cl);
+    }
     hLine *= uLineAlpha;
     vLine *= uLineAlpha;
+    cLine *= uLineAlpha;
     vec3 hLit = hCol * (1.0 + uGlow.y * g + uTipGlow.x * tg);
     vec3 vLit = vCol * (1.0 + uGlow.y * g);
     // Glow halo: soft light falling off either side of each line, added on top.
@@ -807,6 +845,8 @@ const DISPLAY_FRAG = /* glsl */ `
     alpha = mix(alpha, 1.0, hLine);
     col = mix(col, min(vLit, vec3(1.0)), vLine);
     alpha = mix(alpha, 1.0, vLine);
+    col = mix(col, mix(uColumnsColor, hCol, uColumnsMatch), cLine);
+    alpha = mix(alpha, 1.0, cLine);
 
     // Contact traces: each runs along a column from the top or bottom edge to its turn
     // row, then along that row to the side of the page. Lit near the leading end.
@@ -980,7 +1020,7 @@ export default function GridInkBackdrop({ className = '', transparent = false, p
     const aaFor = (r) => Math.max(0.7, 1 / r) // css px of edge softness = at least one canvas pixel
     let quality = 0 // index into ratios
     try { quality = Math.min(ratios.length - 1, Math.max(0, Number(sessionStorage.getItem(QUALITY_KEY)) || 0)) } catch { /* storage blocked */ }
-    try { if (sessionStorage.getItem(QUALITY_KEY + 'Glass') === 'off') document.documentElement.dataset.lowGpu = '' } catch { /* storage blocked */ }
+    delete document.documentElement.dataset.lowGpu // the glass starts on; the backdrop takes it off only while it is measurably slow
     renderer.setPixelRatio(ratios[quality])
     el.dataset.quality = String(ratios[quality])
     renderer.setClearColor(0x000000, 0)
@@ -1064,6 +1104,9 @@ export default function GridInkBackdrop({ className = '', transparent = false, p
         uGlowBand: { value: new THREE.Vector2(-1e4, 1) },
         uTip: { value: new THREE.Vector2(1, 0) },
         uTrace: { value: Array.from({ length: MAX_TRACES }, () => new THREE.Vector4(0, 0, 0, 1)) },
+        uColumns: { value: Array.from({ length: MAX_COLUMNS }, () => new THREE.Vector4(0, 0, 0, 0)) },
+        uColumnsColor: { value: c255(S.columnLights.color ?? S.horizontal.colors.to) },
+        uColumnsMatch: { value: -1 }, // -1 = no columns lit (the loop is skipped); 0 / 1 = fixed colour / matched to the grid
         uTraceLook: { value: new THREE.Vector4(0, 1, glowLook('contact').brightness, glowLook('contact').thicken) },
         uTraceHalo: { value: new THREE.Vector2(glowLook('contact').halo, glowLook('contact').haloStrength) },
         uBounce: { value: new THREE.Vector4(0, S.bounce.amplitude, S.bounce.waves, S.bounce.speed) },
@@ -1512,6 +1555,28 @@ export default function GridInkBackdrop({ className = '', transparent = false, p
     let bounceSeconds = 0 // clock at the previous frame
     let tipX = -1 // where the horizontal lines ended last frame (-1 = first frame)
     let tipAmount = 0
+    // Column lights: one entry per column, { x, t (0..1 along its own animation), on
+    // (drawing in or out), at (the clock when it may start: the stagger) }. A column
+    // asked for again keeps its animation; one no longer asked for draws out, and is
+    // dropped once it has gone.
+    const columns = []
+    const onColumns = (e) => {
+      if (!S.columnLights.enabled) return
+      const asked = Array.isArray(e.detail) ? e.detail.slice(0, MAX_COLUMNS) : []
+      const now = performance.now() / 1000
+      for (const c of columns) c.on = false
+      asked.filter((c) => !S.columnLights.edgesOnly || c.edge).forEach(({ x, y0, y1 }, i) => {
+        const whole = S.columnLights.extent === 'page'
+        const top = whole ? 0 : y0
+        const bottom = whole ? cssH : y1
+        const have = columns.find((c) => Math.abs(c.x - x) < 0.5 && Math.abs(c.y0 - top) < 0.5)
+        if (have) have.on = true
+        else columns.push({ x, y0: top, y1: bottom, t: 0, on: true, at: now + i * S.columnLights.stagger })
+      })
+      for (const c of columns) if (!c.on) c.at = 0
+    }
+    const columnsHost = el.closest('.section') || el
+    columnsHost.addEventListener('grid:columns', onColumns)
     const step = (seconds) => {
       // Lines
       const target = still ? 1 : scrollProgress()
@@ -1615,6 +1680,29 @@ export default function GridInkBackdrop({ className = '', transparent = false, p
       // the shape is the same whatever the frame rate.
       const dt = lastFrame < 0 ? 1 / 60 : Math.min(0.25, seconds - lastFrame)
       lastFrame = seconds
+      // Column lights: each draws in (easing out) or back out (quick, easing in).
+      if (columns.length) {
+        const wall = performance.now() / 1000
+        for (let i = columns.length - 1; i >= 0; i--) {
+          const c = columns[i]
+          if (c.on) {
+            if (wall >= c.at) c.t = Math.min(1, c.t + dt / Math.max(0.01, S.columnLights.inSeconds))
+          } else {
+            c.t = Math.max(0, c.t - dt / Math.max(0.01, S.columnLights.outSeconds))
+            if (c.t <= 0) columns.splice(i, 1)
+          }
+        }
+        dispMat.uniforms.uColumns.value.forEach((v, i) => {
+          const c = columns[i]
+          if (!c) return v.set(0, 0, 0, 0)
+          const e = c.on ? 1 - Math.pow(1 - c.t, 3) : c.t * c.t
+          v.set(c.x, c.y0, c.y1, e)
+        })
+        dispMat.uniforms.uColumnsMatch.value = S.columnLights.color ? 0 : 1
+      } else {
+        dispMat.uniforms.uColumns.value.forEach((v) => v.set(0, 0, 0, 0))
+        dispMat.uniforms.uColumnsMatch.value = -1 // tells the shader to skip the column loop
+      }
       const subSteps = Math.max(1, Math.ceil(dt * 60))
       if (pourAt.current >= 0 && pourAt.current !== pour.at) {
         pour.at = pourAt.current
@@ -1705,7 +1793,9 @@ export default function GridInkBackdrop({ className = '', transparent = false, p
       // starting / a change (shader compiles, layout), and ignores stalls such as a tab switch.
       let samples = []
       let settleUntil = 0
-      let glassOff = document.documentElement.dataset.lowGpu !== undefined
+      let glassOff = false
+      let slowRun = 0 // slow measurements in a row at the lowest density
+      let quickRun = 0 // quick ones in a row while the glass is off
       const adapt = (gap, now) => {
         if (now < settleUntil || gap > 250) return
         samples.push(gap)
@@ -1713,7 +1803,17 @@ export default function GridInkBackdrop({ className = '', transparent = false, p
         samples.sort((a, b) => a - b)
         const median = samples[samples.length >> 1]
         samples = []
-        if (median <= SLOW_FRAME_MS) return
+        if (median <= SLOW_FRAME_MS) {
+          slowRun = 0
+          if (glassOff && ++quickRun >= GLASS_OFF_AFTER) {
+            glassOff = false
+            quickRun = 0
+            delete document.documentElement.dataset.lowGpu
+            if (import.meta.env.DEV) console.info(`GridInkBackdrop: quick again (${median.toFixed(1)} ms), glass blur back on`)
+          }
+          return
+        }
+        quickRun = 0
         if (quality < ratios.length - 1) {
           quality++
           renderer.setPixelRatio(ratios[quality])
@@ -1723,9 +1823,10 @@ export default function GridInkBackdrop({ className = '', transparent = false, p
           try { sessionStorage.setItem(QUALITY_KEY, String(quality)) } catch { /* storage blocked */ }
           if (import.meta.env.DEV) console.info(`GridInkBackdrop: slow frames (${median.toFixed(1)} ms), density -> ${ratios[quality]}`)
         } else if (!glassOff) {
+          if (++slowRun < GLASS_OFF_AFTER) return
           glassOff = true
+          slowRun = 0
           document.documentElement.dataset.lowGpu = ''
-          try { sessionStorage.setItem(QUALITY_KEY + 'Glass', 'off') } catch { /* storage blocked */ }
           if (import.meta.env.DEV) console.info(`GridInkBackdrop: still slow (${median.toFixed(1)} ms), glass blur off`)
         } else return
         settleUntil = now + 1000
@@ -1761,6 +1862,7 @@ export default function GridInkBackdrop({ className = '', transparent = false, p
     return () => {
       cancelAnimationFrame(raf)
       io?.disconnect()
+      columnsHost.removeEventListener('grid:columns', onColumns)
       lock.active = false
       window.removeEventListener('wheel', stopScroll)
       window.removeEventListener('touchmove', stopScroll)

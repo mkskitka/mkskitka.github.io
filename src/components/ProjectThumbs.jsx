@@ -35,6 +35,11 @@ import { BOUNCE } from './GridInkBackdrop.jsx'
  * opened, and they then hold there for STEPPED.hold ms before the wheel can move them
  * again, so they lock into place between moves rather than sliding freely. The arrow
  * keys step one tile too; the end arrows still move a screen. Phones keep their swipe.
+ * While stepped, the tiles tell the backdrop when they lock into place and when they
+ * move again (a 'grid:columns' event on the section with every vertical grid line along
+ * the tiles on screen, { x, y0, y1, edge } from each tile's top edge to its bottom, edge
+ * marking the two that border a tile, or an empty list), and it lights those lines up
+ * (GridInkBackdrop SETTINGS.columnLights).
  *
  * More items than MAX_PER_SCREEN: the rest are scattered over further screens' worth
  * of grid to the right, off the page. Scrolling (wheel, trackpad, swipe, left/right
@@ -275,6 +280,11 @@ export default function ProjectThumbs({ open = false, onSelect, items = projects
       // ...and centred (to the nearest column) between the panel and the right edge.
       const rowCols = Math.min(perRow, items.length) * pitch - PAD
       const col0 = Math.max(0, Math.floor((span - rowCols) / 2))
+      // Stepped (the Systems grid): centred exactly, to the pixel, between the panel's
+      // right edge and the page's right edge, so the tile sits in the middle of that
+      // space when it locks. With an odd number of spare columns that puts its edges
+      // half a cell off the grid lines; the rows still sit on the lines.
+      const shift = stepped && rows ? panelRight + (W - panelRight - rowCols * sx) / 2 - LX(firstCol + col0) : 0
       const out = items.map((_, n) => {
         const first = firstCol + Math.floor(n / per) * span
         if (rows) {
@@ -287,7 +297,7 @@ export default function ProjectThumbs({ open = false, onSelect, items = projects
           const j = row0 + (colMajor ? k % rowCount : Math.floor(k / perRow)) * pitch
           const c = dc
           const dy = j + c + 1 <= tileRows ? 0 : -sy
-          return { x: LX(i), y: LY(j), s: c * sx, sh: c * sy, cell: sx, cellY: sy, col: i, n: c, dx: 0, dy }
+          return { x: LX(i) + shift, y: LY(j), s: c * sx, sh: c * sy, cell: sx, cellY: sy, col: i, n: c, dx: 0, dy }
         }
         // c = tile size in cells: the wanted size first, then smaller if it will not fit.
         // With `sizes` ({ desktop: [min, max] }) each tile wants its own size, drawn at
@@ -344,7 +354,7 @@ export default function ProjectThumbs({ open = false, onSelect, items = projects
       ro.disconnect()
       mo.disconnect()
     }
-  }, [items.length, tileCells.desktop, tileCells.phone, rows, columns?.phone, sizes?.desktop?.[0], sizes?.desktop?.[1], phoneRows])
+  }, [items.length, tileCells.desktop, tileCells.phone, rows, stepped, columns?.phone, sizes?.desktop?.[0], sizes?.desktop?.[1], phoneRows])
   useEffect(() => {
     dull(pos.current.cur)
   }) // after every render: the tiles near the panel (or under the open list) get their --seen as soon as they exist
@@ -392,6 +402,23 @@ export default function ProjectThumbs({ open = false, onSelect, items = projects
       if (track.current) track.current.style.transform = p.cur ? `translate3d(${-p.cur}px, 0, 0)` : ''
       dull(p.cur)
     }
+    // Stepped: the vertical grid lines along the tiles on screen, for the backdrop to
+    // light while the tiles rest (`locked`), or none while they move.
+    const announce = (locked) => {
+      const sec = nav.current?.closest('.section')
+      if (!sec || !stepped) return
+      const xs = []
+      if (locked && spots && strip) {
+        const from = strip.fadeTo ?? 0
+        for (const t of spots) {
+          if (!t) continue
+          const x = t.x - p.cur
+          if (x < from - 1 || x + t.s > window.innerWidth + 1) continue
+          for (let k = 0; k <= t.n; k++) xs.push({ x: x + k * t.cell, y0: t.y, y1: t.y + t.sh, edge: k === 0 || k === t.n })
+        }
+      }
+      sec.dispatchEvent(new CustomEvent('grid:columns', { detail: xs }))
+    }
     if (!open && keep && max > 0) {
       // Closed because one of the tiles is open: stay scrolled where we are.
       goBy.current = null
@@ -401,6 +428,7 @@ export default function ProjectThumbs({ open = false, onSelect, items = projects
     if (!open || max <= 0) {
       p.cur = p.target = 0 // closed (or everything fits): back to the start
       apply()
+      announce(open && max <= 0 && !!spots) // everything fits: the tiles are at rest where they are
       setShift(0)
       setNear(0)
       setEnds(0)
@@ -423,6 +451,7 @@ export default function ProjectThumbs({ open = false, onSelect, items = projects
         apply()
         raf = 0
         setShift(Math.round(p.cur / step))
+        announce(true) // locked into place
         return
       }
       p.cur += d * (1 - Math.exp(-dt * 12))
@@ -433,6 +462,7 @@ export default function ProjectThumbs({ open = false, onSelect, items = projects
       p.target = clamp(target)
       setNear(Math.round(p.target / page) * page)
       setEnds((p.target > 0.5 ? 1 : 0) | (p.target < max - 0.5 ? 2 : 0))
+      if (Math.abs(p.target - p.cur) >= 0.3) announce(false) // on the move: the lights go out
       if (!raf) {
         last = performance.now()
         raf = requestAnimationFrame(tick)
@@ -564,6 +594,7 @@ export default function ProjectThumbs({ open = false, onSelect, items = projects
       cancelAnimationFrame(raf)
       clearTimeout(idle)
       clearTimeout(hold)
+      announce(false)
       window.removeEventListener('wheel', onWheel)
       window.removeEventListener('touchstart', onTouchStart)
       window.removeEventListener('touchmove', onTouchMove)
