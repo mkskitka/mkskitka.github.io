@@ -435,9 +435,6 @@ a:hover,
   pointer-events: none;
 }
 @media (hover: hover) {
-  .project_thumb_hover {
-    pointer-events: auto; /* so the tile's pointer enter/leave reach it on a mouse */
-  }
   .project_thumb_hover.is-playing {
     opacity: 1;
   }
