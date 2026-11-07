@@ -768,8 +768,7 @@ a:hover,
     }
   }
   .project_thumbs--scatter .project_thumb_title {
-    font-size: 0.65rem;
-    padding: 1.2em 0.5em 0.45em;
+    padding: 1.2em 0.5em 0.45em; /* (the type size is the base rule's: the same as the sort controls and arrow labels) */
   }
 
   /* Contact tiles: regular grid beside the panel, on the grid lines. */
@@ -837,7 +836,6 @@ a:hover,
   }
   .project_thumbs--scatter .project_thumb_title {
     opacity: var(--thumb-title-phone, 0);
-    font-size: 0.6rem;
     padding: 1em 0.45em 0.4em;
   }
   .contact_tiles .contact_tile_icon {
