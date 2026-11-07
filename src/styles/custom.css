@@ -430,12 +430,12 @@ a:hover,
 /* Hover clip (ProjectThumbs.jsx): sits over the still, unseen until it plays. The swap
    is a cut, not a fade: cross-fading the two over the dark tile dipped to black halfway,
    and the clip's first frame is the still anyway. */
-.project_thumb_hover {
+.project_thumb_media video.project_thumb_hover {
   position: absolute;
   inset: 0;
   opacity: 0;
   pointer-events: none;
-  transition: none;
+  transition: none; /* (outweighs the img / video rule above, which fades opacity) */
 }
 @media (hover: hover) {
   .project_thumb_hover.is-playing {
