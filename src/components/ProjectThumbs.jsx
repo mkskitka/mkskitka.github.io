@@ -764,7 +764,11 @@ export default function ProjectThumbs({ open = false, onSelect, items = projects
                 if (!v) return
                 v.currentTime = 0
                 v.play().catch(() => {})
-                v.classList.add('is-playing')
+                // Shown the instant it has a frame to show (at once when preloaded), so the
+                // still is never swapped for a blank.
+                const show = () => { if (!v.paused) v.classList.add('is-playing') }
+                if (v.readyState >= 2) show()
+                else v.addEventListener('playing', show, { once: true })
               }}
               onPointerLeave={(e) => {
                 const v = e.currentTarget.querySelector('.project_thumb_hover')

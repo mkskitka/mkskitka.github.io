@@ -427,20 +427,26 @@ a:hover,
   object-fit: cover;
   transition: transform 0.5s ease, opacity 0.3s ease;
 }
-/* Hover clip (ProjectThumbs.jsx): sits over the still, unseen until it plays. */
+/* Hover clip (ProjectThumbs.jsx): sits over the still, unseen until it plays. The swap
+   is a cut, not a fade: cross-fading the two over the dark tile dipped to black halfway,
+   and the clip's first frame is the still anyway. */
 .project_thumb_hover {
   position: absolute;
   inset: 0;
   opacity: 0;
   pointer-events: none;
+  transition: none;
 }
 @media (hover: hover) {
   .project_thumb_hover.is-playing {
     opacity: 1;
   }
-  /* The still goes while the clip plays (a screen-blended clip would otherwise show it through). */
-  .project_thumb_media:has(.project_thumb_hover.is-playing) img {
+  /* A framed tile keeps its still under the clip (the clip covers it). A glass tile's
+     clip is screen-blended or transparent, so the still would show through it: it goes,
+     in the same instant the clip appears. */
+  .project_thumb--glass .project_thumb_media:has(.project_thumb_hover.is-playing) img {
     opacity: 0;
+    transition: none;
   }
   /* A thumbnail with its black background knocked out (thumbGlass): the clip's own black
      blends away too, so the glass and grid show through it as they do through the still.
