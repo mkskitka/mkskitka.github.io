@@ -1196,6 +1196,7 @@ export default function GridInkBackdrop({ className = '', transparent = false, p
 
     let simW = -1
     let simH = -1
+    const measure = document.createElement('canvas').getContext('2d') // for the menu text's cap height (below)
     const resize = () => {
       cssW = Math.max(1, el.clientWidth)
       cssH = Math.max(1, el.clientHeight)
@@ -1222,6 +1223,10 @@ export default function GridInkBackdrop({ className = '', transparent = false, p
         originX = 0
         originY = 0
       }
+      // Rows a whole number of pixels tall (within half a pixel of the columns), so every
+      // row starts on a pixel and the menu text, which the browser snaps to pixels, sits
+      // at the same place in each row; with fractional rows each line snapped differently.
+      spacingY = Math.max(1, Math.round(spacingY))
       spacing = spacingX // what the CSS calls --grid-spacing
       gridMats.forEach((m) => {
         m.uniforms.uSize.value.set(cssW, cssH)
@@ -1244,6 +1249,18 @@ export default function GridInkBackdrop({ className = '', transparent = false, p
         section.style.setProperty('--grid-origin-y', `${originY}px`)
         // Line thickness, so the tiles can stop short of the lines (--thumb-gap in custom.css).
         section.style.setProperty('--grid-line-weight', `${S.weight}px`)
+        // Centre the menu's capitals in their rows. The browser centres a line of text
+        // by the font's ascent and descent, which for most fonts puts the capitals a
+        // little low; this measures the capitals' real height at the current font size
+        // and lifts the text by the difference (--hero-text-nudge, custom.css). Re-run
+        // on every resize and once the webfont has loaded, so it holds at any size.
+        if (link) {
+          const f = getComputedStyle(link)
+          measure.font = `${f.fontStyle} ${f.fontWeight} ${f.fontSize} ${f.fontFamily}`
+          const m = measure.measureText('H')
+          const low = (m.fontBoundingBoxAscent - m.fontBoundingBoxDescent) / 2 - (m.actualBoundingBoxAscent - m.actualBoundingBoxDescent) / 2
+          section.style.setProperty('--hero-text-nudge', `${Number.isFinite(low) ? (-low).toFixed(2) : 0}px`)
+        }
         if (panel) {
           const phone = window.matchMedia('(max-width: 767px)').matches
           const topRow = Math.floor((padTop - originY) / spacingY) // line at or just above the section padding

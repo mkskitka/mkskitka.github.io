@@ -119,6 +119,8 @@ a:hover,
 .home .section.is-full-screen > .header.margin-bottom_none .heading_primary.hero_menu_text_color {
   font-size: var(--hero-menu-size);
   line-height: var(--grid-spacing-y, var(--grid-spacing, 1.15em)); /* one grid row per line (rows, not columns: they differ slightly), so the panel's edges land on lines */
+  position: relative;
+  top: var(--hero-text-nudge, 0px); /* lifts the capitals to the exact middle of the row (measured per font size by GridInkBackdrop.jsx) */
   margin: 0;
   padding: 0;
   max-width: none;
