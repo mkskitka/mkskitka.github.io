@@ -438,15 +438,17 @@ a:hover,
   transition: none; /* (outweighs the img / video rule above, which fades opacity) */
 }
 @media (hover: hover) {
-  .project_thumb_hover.is-playing {
+  .project_thumb_media video.project_thumb_hover.is-playing {
     opacity: 1;
   }
   /* A framed tile keeps its still under the clip (the clip covers it). A glass tile's
      clip is screen-blended or transparent, so the still would show through it: it goes,
      in the same instant the clip appears. */
+  .project_thumb--glass .project_thumb_media img {
+    transition: transform 0.5s ease; /* no opacity fade: it swaps with the clip in a cut, both ways */
+  }
   .project_thumb--glass .project_thumb_media:has(.project_thumb_hover.is-playing) img {
     opacity: 0;
-    transition: none;
   }
   /* A thumbnail with its black background knocked out (thumbGlass): the clip's own black
      blends away too, so the glass and grid show through it as they do through the still.
