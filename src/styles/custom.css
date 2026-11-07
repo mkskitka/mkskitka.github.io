@@ -505,9 +505,11 @@ a:hover,
   right: 0;
   bottom: 0;
   padding: 1.4em 0.7em 0.6em;
-  font-size: 0.75rem;
+  /* The same type as the sort controls (top row) and the arrow labels (bottom row). */
+  font-size: clamp(0.6rem, 1.8vw, 0.76rem);
+  font-weight: var(--panel-text-weight);
   line-height: 1.2;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   color: #fff;
   background: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.7));
