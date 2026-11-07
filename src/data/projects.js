@@ -215,6 +215,7 @@ const projectList = [
     // 01–04 and thumb.png; drop the Tapestry Electric booth's clips and photos in
     // beside them (the gallery shows the first four by name, so name them to lead).
     slug: 'video-booths',
+    hidden: 'true', // off the grid for now (delete this line to show it)
     date: year('video-booths', '2025'),
     title: 'Video Booths',
     heading: ['VIDEO', 'BOOTHS'],
