@@ -11,9 +11,10 @@
 //
 //   images   -> .webp, no wider / taller than MAX_IMAGE px (thumb.* -> MAX_THUMB px);
 //               gifs are copied as they are, so they keep animating
-//   videos   -> .mp4, H.264, no wider / taller than MAX_VIDEO px, at most 30 fps,
+//   videos   -> .mp4, H.264, no wider / taller than MAX_VIDEO px, at most 30 fps, with
+//               no sound (the site plays every video muted, so the audio track is dropped),
 //               plus a <name>-poster.webp frame the gallery shows before it plays;
-//               a video already small enough (see KEEP_VIDEO) is copied as it is
+//               a video already small enough (see KEEP_VIDEO) keeps its picture as it is
 //   skipped  -> *.source.*, .MOV / .HEIC (browsers can't play them; convert first)
 //
 // Needs ffmpeg + ffprobe on the PATH (brew install ffmpeg) and sharp (npm).
@@ -71,15 +72,19 @@ function video(src, out) {
   const p = probe(src)
   const small = Math.max(p.width, p.height) <= MAX_VIDEO && p.fps <= MAX_FPS + 0.01 && p.bitrate <= KEEP_VIDEO.bitrate && /\.mp4$/i.test(src)
   if (small || /\.webm$/i.test(src)) {
-    copyFileSync(src, out)
-    return { how: 'copied', duration: p.duration }
+    if (!p.audio) {
+      copyFileSync(src, out)
+      return { how: 'copied', duration: p.duration }
+    }
+    // Picture untouched, sound dropped.
+    run('ffmpeg', ['-v', 'error', '-y', '-i', src, '-c:v', 'copy', '-an', '-movflags', '+faststart', out])
+    return { how: 'copied, no sound', duration: p.duration }
   }
   const scale = `scale='if(gt(iw,ih),min(${MAX_VIDEO},iw),-2)':'if(gt(iw,ih),-2,min(${MAX_VIDEO},ih))'`
   const filters = [scale]
   if (p.fps > MAX_FPS + 0.01) filters.push(`fps=${MAX_FPS}`)
   const args = ['-v', 'error', '-y', '-i', src, '-vf', filters.join(','), '-c:v', 'libx264', '-preset', 'medium', '-crf', String(CRF), '-pix_fmt', 'yuv420p', '-movflags', '+faststart']
-  args.push(...(p.audio ? ['-c:a', 'aac', '-b:a', '96k'] : ['-an']))
-  args.push(out)
+  args.push('-an', out) // no sound: the site plays every video muted
   run('ffmpeg', args)
   return { how: 'encoded', duration: p.duration }
 }

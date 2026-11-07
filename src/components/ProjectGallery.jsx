@@ -113,7 +113,7 @@ export default function ProjectGallery({ images = [], label = 'Gallery' }) {
             aria-modal="true"
           >
             {current.video ? (
-              <video key={current.src} src={current.src} className="lightbox_img" style={pull} autoPlay loop playsInline controls onClick={(e) => e.stopPropagation()} />
+              <video key={current.src} src={current.src} className="lightbox_img" style={pull} autoPlay muted loop playsInline controls onClick={(e) => e.stopPropagation()} />
             ) : (
               <img key={current.src} src={current.src} alt={current.alt ?? ''} className="lightbox_img" style={pull} draggable={false} onClick={(e) => e.stopPropagation()} />
             )}
