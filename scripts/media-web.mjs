@@ -29,7 +29,7 @@ const SRC = join(ROOT, 'src/assets/projects')
 const OUT = join(ROOT, 'src/assets/web')
 
 const MAX_IMAGE = 2000 // px, longest side, for gallery / showcase / hero images
-const MAX_THUMB = 640 // px, longest side, for thumb.* (the Systems tiles are ~130 px, 3x on a retina hover)
+const MAX_THUMB = 1024 // px, longest side, for thumb.* (the Systems tiles are 6 cells, ~450 px, so ~900 px on a retina screen)
 const WEBP_QUALITY = 82
 const MAX_VIDEO = 1280 // px, longest side
 const MAX_FPS = 30
