@@ -25,8 +25,10 @@ One folder per project, named by the project's slug (the part of its URL after
 ## Thumbnail (the tile in the Systems grid on the home page)
 
 - `thumb.jpg` / `thumb.png` / `thumb.webp` / `thumb.gif` -> a still or animated image.
-- `thumb.mp4` (plus `thumb.webm` if you have one) -> a looping muted video.
-  Add `thumb.jpg` or `thumb-poster.jpg` next to it as the poster frame.
+- `thumb-hover.mp4` (plus `thumb-hover.webm` if you have one) -> a few seconds of
+  video the tile plays, muted, while the mouse is over it (never on a phone). Cut one
+  from a video in the folder with `node scripts/thumb-hover.mjs <slug> <video> <start>`.
+  `thumb.mp4` does the same, with `thumb.jpg` / `thumb-poster.jpg` as the still.
 - No thumb file -> the project's first showcase image is used.
 - To pick a differently named file, set `thumb: 'some-file.gif'` on the project in
   `src/data/projects.js`.

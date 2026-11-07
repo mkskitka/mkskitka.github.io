@@ -751,14 +751,35 @@ export default function ProjectThumbs({ open = false, onSelect, items = projects
               }}
             >
               <span className="project_thumb_media">
-                {p.thumb?.video ? (
-                  <video autoPlay muted loop playsInline preload="metadata" poster={p.thumb.video.poster}>
-                    {p.thumb.video.webm && <source src={p.thumb.video.webm} type="video/webm" />}
-                    {p.thumb.video.mp4 && <source src={p.thumb.video.mp4} type="video/mp4" />}
+                {p.thumb?.image || p.image ? <img src={p.thumb?.image || p.image} alt="" loading="lazy" /> : null}
+                {/* Hover clip (thumb-hover.mp4 in the project folder): a few seconds of the
+                    project's video, over the still, while the mouse is on the tile. Mouse
+                    only: a finger on a phone never starts it (custom.css .project_thumb_hover). */}
+                {p.thumb?.hover && (
+                  <video
+                    className="project_thumb_hover"
+                    muted
+                    loop
+                    playsInline
+                    preload="metadata"
+                    disablePictureInPicture
+                    onPointerEnter={(e) => {
+                      if (e.pointerType !== 'mouse') return
+                      const v = e.currentTarget
+                      v.currentTime = 0
+                      v.play().catch(() => {})
+                      v.classList.add('is-playing')
+                    }}
+                    onPointerLeave={(e) => {
+                      const v = e.currentTarget
+                      v.pause()
+                      v.classList.remove('is-playing')
+                    }}
+                  >
+                    {p.thumb.hover.webm && <source src={p.thumb.hover.webm} type="video/webm" />}
+                    {p.thumb.hover.mp4 && <source src={p.thumb.hover.mp4} type="video/mp4" />}
                   </video>
-                ) : p.thumb?.image || p.image ? (
-                  <img src={p.thumb?.image || p.image} alt="" loading="lazy" />
-                ) : null}
+                )}
               </span>
               {p.lock && (
                 <span className="project_thumb_lock" aria-label="Password protected">

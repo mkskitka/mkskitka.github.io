@@ -16,7 +16,7 @@ const files = import.meta.glob('../assets/web/*/*.{webp,gif,mp4,webm}', {
 const IMAGE = /\.(png|jpe?g|webp|gif|avif)$/i
 const VIDEO = /\.(mp4|webm)$/i
 const HERO = /^hero(-poster)?\./i
-const THUMB = /^thumb(-poster)?\./i
+const THUMB = /^thumb[.-]/i // thumb.*, thumb-poster.*, thumb-hover.* (never gallery items)
 const POSTER = /-poster\.webp$/i // a video's poster frame, not a gallery image of its own
 
 // { slug: { 'file.webp': '/assets/file-abc123.webp', ... } }
@@ -120,8 +120,12 @@ export function heroFor(slug, override) {
 
 /**
  * The thumbnail for a project (its tile in the Systems grid on the home page).
- *   thumb.mp4 / thumb.webm         -> { video: { mp4, webm, poster } }  (poster: thumb.jpg etc. if present)
  *   thumb.gif / .jpg / .png / ...  -> { image: url }
+ *   thumb-hover.mp4 / .webm        -> adds hover: { mp4, webm }: a short clip the tile plays
+ *                                     while the mouse is over it (scripts/thumb-hover.mjs cuts
+ *                                     one from a video in the folder)
+ *   thumb.mp4 / thumb.webm         -> the same, with thumb.jpg (etc.) or the video's own
+ *                                     poster frame as the still
  *   nothing                        -> null (caller falls back to the first showcase image)
  * `override` is an explicit filename from projects.js and takes precedence.
  */
@@ -140,14 +144,15 @@ export function thumbFor(slug, override) {
       console.warn(`[media] ${slug}: thumb "${override}" not found in src/assets/projects/${slug}/`)
     }
   }
-  videoName ??= find(/^thumb\.(mp4|webm)$/i)
+  videoName ??= find(/^thumb-hover\.(mp4|webm)$/i) ?? find(/^thumb\.(mp4|webm)$/i)
   imageName ??= find(/^thumb(-poster)?\.(png|jpe?g|webp|gif|avif)$/i)
 
+  let hover = null
   if (videoName && f[videoName]) {
-    const mp4 = /\.mp4$/i.test(videoName) ? f[videoName] : f[find(/^thumb\.mp4$/i)]
-    const webm = /\.webm$/i.test(videoName) ? f[videoName] : f[find(/^thumb\.webm$/i)]
-    return { video: { mp4, webm, poster: f[imageName] } }
+    const kind = /^thumb-hover\./i.test(videoName) ? 'thumb-hover' : 'thumb'
+    hover = { mp4: f[`${kind}.mp4`], webm: f[`${kind}.webm`] }
+    imageName ??= `${kind}-poster.webp` // no still of its own: the clip's poster frame
   }
-  if (imageName && f[imageName]) return { image: f[imageName] }
+  if (imageName && f[imageName]) return hover ? { image: f[imageName], hover } : { image: f[imageName] }
   return null
 }
