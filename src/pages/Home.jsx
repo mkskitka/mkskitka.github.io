@@ -396,11 +396,11 @@ export default function Home() {
             components/HomeVideo.jsx, <HomeVideo open={!active && !project} /> here. */}
         {/* MK SKITKA: the bio (src/data/about.js). A project: its write-up (src/data/projects.js). */}
         <WriteUp open={active === 'home' && !project} heading={about.heading} paragraphs={about.paragraphs} align="center">
-          <Link to="/resume" className="writeup_link">
-            Resume -&gt;
-          </Link>
           <Link to="/contact" className="writeup_link">
             Contact -&gt;
+          </Link>
+          <Link to="/resume" className="writeup_link">
+            Resume -&gt;
           </Link>
         </WriteUp>
         <WriteUp

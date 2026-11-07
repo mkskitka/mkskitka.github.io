@@ -118,7 +118,6 @@ const GALLERY_MAX = 8
 const projectList = [
   {
     slug: 'pgn-immersive-mobility-rehab',
-    thumbGlass: true,
     date: year('pgn-immersive-mobility-rehab', '2026'),
     title: 'PGN - Immersive Mobility Rehab',
     heading: ['PGN', 'IMMERSIVE MOBILITY REHAB'],
