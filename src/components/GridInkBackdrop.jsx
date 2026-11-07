@@ -108,11 +108,12 @@ const SETTINGS = {
   // width exactly, with lines landing on the left and right edges.
   // false = the old grid: one square cell size, half cells at the edges.
   fitToPage: true,
-  // Square cells: the rows take the columns' size, so every cell (and every tile built
-  // from cells) is a true square; the height then ends on a part row at the bottom.
-  // false = the rows are fitted to the height too, which makes the cells a few percent
-  // taller or wider than square depending on the window.
-  squareCells: true,
+  // Square cells: the rows take the columns' size (to the nearest pixel), so every cell
+  // (and every tile built from cells) is square; the height then ends on a part row at
+  // the bottom. false = the rows are fitted to the height too, so a whole number of
+  // rows fills the page with lines on the top and bottom edges, which makes the cells
+  // a few percent taller or wider than square depending on the window.
+  squareCells: false,
 
   rowsFromText: 1.2, // row height = hero menu text size x this, so one line of text fits a row, on every screen size
   //                    (0 = use `spacing`). Phones get a smaller text size (--hero-menu-size in custom.css), so a larger
@@ -1219,14 +1220,15 @@ export default function GridInkBackdrop({ className = '', transparent = false, p
       let originY = spacing / 2
       if (S.fitToPage) {
         spacingX = cssW / Math.max(1, Math.round(cssW / spacing))
-        spacingY = S.squareCells ? spacingX : cssH / Math.max(1, Math.round(cssH / spacing))
+        // Square cells: rows a whole number of pixels tall (within half a pixel of the
+        // columns), so every row starts on a pixel and the menu text, which the browser
+        // snaps to pixels, sits at the same place in each row. Fitted rows: exactly a
+        // whole number of rows down the page (so fractional; the text's snapping can
+        // then differ between rows by up to half a device pixel).
+        spacingY = S.squareCells ? Math.max(1, Math.round(spacingX)) : cssH / Math.max(1, Math.round(cssH / spacing))
         originX = 0
         originY = 0
       }
-      // Rows a whole number of pixels tall (within half a pixel of the columns), so every
-      // row starts on a pixel and the menu text, which the browser snaps to pixels, sits
-      // at the same place in each row; with fractional rows each line snapped differently.
-      spacingY = Math.max(1, Math.round(spacingY))
       spacing = spacingX // what the CSS calls --grid-spacing
       gridMats.forEach((m) => {
         m.uniforms.uSize.value.set(cssW, cssH)
