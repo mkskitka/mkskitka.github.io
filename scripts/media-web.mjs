@@ -123,7 +123,10 @@ async function main() {
         continue
       }
       wanted.add(out)
-      const posterOut = isVideo ? join(outDir, `${stem(name)}-poster.webp`) : null
+      // thumb-hover.* (a tile's hover clip, made on purpose by scripts/thumb-hover.mjs or by
+      // hand, maybe with an alpha channel): shipped exactly as it is, and no poster.
+      const asIs = isVideo && /^thumb-hover\./i.test(name)
+      const posterOut = isVideo && !asIs ? join(outDir, `${stem(name)}-poster.webp`) : null
       if (posterOut) wanted.add(posterOut)
       before += statSync(src).size
       if (fresh(src, out) && (!posterOut || fresh(src, posterOut))) {
@@ -133,7 +136,10 @@ async function main() {
       process.stdout.write(`${slug}/${name} ... `)
       try {
         let how = 'webp'
-        if (isVideo) {
+        if (asIs) {
+          copyFileSync(src, out)
+          how = 'copied as is'
+        } else if (isVideo) {
           const v = video(src, out)
           how = v.how
           await poster(src, posterOut, v.duration)

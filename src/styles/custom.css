@@ -439,8 +439,9 @@ a:hover,
     opacity: 1;
   }
   /* A thumbnail with its black background knocked out (thumbGlass): the clip's own black
-     blends away too, so the glass and grid show through it as they do through the still. */
-  .project_thumb--glass .project_thumb_hover {
+     blends away too, so the glass and grid show through it as they do through the still.
+     Not a clip made with transparency of its own (--alpha): that shows as it is. */
+  .project_thumb--glass .project_thumb_hover:not(.project_thumb_hover--alpha) {
     mix-blend-mode: screen;
   }
 }

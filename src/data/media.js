@@ -121,9 +121,12 @@ export function heroFor(slug, override) {
 /**
  * The thumbnail for a project (its tile in the Systems grid on the home page).
  *   thumb.gif / .jpg / .png / ...  -> { image: url }
- *   thumb-hover.mp4 / .webm        -> adds hover: { mp4, webm }: a short clip the tile plays
+ *   thumb-hover.mp4 / .webm        -> adds hover: { mp4, webm, alpha }: a short clip the tile plays
  *                                     while the mouse is over it (scripts/thumb-hover.mjs cuts
- *                                     one from a video in the folder)
+ *                                     one from a video in the folder). `alpha`: the clip has
+ *                                     a transparent background, made as a pair, VP9 .webm
+ *                                     (Chrome, Firefox) + HEVC .mp4 (Safari), so the tile
+ *                                     shows it as it is rather than blending its black away
  *   thumb.mp4 / thumb.webm         -> the same, with thumb.jpg (etc.) or the video's own
  *                                     poster frame as the still
  *   nothing                        -> null (caller falls back to the first showcase image)
@@ -151,6 +154,7 @@ export function thumbFor(slug, override) {
   if (videoName && f[videoName]) {
     const kind = /^thumb-hover\./i.test(videoName) ? 'thumb-hover' : 'thumb'
     hover = { mp4: f[`${kind}.mp4`], webm: f[`${kind}.webm`] }
+    hover.alpha = !!(hover.mp4 && hover.webm) // a pair = made with transparency (see above)
     imageName ??= `${kind}-poster.webp` // no still of its own: the clip's poster frame
   }
   if (imageName && f[imageName]) return hover ? { image: f[imageName], hover } : { image: f[imageName] }

@@ -90,6 +90,9 @@ const MAX_PER_SCREEN = { desktop: 10, phone: 6 }
 // read as a change of direction.
 const STEPPED = { pull: 150, hold: 350, gap: 250, swipe: 8, above: 4 }
 const SEEN_MIN = 0.12 // how visible a tile stays once it has slid behind the menu panel (1 = not dulled)
+// Safari (desktop and iOS; Chrome on iOS too, which is Safari underneath): plays HEVC video with
+// alpha, not VP9 with alpha. Everything else is the other way round.
+const SAFARI = typeof navigator !== 'undefined' && /apple/i.test(navigator.vendor) && !/crios|fxios|edgios/i.test(navigator.userAgent) ? true : typeof navigator !== 'undefined' && /iphone|ipad|ipod/i.test(navigator.userAgent)
 const SEEN_MIN_STEPPED = 0 // the same in the stepped Systems grid: gone completely, glass and all (--seen-tile fades the whole tile there; elsewhere --seen fades the picture)
 const CLOSE_MS = 320 // how long the tiles take to fade out when closed (matches .is-closing in custom.css)
 const TAP_SLOP = 16 // px a finger may move and still count as a tap rather than a swipe
@@ -772,9 +775,18 @@ export default function ProjectThumbs({ open = false, onSelect, items = projects
                     project's video, over the still, while the mouse is on the tile (the
                     tile's pointer handlers above; custom.css .project_thumb_hover). */}
                 {p.thumb?.hover && (
-                  <video className="project_thumb_hover" muted loop playsInline preload="metadata" disablePictureInPicture>
-                    {p.thumb.hover.webm && <source src={p.thumb.hover.webm} type="video/webm" />}
-                    {p.thumb.hover.mp4 && <source src={p.thumb.hover.mp4} type="video/mp4" />}
+                  <video className={`project_thumb_hover${p.thumb.hover.alpha ? ' project_thumb_hover--alpha' : ''}`} muted loop playsInline preload="metadata" disablePictureInPicture>
+                    {/* A transparent clip comes as a pair; only one plays with its alpha in each
+                        browser (Safari the HEVC .mp4, the rest the VP9 .webm), so pick it here
+                        rather than leave the browser to take the first it can decode. */}
+                    {p.thumb.hover.alpha ? (
+                      <source src={SAFARI ? p.thumb.hover.mp4 : p.thumb.hover.webm} type={SAFARI ? 'video/mp4' : 'video/webm'} />
+                    ) : (
+                      <>
+                        {p.thumb.hover.webm && <source src={p.thumb.hover.webm} type="video/webm" />}
+                        {p.thumb.hover.mp4 && <source src={p.thumb.hover.mp4} type="video/mp4" />}
+                      </>
+                    )}
                   </video>
                 )}
               </span>
