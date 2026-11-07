@@ -324,7 +324,7 @@ export default function Home() {
       {/* Full-screen hero with site menu */}
       <header
         ref={heroRef}
-        className={`section is-full-screen${active ? ' has-selection' : ''}${project ? ' has-project' : ''}`}
+        className={`section is-full-screen${active ? ` has-selection is-${active}` : ''}${project ? ' has-project' : ''}`}
       >
         <HeroBackdrop
           nodeId="w-node-cdbde5e8-8b4f-e20c-bac0-1a4bbfefe3c5-bfefe3c3"

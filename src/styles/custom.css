@@ -59,6 +59,7 @@ a:hover,
   --glass-blur: 4px; /* sharper glass; 20px was the original Webflow blur (you had 25px) */
   --glass-saturate: 1; /* 1 = unchanged colours behind the glass (you had 1.6) */
   --menu-glass-blur: 0px; /* the home menu panel's own blur: 0px = none (the grid shows sharp through it); remove this line to give it --glass-blur like the other panels */
+  --menu-glass-blur-contact: var(--glass-blur); /* the same panel while CONTACT is selected: the usual glass blur */
 }
 .section.is-full-screen > .header.margin-bottom_none,
 .section.systems_menu .project_wheel {
@@ -66,10 +67,15 @@ a:hover,
   -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
   backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
 }
-/* The home menu panel: its own blur amount (--menu-glass-blur above). */
+/* The home menu panel: its own blur amount (--menu-glass-blur above), and another
+   while CONTACT is selected (the section gets is-<page> from Home.jsx). */
 .home .section.is-full-screen > .header.margin-bottom_none {
   -webkit-backdrop-filter: blur(var(--menu-glass-blur, var(--glass-blur))) saturate(var(--glass-saturate));
   backdrop-filter: blur(var(--menu-glass-blur, var(--glass-blur))) saturate(var(--glass-saturate));
+}
+.home .section.is-full-screen.is-contact > .header.margin-bottom_none {
+  -webkit-backdrop-filter: blur(var(--menu-glass-blur-contact, var(--glass-blur))) saturate(var(--glass-saturate));
+  backdrop-filter: blur(var(--menu-glass-blur-contact, var(--glass-blur))) saturate(var(--glass-saturate));
 }
 /* Weak GPU: GridInkBackdrop sets html[data-low-gpu] when the backdrop is still slow at its
    lowest density. Blurring an animated canvas means re-blurring it every frame, so the
