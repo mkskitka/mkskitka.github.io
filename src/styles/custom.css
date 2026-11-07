@@ -157,7 +157,7 @@ a:hover,
   --thumb-opacity-dim: 0.45; /* the other tiles while one is hovered */
   --thumb-title-rest: 1; /* project names on the tiles at rest: 1 = always shown, 0 = only on hover / focus */
   --thumb-title-phone: 1; /* phones (no hover): 1 = names always on the tiles, 0 = no names */
-  --thumb-frame: 22%; /* Systems grid view: how far a picture sits in from its tile's edges, so the glass shows around it (0 = edge to edge) */
+  --thumb-frame: 0%; /* Systems grid view: how far a picture sits in from its tile's edges, so the glass shows around it (0 = edge to edge) */
 }
 /* Windows under ~1000px tall: 2x2 blocks so all the projects still fit beside the
    menu (eight 3x3 tiles need three rows, about 11 cells tall). */
