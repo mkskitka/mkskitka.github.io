@@ -149,7 +149,10 @@ const projectList = [
     role: 'Visualist, Technologist',
     mediums: 'Unity, Gemini, ChatGPT, Claude, Midjourney, image and video generation',
     tags: ['ai'],
-    description: 'I worked with a graphic designer to produce 16-bit style game graphics for an arcade savings simulator game at SXSW (South by Southwest).',
+    description: [
+      'I produced the 16-bit style graphics for an arcade savings simulator game shown at SXSW (South by Southwest).',
+      'The art came out of a set of AI workflows I put together for the job: Midjourney for the characters, backdrops and screens, with ChatGPT, Gemini and Claude used to iterate on prompts, keep the pixel style consistent from one asset to the next, and generate the animation frames and video elements, all assembled in Unity.',
+    ],
     // Full-width strip on top, two wide screens side by side below.
     featured: [
       tile(P4, { width: '92vw', aspect: '4 / 1', top: '4vh', left: '4vw' }),
@@ -167,7 +170,7 @@ const projectList = [
     tags: ['web'],
     // One string per paragraph: description: ['First paragraph.', 'Second paragraph.']
     description: [
-      'Audible Story House was a month-long pop-up where visitors could listen to audiobooks, with a dedicated listening room in the back. I built the audio-reactive visualizer that played in that room for the length of the pop-up.',
+      'Audible Story House was Audible’s first physical pop-up, open for the month of May 2026, where visitors could listen to audiobooks, with a dedicated listening room in the back. I built the audio-reactive visualizer that played in that room for the length of the pop-up.',
       "The visuals evolved over the course of the day and responded to the voices and sounds of whatever was playing. Alongside the visualizer, I built a web interface that Audible's brand ambassadors used to further customize the audio-visual experience.",
     ],
     // Tall portrait on the left, big screen top right, two short strips under it.
@@ -186,7 +189,10 @@ const projectList = [
     role: 'Visualist, Technologist',
     mediums: 'LED wall, TouchDesigner, Body Tracking',
     // One string per paragraph: description: ['First paragraph.', 'Second paragraph.']
-    description: ["I built a real-time performance that reacted to dancers' body movement at Intel's pop-up in Times Square."],
+    description: [
+      "I built the real-time visual system for The Light Keeper, a dance performance at Intel's Times Square pop-up (November to December 2025), with Smooth Technology.",
+      "The dancers' bodies were tracked live and their movement drove the visuals on the LED wall behind them, all running in TouchDesigner.",
+    ],
     // Big hero screen top left, tall portrait on the right, two strips along the bottom.
     featured: [
       tile(P1, { width: '60vw', aspect: '16 / 9', top: '4vh', left: '4vw' }),
@@ -222,8 +228,8 @@ const projectList = [
     mediums: 'TouchDesigner, Kinect, web application, projection',
     // One string per paragraph: description: ['First paragraph.', 'Second paragraph.']
     description: [
-      'Custom video booths for events: reactive visuals that people step into, with their reel delivered to their phone afterwards.',
-      'Tapestry Electric (2025): a video booth for the gaming and performing arts company at a gaming conference.',
+      'Custom video booths I design and build for events: reactive visuals that people step into, with their reel delivered to their phone afterwards.',
+      'Tapestry Electric (2025): a booth built for the gaming and performing arts company at a gaming conference.',
       'Wedding booth (2023): I built a customized interactive photobooth with TouchDesigner, a Kinect, a web application and a projector, and worked with the newlywed couple to match the booth’s filters to the theme and palette of the wedding. Many guests were inclined to dance with the reactive visuals, resulting in fun, candid photo reels that could then be accessed and downloaded via a QR code.',
     ],
   },
@@ -272,11 +278,12 @@ const projectList = [
     title: "'24 VENICE BIENNALE",
     heading: ["'24", 'VENICE BIENNALE'],
     role: 'Visualist, Technologist',
-    mediums: '',
+    mediums: 'Generative AI video, video generation API',
     tags: ['ai'],
     // One string per paragraph: description: ['First paragraph.', 'Second paragraph.']
     description: [
-      "Collaborating with Volvox Labs and artist Fatimah Tuggar, I worked on the design and development of a real-time generative AI video depicting imaginaries of the Calabash Gourd for the Creampods exhibit at the 2024 Venice Biennale. The generative video API produced days' worth of unique content for the exhibit.",
+      "With Volvox Labs, I designed and developed the generative AI video system for artist Fatimah Tuggar's Creampods in the Nigerian Pavilion at the 2024 Venice Biennale: video imagining the Calabash Gourd, shown across the pavilion's seven-month run.",
+      'The system produced over 16 hours of content for the opening, plus an API that generated more, so the exhibit kept showing new material throughout.',
     ],
     // Tall portrait on the left, big screen and a strip stacked on the right.
     featured: [
@@ -311,7 +318,7 @@ const projectList = [
     // One string per paragraph: description: ['First paragraph.', 'Second paragraph.']
     description: [
       'Wild Birds was a two-part show series that brought together multi-wall projection, VJing and live band and DJ sets. As a co-producer on the project, I worked closely with the owners of the venue and the technical staff of Brooklyn Art Haus to set up the multi-wall projection and VJ system.',
-      'I promoted and oversaw the events, recruited VJs to perform and was in charge of space setup and design. Concluding the shows, I started work as a technical consultant and projection technician for the venue.',
+      'I promoted and oversaw the events, recruited VJs to perform and was in charge of space setup and design. After the shows I worked for a time as the venue’s technical consultant and projection technician.',
     ],
   },
   {
