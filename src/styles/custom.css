@@ -438,6 +438,10 @@ a:hover,
   .project_thumb_hover.is-playing {
     opacity: 1;
   }
+  /* The still goes while the clip plays (a screen-blended clip would otherwise show it through). */
+  .project_thumb_media:has(.project_thumb_hover.is-playing) img {
+    opacity: 0;
+  }
   /* A thumbnail with its black background knocked out (thumbGlass): the clip's own black
      blends away too, so the glass and grid show through it as they do through the still.
      Not a clip made with transparency of its own (--alpha): that shows as it is. */
