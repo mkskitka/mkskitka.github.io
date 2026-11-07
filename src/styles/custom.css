@@ -1283,6 +1283,12 @@ a:hover,
   position: absolute;
   overflow: hidden;
 }
+/* The image in one piece, once the cells have finished revealing it (ProjectBackdrop.jsx). */
+.project_whole {
+  position: absolute;
+  inset: 0;
+  background-repeat: no-repeat;
+}
 .project_cell_img {
   position: absolute;
   inset: 0;

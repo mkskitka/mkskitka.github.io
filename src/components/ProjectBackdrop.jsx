@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useMemo, useState } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 
 /**
  * A project's image behind the grid lines, revealed square by
@@ -30,6 +30,8 @@ export default function ProjectBackdrop({ project, from, onClosed, host, fit = '
   const [closing, setClosing] = useState(false)
   const [img, setImg] = useState(null) // { url, w, h }
   const [box, setBox] = useState({ w: 1, h: 1, s: 64 })
+  // The reveal has finished: the cells are swapped for the image in one piece (below).
+  const [settled, setSettled] = useState(false)
 
   const media = project?.hero?.video
     ? { video: project.hero.video }
@@ -87,9 +89,10 @@ export default function ProjectBackdrop({ project, from, onClosed, host, fit = '
     return () => window.removeEventListener('resize', measure)
   }, [host, project])
 
-  // The cells, with their slice of the image and their ripple delay.
-  const cells = useMemo(() => {
-    if (!img) return []
+  // The cells, with their slice of the image and their ripple delay; `whole` is the
+  // same image in one piece, and `doneMs` when the last cell has finished.
+  const { cells, whole, doneMs } = useMemo(() => {
+    if (!img) return { cells: [], whole: null, doneMs: 0 }
     const { w, h, s } = box
     const sy = box.sy ?? s
     // 'cover' fills the page and crops; 'contain' shows the whole image as large as it fits.
@@ -111,30 +114,55 @@ export default function ProjectBackdrop({ project, from, onClosed, host, fit = '
       ? { x: from.left + from.width / 2, y: from.top + from.height / 2 }
       : { x: w / 2, y: h / 2 }
     const out = []
+    let doneMs = 0
     for (let j = 0; j < rows; j++) {
       for (let i = 0; i < cols; i++) {
         const x = startX + i * px
         const y = startY + j * py
         const dist = Math.hypot(x + px / 2 - origin.x, y + py / 2 - origin.y) / s
+        const delay = Math.round(dist * RIPPLE_MS)
+        doneMs = Math.max(doneMs, delay + CELL_MS)
+        // Each cell's edges on whole pixels (the grid's cells are fractional): a cell
+        // edge between two pixels is drawn soft on both sides, and two cells meeting
+        // there leave a dark seam, a grid of hairlines over the image.
+        const x0 = Math.round(x)
+        const y0 = Math.round(y)
         out.push({
           key: `${i}-${j}`,
           style: {
-            left: x,
-            top: y,
-            width: px,
-            height: py,
-            '--delay': `${Math.round(dist * RIPPLE_MS)}ms`,
+            left: x0,
+            top: y0,
+            width: Math.round(x + px) - x0,
+            height: Math.round(y + py) - y0,
+            '--delay': `${delay}ms`,
           },
           inner: {
             backgroundImage: `url("${img.url}")`,
             backgroundSize: `${bw}px ${bh}px`,
-            backgroundPosition: `${ox - x}px ${oy - y}px`,
+            backgroundPosition: `${ox - x0}px ${oy - y0}px`,
           },
         })
       }
     }
-    return out
+    const whole = {
+      backgroundImage: `url("${img.url}")`,
+      backgroundSize: `${bw}px ${bh}px`,
+      backgroundPosition: `${ox}px ${oy}px`,
+    }
+    return { cells: out, whole, doneMs }
   }, [img, box, from, fit])
+
+  // Once every cell has finished its reveal, show the image in one piece instead, so
+  // nothing can show between the cells (and the page has one layer, not hundreds).
+  // With DEPTH on the cells stay, since the shading is per cell.
+  const doneRef = useRef(0)
+  doneRef.current = doneMs
+  useEffect(() => {
+    setSettled(false)
+    if (!img || DEPTH.enabled) return undefined
+    const t = setTimeout(() => setSettled(true), doneRef.current + 50)
+    return () => clearTimeout(t)
+  }, [img])
 
   return (
     <div
@@ -152,6 +180,8 @@ export default function ProjectBackdrop({ project, from, onClosed, host, fit = '
           {media.video.webm && <source src={media.video.webm} type="video/webm" />}
           {media.video.mp4 && <source src={media.video.mp4} type="video/mp4" />}
         </video>
+      ) : settled && whole ? (
+        <div className="project_whole" style={whole} />
       ) : (
         cells.map((c) => (
           <div key={c.key} className="project_cell" style={c.style}>
