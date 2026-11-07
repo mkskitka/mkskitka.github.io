@@ -30,11 +30,12 @@ import { BOUNCE } from './GridInkBackdrop.jsx'
  * enlargement (the tile growing a cell and its image zooming), as on Systems.
  * `phoneRows` caps the rows of tiles under the panel on phones (Systems 2, Visuals 3).
  * `dimBehind`: the sort dropdown's list is open, so the tiles under it are dulled.
- * `stepped` (Systems grid view, desktop): the wheel moves the tiles one tile at a time.
- * Each step lands the next tile exactly where the first one stood when the tiles
- * opened, and they then hold there for STEPPED.hold ms before the wheel can move them
- * again, so they lock into place between moves rather than sliding freely. The arrow
- * keys step one tile too; the end arrows still move a screen. Phones keep their swipe.
+ * `stepped` (Systems grid view, desktop): the wheel moves the tiles a screen's worth of
+ * columns at a time (as many as stand beside the menu panel: two tiles showing, a swipe
+ * moves two). Each step lands the next column of tiles exactly where the first one
+ * stood when the tiles opened, and they then hold there for STEPPED.hold ms before the
+ * wheel can move them again, so they lock into place between moves rather than sliding
+ * freely. The arrow keys step the same; the end arrows too. Phones keep their swipe.
  * While stepped, the tiles tell the backdrop when they lock into place and when they
  * move again (a 'grid:columns' event on the section with every vertical grid line along
  * the tiles on screen, { x, y0, y1, edge } from each tile's top edge to its bottom, edge
@@ -75,7 +76,7 @@ const TILE_CELLS = { desktop: 1, phone: 2 }
 // The most tiles shown on one screen. With more than this, the rest wait off the right
 // edge and scrolling brings them in.
 const MAX_PER_SCREEN = { desktop: 10, phone: 6 }
-// `stepped` scrolling: one swipe moves one tile, never more. `pull` is how much wheel
+// `stepped` scrolling: one swipe moves one step (a screen's worth of columns), never more. `pull` is how much wheel
 // travel (px) a swipe needs to count; after its step the tiles hold in place for `hold`
 // ms, during which the wheel is ignored altogether, and after it the rest of the same
 // swipe is still ignored: a trackpad flick keeps sending ever smaller events as it
@@ -337,6 +338,7 @@ export default function ProjectThumbs({ open = false, onSelect, items = projects
         fadeTo: LX(firstCol),
         page: span * sx,
         per,
+        perRow, // tiles across one screen: how many columns a stepped move goes
         // The arrows sit in the first and last whole grid cells of the bottom row, at the
         // page's edges (not beside the panel, which on a wide screen is well in from the left).
         arrows: { y: LY(gridRows - 1), left: LX(0), right: LX(cols - 1), w: sx, h: sy },
@@ -396,9 +398,10 @@ export default function ProjectThumbs({ open = false, onSelect, items = projects
   const snap = strip?.snap ?? 1
   const step = strip?.step ?? 1
   const page = strip?.page ?? snap
-  // Stepped scrolling (desktop rows): the tiles' x positions in order, so a step can
-  // land the next tile where the first one stood.
-  const stops = stepped && strip && spots ? spots.filter(Boolean).map((t) => t.x).sort((a, b) => a - b) : null
+  // Stepped scrolling (desktop rows): the tiles' column x positions in order (one per
+  // column, however many rows), so a step can land a later column where the first stood.
+  const stops = stepped && strip && spots ? [...new Set(spots.filter(Boolean).map((t) => t.x))].sort((a, b) => a - b) : null
+  const stepCols = strip?.perRow ?? 1 // columns per step: as many as show beside the panel
   const stopsKey = stops ? stops.join() : ''
   useEffect(() => {
     const p = pos.current
@@ -483,18 +486,19 @@ export default function ProjectThumbs({ open = false, onSelect, items = projects
     go(Math.round(p.target / snap) * snap) // after a resize: still on the grid, still in range
     goBy.current = (dir) => go(Math.round((p.target + dir * page) / snap) * snap)
 
-    // Stepped: one tile along (dir 1) or back (-1), to where the first tile stood at
-    // the start. From somewhere between tiles (after a screen move), the next tile
-    // that way.
+    // Stepped: a screen's worth of columns along (dir 1) or back (-1), so the columns
+    // now showing all leave and the next ones land where they stood, the first of them
+    // where the first tile stood at the start. From somewhere between columns (after a
+    // resize or a clamp at the end), the step counts from the next column that way.
     const stepTo = (dir) => {
       if (!stops?.length) return
-      const at = p.target + stops[0] // the x of whatever tile stands at the first tile's place
+      const at = p.target + stops[0] // the x of whatever column stands at the first tile's place
       let k = stops.findIndex((x) => Math.abs(x - at) < 1)
       if (k < 0) {
         const after = stops.findIndex((x) => x > at)
         k = dir > 0 ? (after < 0 ? stops.length : after) - 1 : after < 0 ? stops.length : after
       }
-      go(stops[Math.min(stops.length - 1, Math.max(0, k + dir))] - stops[0])
+      go(stops[Math.min(stops.length - 1, Math.max(0, k + dir * stepCols))] - stops[0])
     }
     // Stepped: wheel travel adds up until it asks for a step; then the tiles hold, and
     // the rest of the gesture is ignored, so a flick's coasting can't take a second step.
@@ -612,7 +616,7 @@ export default function ProjectThumbs({ open = false, onSelect, items = projects
       el?.removeEventListener('focusin', onFocus)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open, keep, max, snap, step, page, stopsKey, strip?.fadeTo])
+  }, [open, keep, max, snap, step, page, stopsKey, stepCols, strip?.fadeTo])
 
   // While closed with an item open: if the open item changes (swiped to the next one),
   // move to the screen that item's tile is on, so going back lands beside it.
