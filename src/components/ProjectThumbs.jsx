@@ -89,6 +89,7 @@ const MAX_PER_SCREEN = { desktop: 10, phone: 6 }
 // read as a change of direction.
 const STEPPED = { pull: 150, hold: 350, gap: 250, swipe: 8, above: 4 }
 const SEEN_MIN = 0.12 // how visible a tile stays once it has slid behind the menu panel (1 = not dulled)
+const SEEN_MIN_STEPPED = 0 // the same in the stepped Systems grid: gone completely, glass and all (--seen-tile fades the whole tile there; elsewhere --seen fades the picture)
 const CLOSE_MS = 320 // how long the tiles take to fade out when closed (matches .is-closing in custom.css)
 const TAP_SLOP = 16 // px a finger may move and still count as a tap rather than a swipe
 
@@ -376,13 +377,16 @@ export default function ProjectThumbs({ open = false, onSelect, items = projects
         const x = parseFloat(el.style.getPropertyValue('--x')) - scrolled
         const w = parseFloat(el.style.getPropertyValue('--s')) || 1
         const clear = Math.min(1, Math.max(0, (x + w - edge) / w)) // the part of the tile right of the panel's edge
-        seen = SEEN_MIN + (1 - SEEN_MIN) * clear
+        const floor = stepped ? SEEN_MIN_STEPPED : SEEN_MIN
+        seen = floor + (1 - floor) * clear
       }
       if (list) {
         const r = el.getBoundingClientRect()
         if (r.left < list.right && r.right > list.left && r.top < list.bottom && r.bottom > list.top) seen = Math.min(seen, SEEN_MIN)
       }
-      el.style.setProperty('--seen', seen.toFixed(3))
+      // Stepped grid: the whole tile fades (glass, picture and title); otherwise only the picture.
+      el.style.setProperty('--seen', stepped ? '1' : seen.toFixed(3))
+      el.style.setProperty('--seen-tile', stepped ? seen.toFixed(3) : '1')
     }
   }
 
@@ -400,7 +404,11 @@ export default function ProjectThumbs({ open = false, onSelect, items = projects
     const p = pos.current
     const apply = () => {
       if (track.current) track.current.style.transform = p.cur ? `translate3d(${-p.cur}px, 0, 0)` : ''
-      dull(p.cur)
+      // Stepped: the fade is judged from where the tiles are heading, not where they are,
+      // so a tile going behind the menu starts fading the moment the step starts and is
+      // gone as it lands, the mirror of one coming back out, which brightens over the
+      // slide and is full as it lands (the opacity transition in custom.css does the easing).
+      dull(stepped ? p.target : p.cur)
     }
     // Stepped: the vertical grid lines along the tiles on screen, for the backdrop to
     // light while the tiles rest (`locked`), or none while they move.

@@ -66,7 +66,7 @@ const SHOW_VISUAL_TITLES = false
 const VISUAL_SWIPE = 50 // px a finger must travel sideways to count as a swipe
 
 // Desktop Systems tiles (see the Systems <ProjectThumbs> below).
-const SYSTEMS_DESKTOP = { rows: 1, cells: 6, opacity: 0.85, dim: 0.45 } // 6x6 tiles: the same rows as the 6x6 menu panel, so they line up with it
+const SYSTEMS_DESKTOP = { rows: 1, cells: 6, opacity: 0.85, dim: 0.45 } // 6x6 tiles: the same rows as the 6x6 menu panel, so they line up with it.
 
 const MENU = [
   { id: 'home', label: 'MK SKITKA', path: '/about' },

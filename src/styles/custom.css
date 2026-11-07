@@ -57,13 +57,19 @@ a:hover,
 :root {
   --glass-tint: rgba(255, 255, 255, 0); /* white backing: 0 = none, 0.25 = milky (you had 0.34) */
   --glass-blur: 4px; /* sharper glass; 20px was the original Webflow blur (you had 25px) */
-  --glass-saturate: 1.2; /* 1 = unchanged colours behind the glass (you had 1.6) */
+  --glass-saturate: 1; /* 1 = unchanged colours behind the glass (you had 1.6) */
+  --menu-glass-blur: 0px; /* the home menu panel's own blur: 0px = none (the grid shows sharp through it); remove this line to give it --glass-blur like the other panels */
 }
 .section.is-full-screen > .header.margin-bottom_none,
 .section.systems_menu .project_wheel {
   background-color: var(--glass-tint);
   -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
   backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+}
+/* The home menu panel: its own blur amount (--menu-glass-blur above). */
+.home .section.is-full-screen > .header.margin-bottom_none {
+  -webkit-backdrop-filter: blur(var(--menu-glass-blur, var(--glass-blur))) saturate(var(--glass-saturate));
+  backdrop-filter: blur(var(--menu-glass-blur, var(--glass-blur))) saturate(var(--glass-saturate));
 }
 /* Weak GPU: GridInkBackdrop sets html[data-low-gpu] when the backdrop is still slow at its
    lowest density. Blurring an animated canvas means re-blurring it every frame, so the
@@ -382,7 +388,7 @@ a:hover,
   touch-action: manipulation;
 }
 .project_thumbs.is-open .project_thumb {
-  opacity: 1;
+  opacity: var(--seen-tile, 1); /* --seen-tile: the stepped Systems grid fades a whole tile out behind the menu panel (ProjectThumbs.jsx) */
   transform: none;
   transition: opacity 0.4s ease, transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
   transition-delay: calc(var(--i, 0) * 45ms);
