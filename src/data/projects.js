@@ -318,7 +318,6 @@ const projectList = [
   {
     // Files live in src/assets/projects/devolving-spam/ (from the old mks.computer site).
     slug: 'devolving-spam',
-    thumbGlass: true,
     date: year('devolving-spam', '2023'),
     title: 'Devolving Spam',
     heading: ['DEVOLVING', 'SPAM'],
