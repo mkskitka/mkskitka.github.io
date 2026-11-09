@@ -95,7 +95,7 @@ const MAX_PER_SCREEN = { desktop: 10, phone: 6 }
 // gesture keeps the axis (up/down or sideways) it started on, so a slanted swipe is not
 // read as a change of direction.
 const STEPPED = { pull: 150, hold: 350, gap: 250, swipe: 8, above: 4 }
-const SEEN_MIN = 0.12 // how visible a tile stays once it has slid behind the menu panel (1 = not dulled)
+export const SEEN_MIN = 0.12 // how visible a tile stays once it has slid behind the menu panel (1 = not dulled); Home.jsx dulls the menu links under an open dropdown list by the same amount
 // Safari (desktop and iOS; Chrome on iOS too, which is Safari underneath): plays HEVC video with
 // alpha, not VP9 with alpha. Everything else is the other way round.
 // A mouse to hover with: the clips are fetched up front, so a hover starts them at once

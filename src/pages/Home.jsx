@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { projects } from '../data/projects.js'
 import HeroBackdrop from '../components/HeroBackdrop.jsx'
-import ProjectThumbs from '../components/ProjectThumbs.jsx'
+import ProjectThumbs, { SEEN_MIN } from '../components/ProjectThumbs.jsx'
 import ContactTiles from '../components/ContactTiles.jsx'
 import { visuals } from '../data/visuals.js'
 import { about } from '../data/about.js'
@@ -163,6 +163,30 @@ export default function Home() {
   const [visualAt, setVisualAt] = useState(null)
   const [palette, setPalette] = useState(null) // grid line colours sampled from the open project's image
   const heroRef = useRef(null)
+
+  // A dropdown's list that comes down over the menu text dulls the menu, exactly as it
+  // dulls the tiles under it (ProjectThumbs.jsx SEEN_MIN): if the list overlaps any of
+  // the links, all of them get --menu-seen, which custom.css multiplies into their
+  // opacity. Measured once the list is in place, and again on resize while it is open;
+  // all clear when it closes.
+  useEffect(() => {
+    const links = [...(heroRef.current?.querySelectorAll('.header.margin-bottom_none .heading_primary') ?? [])]
+    const listOpen = !!(active && sortListOpen[active])
+    const measure = () => {
+      const list = listOpen ? document.querySelector('.visuals_sort_main.is-open .visuals_sort_list')?.getBoundingClientRect() : null
+      const under = !!list && links.some((el) => {
+        const r = el.getBoundingClientRect()
+        return r.left < list.right && r.right > list.left && r.top < list.bottom && r.bottom > list.top
+      })
+      for (const el of links) el.style.setProperty('--menu-seen', under ? String(SEEN_MIN) : '1')
+    }
+    const raf = requestAnimationFrame(measure)
+    if (listOpen) window.addEventListener('resize', measure)
+    return () => {
+      cancelAnimationFrame(raf)
+      window.removeEventListener('resize', measure)
+    }
+  }, [sortListOpen, active, project])
 
   // Flat line colour while a project or visual is open; back to the site palette on close.
   useEffect(() => {
