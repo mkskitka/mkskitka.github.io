@@ -2,6 +2,9 @@ import { useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
 
 /**
+ * NOT MOUNTED at the moment (see src/App.jsx): the tab icon is public/favicon.svg, the
+ * backdrop's lines, on every address. What this did when mounted:
+ *
  * The browser-tab icon follows the address: each section has one of the pixel
  * sprites from the logo (public/icons/<name>.svg; public/favicon.svg is the home
  * one, for the first paint and for browsers that never swap). Safari keeps the icon
