@@ -77,14 +77,6 @@ a:hover,
   -webkit-backdrop-filter: blur(var(--menu-glass-blur-contact, var(--glass-blur))) saturate(var(--glass-saturate));
   backdrop-filter: blur(var(--menu-glass-blur-contact, var(--glass-blur))) saturate(var(--glass-saturate));
 }
-/* Weak GPU: GridInkBackdrop sets html[data-low-gpu] when the backdrop is still slow at its
-   lowest density. Blurring an animated canvas means re-blurring it every frame, so the
-   glass goes plain (the tint is clear and the blur only 4px, so it looks nearly the same). */
-:root[data-low-gpu] * {
-  -webkit-backdrop-filter: none !important;
-  backdrop-filter: none !important;
-}
-
 /* The list inside the Systems panel had its own blur; one pane is enough. */
 .section.systems_menu .project_wheel_list {
   -webkit-backdrop-filter: none;
@@ -531,6 +523,30 @@ a:hover,
   .project_thumb:hover .project_thumb_title {
     opacity: var(--seen, 1);
   }
+}
+/* The project's categories, in a row under its name: smaller, dimmer, a dot between. */
+.project_thumb_tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 1em;
+  margin-top: 0.45em;
+  font-size: 0.82em;
+  letter-spacing: 0.12em;
+  color: rgba(255, 255, 255, 0.6);
+}
+.project_thumb_tag {
+  position: relative;
+}
+.project_thumb_tag + .project_thumb_tag::before {
+  content: '';
+  position: absolute;
+  left: -0.65em; /* (letter-spacing leaves a little air after the last letter of the tag before) */
+  top: 50%;
+  width: 2px;
+  height: 2px;
+  margin-top: -1px;
+  border-radius: 50%;
+  background: currentColor;
 }
 
 /* Two grids share the space beside the panel (Systems tiles, Contact tiles); only the
@@ -1398,13 +1414,13 @@ a:hover,
 }
 
 /* Darken the image a little so the lines, menu and write-up stay legible over it:
-   0.35 by default, or the project's own `heroDim` (src/data/projects.js) for a
+   0.55 by default, or the project's own `heroDim` (src/data/projects.js) for a
    bright image. */
 .project_backdrop::after {
   content: '';
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, var(--hero-dim, 0.35));
+  background: rgba(0, 0, 0, var(--hero-dim, 0.55));
   pointer-events: none;
 }
 /* The sketch sits above the image. */

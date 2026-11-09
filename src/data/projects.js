@@ -4,7 +4,7 @@
 // Photos and videos for each project go in src/assets/projects/<slug>/ (see the
 // README there). A file named hero.jpg / hero.mp4 becomes that project's hero
 // backdrop, or set `hero: 'file.jpg'` here to pick one by name. The backdrop is
-// darkened by 0.35 so the write-up reads over it; `heroDim: 0.6` on a project darkens
+// darkened by 0.55 so the write-up reads over it; `heroDim: 0.75` on a project darkens
 // a bright one more (0 none, 1 black).
 //
 // Fill in `role`, `mediums`, `description`, and swap the placeholder `featured` images
@@ -20,13 +20,30 @@ import { folderImages, folderMedia, heroFor, isVideo, resolveMedia, thumbFor } f
 import resume from '../../resume/resume.json'
 // A project's year, from resume/resume.json when it is listed there (the resume, the CV
 // and the site then always agree); otherwise the `date` written below.
-// `tags` on a project (['ai'], ['web', 'installation']...) are the subsets the Systems
-// "Show" dropdown offers (SUBSETS in src/lib/sortItems.js); a subset appears once a
-// project carries its tag. Featured, the subset the tiles open in, is every project
-// but those tagged 'unfeatured', which only show under All.
+// `tags` on a project (['ai'], ['web', 'installation']...) are its categories: they
+// are written under its name on the Systems tile (TAG_LABELS below gives each its
+// wording), and those that SUBSETS in src/lib/sortItems.js lists are the subsets the
+// Systems "Show" dropdown offers (a subset appears once a project carries its tag).
+// Featured, the subset the tiles open in, is every project but those tagged
+// 'unfeatured', which only show under All (and is never written on a tile).
 const year = (slug, fallback) => resume.projects.find((p) => p.slug === slug)?.year ?? fallback
 
 const img = (name) => `/images/${name}`
+
+// How each tag reads on a tile, in the order the tags are written there. A tag not
+// listed here (such as 'unfeatured') is not shown.
+export const TAG_LABELS = {
+  ai: 'AI',
+  web: 'Web',
+  installation: 'Installation',
+  interactive: 'Interactive',
+  projection: 'Projection',
+  live: 'Live',
+  print: 'Print',
+  'audio-reactive': 'Audio-reactive',
+  '270-projection': '270° projection',
+  scrollytelling: 'Scrollytelling',
+}
 
 // Every image from the Webflow export, for picking from (public/images).
 export const allImages = [
@@ -127,6 +144,7 @@ const projectList = [
     heading: ['PGN', 'IMMERSIVE MOBILITY REHAB'],
     role: 'Visualist, Technologist',
     mediums: 'TouchDesigner, Orbbec, MediaPipe, body tracking, eye tracking, LED walls, projection, lidar',
+    tags: ['installation', 'interactive'],
     // One string per paragraph: description: ['First paragraph.', 'Second paragraph.']
     description: [
       'PGN is a multi-room interactive therapy system for physical, cognitive and vision rehabilitation, built for personalized health care and installed at multiple locations. Each site combines an interactive LED hallway, a full-body projection motion room and an ambient multi-sensory recharge room.',
@@ -147,13 +165,13 @@ const projectList = [
   {
     slug: 'realtor-savings-simulator',
     thumbGlass: true,
-    heroDim: 0.6, // a bright, pale image: darkened more than most so the write-up reads over it
+    heroDim: 0.75, // a bright, pale image: darkened more than most so the write-up reads over it
     date: year('realtor-savings-simulator', '2026'),
     title: 'Realtor.com Savings Simulator',
     heading: ['REALTOR.COM', 'SAVINGS SIMULATOR'],
     role: 'Visualist, Technologist',
     mediums: 'Unity, Gemini, ChatGPT, Claude, Midjourney, image and video generation',
-    tags: ['ai'],
+    tags: ['ai', 'interactive'],
     description: [
       'I produced the 16-bit style graphics for an arcade savings simulator game shown at SXSW (South by Southwest).',
       'The art came out of a set of AI workflows I put together for the job: Midjourney for the characters, backdrops and screens, with ChatGPT, Gemini and Claude used to iterate on prompts, keep the pixel style consistent from one asset to the next, and generate the animation frames and video elements, all assembled in Unity.',
@@ -172,7 +190,7 @@ const projectList = [
     heading: ['AUDIBLE', 'STORY HOUSE VISUALIZER'],
     role: 'Visualist, Technologist',
     mediums: 'TouchDesigner, Audio Reactive, Projection',
-    tags: ['web'],
+    tags: ['installation', 'projection', 'audio-reactive', 'web'],
     // One string per paragraph: description: ['First paragraph.', 'Second paragraph.']
     description: [
       'Audible Story House was Audible’s first physical pop-up, open for the month of May 2026, where visitors could listen to audiobooks, with a dedicated listening room in the back. I built the audio-reactive visualizer that played in that room for the length of the pop-up.',
@@ -193,6 +211,7 @@ const projectList = [
     heading: ['INTEL x SMOOTH TECH', 'THE LIGHT KEEPER'],
     role: 'Visualist, Technologist',
     mediums: 'LED wall, TouchDesigner, Body Tracking',
+    tags: ['installation', 'interactive'],
     // One string per paragraph: description: ['First paragraph.', 'Second paragraph.']
     description: [
       "I built the real-time visual system for The Light Keeper, a dance performance at Intel's Times Square pop-up (November to December 2025), with Smooth Technology.",
@@ -214,7 +233,7 @@ const projectList = [
     heading: ['END OF SIGNAL', 'CEZAR MOCAN'],
     role: 'Visualist, Technologist',
     mediums: 'TouchDesigner, ComfyUI, custom-trained model, web app, live-rendered AI visuals',
-    tags: ['ai'],
+    tags: ['ai', 'live'],
     // One string per paragraph: description: ['First paragraph.', 'Second paragraph.']
     description: [
       'I built the live-rendered AI visuals system for artist Cezar Mocan’s End of Signal. The installation won the SOLO AI ’25 award and has shown across multiple venues.',
@@ -232,6 +251,7 @@ const projectList = [
     heading: ['VIDEO', 'BOOTHS'],
     role: 'Visualist, Technologist',
     mediums: 'TouchDesigner, Kinect, web application, projection',
+    tags: ['installation', 'interactive'],
     // One string per paragraph: description: ['First paragraph.', 'Second paragraph.']
     description: [
       'Custom video booths I design and build for events: reactive visuals that people step into, with their reel delivered to their phone afterwards.',
@@ -247,6 +267,7 @@ const projectList = [
     heading: ['BLUEBERRY', 'SWAMP FESTIVAL'],
     role: 'Visualist, Technologist',
     mediums: '',
+    tags: ['live', 'projection'],
     // One string per paragraph: description: ['First paragraph.', 'Second paragraph.']
     description: [],
     // Two by two grid of wide frames, alternating tilt.
@@ -264,7 +285,7 @@ const projectList = [
     heading: ['370', 'BOTANIC GARDENS'],
     role: 'Visualist, Technologist',
     mediums: 'Projection, Scrim, ComfyUI',
-    tags: ['ai'],
+    tags: ['ai', 'projection'],
     // One string per paragraph: description: ['First paragraph.', 'Second paragraph.']
     description: [
       "A personal exploration of materiality and AI.",
@@ -307,7 +328,7 @@ const projectList = [
     heading: ['FLORA'],
     role: 'Workflow Design, Software Development',
     mediums: 'Node-based AI tooling, web',
-    tags: ['ai'],
+    tags: ['ai', 'web'],
     // One string per paragraph: description: ['First paragraph.', 'Second paragraph.']
     description: [
       '[Flora](https://www.florafauna.ai) is a tool for artists to seamlessly integrate AI models and workflows into their daily practice. I helped with workflow ideation and software development of this node-based visual programming language ahead of its launch.',
@@ -320,10 +341,11 @@ const projectList = [
     title: 'Wild Birds',
     heading: ['WILD BIRDS'],
     role: 'Co-producer, Projection Technician',
-    mediums: 'Multi-wall projection, VJ system, live band and DJ sets',
+    mediums: '270° multi-wall projection, VJ system, live band and DJ sets',
+    tags: ['270-projection', 'live'],
     // One string per paragraph: description: ['First paragraph.', 'Second paragraph.']
     description: [
-      'Wild Birds was a two-part show series that brought together multi-wall projection, VJing and live band and DJ sets. As a co-producer on the project, I worked closely with the owners of the venue and the technical staff of Brooklyn Art Haus to set up the multi-wall projection and VJ system.',
+      'Wild Birds was a two-part show series that brought together 270° projection, VJing and live band and DJ sets. As a co-producer on the project, I worked closely with the owners of the venue and the technical staff of Brooklyn Art Haus to set up the 270° projection across three walls and the VJ system.',
       'I promoted and oversaw the events, recruited VJs to perform and was in charge of space setup and design. After the shows I worked for a time as the venue’s technical consultant and projection technician.',
     ],
   },
@@ -332,7 +354,7 @@ const projectList = [
     slug: 'devolving-spam',
     date: year('devolving-spam', '2023'),
     title: 'Devolving Spam',
-    tags: ['unfeatured'], // shown under All only, not in Featured
+    tags: ['print', 'unfeatured'], // shown under All only, not in Featured
     heading: ['DEVOLVING', 'SPAM'],
     role: 'Artist',
     mediums: 'TouchDesigner, real-time renders, prints',
@@ -374,7 +396,7 @@ const projectList = [
     heading: ['DRUNK ELEPHANT', 'KIOSK'],
     role: 'Visualist, Technologist',
     mediums: 'TouchDesigner, React, Web, Data Visualization, Animation',
-    tags: ['web'],
+    tags: ['web', 'installation', 'interactive'],
     // One string per paragraph: description: ['First paragraph.', 'Second paragraph.']
     description: [
       "I worked with Volvox Labs and Drunk Elephant to update the design of an immersive hair-care quiz kiosk. Users enter information about their hair type to receive a custom hair-care smoothie recommendation.",
@@ -390,7 +412,7 @@ const projectList = [
     heading: ['AFTER', 'AFGHANISTAN'],
     role: 'Designer, Developer',
     mediums: 'Webflow, scrollytelling, web',
-    tags: ['web'],
+    tags: ['web', 'scrollytelling'],
     // One string per paragraph: description: ['First paragraph.', 'Second paragraph.']
     description: [
       'A scrollytelling website documenting the stories of Afghan refugees and their exile from home, at [afterafghanistan.org](https://www.afterafghanistan.org/). I designed and developed the website in Webflow with help from Shawn Carrie (secondary developer), Umar Farooq (journalist) and Oscar Durand (journalist).',
@@ -406,6 +428,7 @@ const projectList = [
     heading: ['DREAMCUBE', 'LOCAL PROJECTS'],
     role: 'Technologist, Unity Developer',
     mediums: 'Unity, four-wall projection, motion detection',
+    tags: ['installation', 'interactive', 'projection'],
     // One string per paragraph: description: ['First paragraph.', 'Second paragraph.']
     description: [
       'An immersive out-of-order storytelling experience created in partnership with Local Projects and their [Dreamcube](https://www.localprojects.com/work/corporate-experience/dreamcube/) four-wall projection technology. My team, Zoe Cohen, Sophia Baker and Martha Janicki, created different trigger points, activated by walking through a space in the cube, that initiated a segment of narrative. Combining three different audio-visual experiences (an iMessage exchange, a diary writing and an interaction with mom), the participant is put in the shoes of an angsty teen girl going through her first heartbreak.',
@@ -417,7 +440,7 @@ const projectList = [
     slug: 'untitled-crt',
     date: year('untitled-crt', '2022'),
     title: 'Untitled (CRT)',
-    tags: ['unfeatured'], // shown under All only, not in Featured
+    tags: ['installation', 'unfeatured'], // shown under All only, not in Featured
     heading: ['UNTITLED', '(CRT)'],
     role: 'Technologist, Installation Design',
     mediums: 'TouchDesigner, ten CRT TVs, robotic arms, A/V',

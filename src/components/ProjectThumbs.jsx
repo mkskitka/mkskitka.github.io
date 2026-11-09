@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
-import { projects } from '../data/projects.js'
+import { projects, TAG_LABELS } from '../data/projects.js'
 import { phoneSpots } from '../lib/phoneTiles.js'
 import { BOUNCE } from './GridInkBackdrop.jsx'
 
@@ -883,7 +883,21 @@ export default function ProjectThumbs({ open = false, onSelect, items = projects
                   </svg>
                 </span>
               )}
-              {titles && <span className="project_thumb_title">{p.title}</span>}
+              {titles && (
+                <span className="project_thumb_title">
+                  {p.title}
+                  {/* The project's categories (`tags` in src/data/projects.js), under its name. */}
+                  {Array.isArray(p.tags) && p.tags.some((t) => TAG_LABELS[t]) && (
+                    <span className="project_thumb_tags">
+                      {p.tags.filter((t) => TAG_LABELS[t]).map((t) => (
+                        <span key={t} className="project_thumb_tag">
+                          {TAG_LABELS[t]}
+                        </span>
+                      ))}
+                    </span>
+                  )}
+                </span>
+              )}
             </a>
           )
         })}

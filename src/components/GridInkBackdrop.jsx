@@ -425,17 +425,15 @@ const MAX_FPS = 60
 // (whole numbers, so the browser scales the canvas up evenly), skipping any at or above
 // the starting cap. The line edges widen to match (uAA), so the lines keep one even
 // thickness. A weak integrated GPU settles a step or two down; a strong GPU never moves.
-// At the lowest step, if it is still slow for GLASS_OFF_AFTER measurements in a row, the
-// glass blur behind the panels is switched off too (html[data-low-gpu] in custom.css),
-// and comes back once frames have been quick again for as many. The density level found
-// is kept for the session so every page starts there (sessionStorage key: QUALITY_KEY);
-// the glass is not, so a reload always tries it again.
+// At the lowest step it stays there (the glass blur behind the panels is never taken
+// off: it used to be, on a slow machine, which made the write-up's glass come and go).
+// The density level found is kept for the session so every page starts there
+// (sessionStorage key: QUALITY_KEY).
 const QUALITY_DIVISORS = [2, 3, 4]
 const MIN_RATIO = 0.4
 const SLOW_FRAME_MS = 1000 / 45
 const QUALITY_WINDOW = 40 // frames per measurement
 const QUALITY_KEY = 'gridInkQuality'
-const GLASS_OFF_AFTER = 3 // slow measurements in a row (at the lowest density) before the glass blur goes off; the same number of quick ones brings it back
 const SIM_STEPS = 2 // simulation steps per frame
 
 // For the Visuals tiles, which bounce along with the lines (components/ProjectThumbs.jsx).
@@ -1146,7 +1144,6 @@ export default function GridInkBackdrop({ className = '', transparent = false, p
     const aaFor = (r) => Math.max(0.7, 1 / r) // css px of edge softness = at least one canvas pixel
     let quality = 0 // index into ratios
     try { quality = Math.min(ratios.length - 1, Math.max(0, Number(sessionStorage.getItem(QUALITY_KEY)) || 0)) } catch { /* storage blocked */ }
-    delete document.documentElement.dataset.lowGpu // the glass starts on; the backdrop takes it off only while it is measurably slow
     renderer.setPixelRatio(ratios[quality])
     el.dataset.quality = String(ratios[quality])
     renderer.setClearColor(0x000000, 0)
@@ -1999,9 +1996,6 @@ export default function GridInkBackdrop({ className = '', transparent = false, p
       // starting / a change (shader compiles, layout), and ignores stalls such as a tab switch.
       let samples = []
       let settleUntil = 0
-      let glassOff = false
-      let slowRun = 0 // slow measurements in a row at the lowest density
-      let quickRun = 0 // quick ones in a row while the glass is off
       const adapt = (gap, now) => {
         if (now < settleUntil || gap > 250) return
         samples.push(gap)
@@ -2009,17 +2003,7 @@ export default function GridInkBackdrop({ className = '', transparent = false, p
         samples.sort((a, b) => a - b)
         const median = samples[samples.length >> 1]
         samples = []
-        if (median <= SLOW_FRAME_MS) {
-          slowRun = 0
-          if (glassOff && ++quickRun >= GLASS_OFF_AFTER) {
-            glassOff = false
-            quickRun = 0
-            delete document.documentElement.dataset.lowGpu
-            if (import.meta.env.DEV) console.info(`GridInkBackdrop: quick again (${median.toFixed(1)} ms), glass blur back on`)
-          }
-          return
-        }
-        quickRun = 0
+        if (median <= SLOW_FRAME_MS) return
         if (quality < ratios.length - 1) {
           quality++
           renderer.setPixelRatio(ratios[quality])
@@ -2028,13 +2012,7 @@ export default function GridInkBackdrop({ className = '', transparent = false, p
           el.dataset.quality = String(ratios[quality])
           try { sessionStorage.setItem(QUALITY_KEY, String(quality)) } catch { /* storage blocked */ }
           if (import.meta.env.DEV) console.info(`GridInkBackdrop: slow frames (${median.toFixed(1)} ms), density -> ${ratios[quality]}`)
-        } else if (!glassOff) {
-          if (++slowRun < GLASS_OFF_AFTER) return
-          glassOff = true
-          slowRun = 0
-          document.documentElement.dataset.lowGpu = ''
-          if (import.meta.env.DEV) console.info(`GridInkBackdrop: still slow (${median.toFixed(1)} ms), glass blur off`)
-        } else return
+        } else return // at the lowest density already: nothing more to give
         settleUntil = now + 1000
       }
       const loop = (now) => {
