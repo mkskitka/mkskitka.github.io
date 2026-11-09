@@ -36,6 +36,9 @@ const SCATTER_TRIES = 200 // whole random layouts to try before falling back to 
  * @param {boolean|number} [o.centerY] slide the block down whole rows so it is centred
  *                                between the row under the panel and the bottom
  *                                (`height`, or this many px when a number)
+ * @param {number} [o.lift]       centerY only: rows the block sits above that centred
+ *                                place; short of room to centre it may take the clear
+ *                                row under the panel (never the panel's own rows)
  * @param {boolean} [o.centerX]   slide the whole block to be centred horizontally
  *                                (rows stay on the grid, tiles may cut across columns)
  * @param {boolean} [o.centered]  lattice only: tidy rows filled in order, a clear cell
@@ -65,6 +68,7 @@ export function phoneSpots({
   columns = 0,
   distinctRows = false,
   centerY = false,
+  lift = 0,
   mixed = null,
 }) {
   // Grid lines sit at origin + k * spacing on each axis (origin is 0 when the grid is
@@ -212,8 +216,9 @@ export function phoneSpots({
       const bottom = Math.max(...placed.map((o) => o.y + o.sh))
       const freeTop = LY(firstRow)
       const freeBottom = LY(Math.floor((bottomPx - originY) / sy + 1e-6))
-      const shiftRows = Math.floor((freeBottom - bottom - (top - freeTop)) / 2 / sy)
-      if (shiftRows > 0) placed = placed.map((o) => ({ ...o, y: o.y + shiftRows * sy }))
+      const panelRow = Math.ceil((panelBottom - originY) / sy) // the first row below the panel
+      const shiftRows = Math.max(panelRow - firstRow, Math.floor((freeBottom - bottom - (top - freeTop)) / 2 / sy) - lift)
+      if (shiftRows !== 0) placed = placed.map((o) => ({ ...o, y: o.y + shiftRows * sy }))
     }
     // centerX: keep the rows on the grid but slide the whole block sideways so it is
     // centred on the page. The tiles then cut across columns, which is fine.

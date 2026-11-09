@@ -32,7 +32,8 @@ import { BOUNCE } from './GridInkBackdrop.jsx'
  * opacity at rest and the others' while one is hovered (custom.css --thumb-opacity,
  * --thumb-opacity-dim), for this set of tiles only. `grow` false turns off the hover
  * enlargement (the tile growing a cell and its image zooming), as on Systems.
- * `phoneRows` caps the rows of tiles under the panel on phones (Systems 2, Visuals 3).
+ * `phoneRows` caps the rows of tiles under the panel on phones (Systems 2, Visuals 3);
+ * `phoneLift` sits the block that many rows above its centred place there.
  * `dimBehind`: one of the corner dropdowns' lists is open (which one, or falsy), so the
  * tiles under it are dulled.
  * `stepped` (Systems grid view, desktop): the wheel moves the tiles a screen's worth of
@@ -98,9 +99,21 @@ const SEEN_MIN = 0.12 // how visible a tile stays once it has slid behind the me
 // Safari (desktop and iOS; Chrome on iOS too, which is Safari underneath): plays HEVC video with
 // alpha, not VP9 with alpha. Everything else is the other way round.
 // A mouse to hover with: the clips are fetched up front, so a hover starts them at once
-// (they are small, and only the tiles near the screen are mounted). Phones never play
-// them, so they fetch nothing.
+// (they are small, and only the tiles near the screen are mounted). Without one (phones)
+// a clip plays by itself while its tile is on screen, and is fetched only then.
 const CAN_HOVER = typeof window !== 'undefined' && window.matchMedia?.('(hover: hover)').matches
+const AUTOPLAY_SEEN = 0.5 // phones: how much of a tile must be on screen for its clip to play
+// Show the clip over the still the instant it has a frame to show (at once when
+// preloaded), so the still is never swapped for a blank.
+const showClip = (v) => {
+  const show = () => { if (!v.paused) v.classList.add('is-playing') }
+  if (v.readyState >= 2) show()
+  else v.addEventListener('playing', show, { once: true })
+}
+const stopClip = (v) => {
+  v.pause()
+  v.classList.remove('is-playing')
+}
 const SAFARI = typeof navigator !== 'undefined' && /apple/i.test(navigator.vendor) && !/crios|fxios|edgios/i.test(navigator.userAgent) ? true : typeof navigator !== 'undefined' && /iphone|ipad|ipod/i.test(navigator.userAgent)
 const SEEN_MIN_STEPPED = 0 // the same in the stepped Systems grid: gone completely, glass and all (--seen-tile fades the whole tile there; elsewhere --seen fades the picture)
 const CLOSE_MS = 320 // how long the tiles take to fade out when closed (matches .is-closing in custom.css)
@@ -135,7 +148,7 @@ const leftToRight = (spots) => {
 const BEAT = 60 / BOUNCE.bpm
 const BEATS = Math.max(1, Math.round((BOUNCE.seconds + 0.6) / BEAT))
 
-export default function ProjectThumbs({ open = false, onSelect, items = projects, label = 'Projects', external = false, bounce = false, titles = true, keep = false, focus = null, cells = TILE_CELLS, rows = false, columns = null, arrowLabels = null, sizes = null, opacity = null, dim = null, grow = true, phoneRows = null, dimBehind = false, stepped = false }) {
+export default function ProjectThumbs({ open = false, onSelect, items = projects, label = 'Projects', external = false, bounce = false, titles = true, keep = false, focus = null, cells = TILE_CELLS, rows = false, columns = null, arrowLabels = null, sizes = null, opacity = null, dim = null, grow = true, phoneRows = null, phoneLift = 0, dimBehind = false, stepped = false }) {
   const nav = useRef(null)
   const tileCells = typeof cells === 'number' ? { desktop: cells, phone: cells } : { ...TILE_CELLS, ...cells }
   const seed = useRef(Math.floor(Math.random() * 1e9))
@@ -238,6 +251,7 @@ export default function ProjectThumbs({ open = false, onSelect, items = projects
             // The block sits centred between the panel and the screen's bottom (above
             // the arrows' row when scrollable), even when `phoneRows` caps its height.
             centerY: section.clientHeight - (clearBottom ? psy : 0),
+            lift: phoneLift,
           })
           out.push(...(rows ? placed : leftToRight(placed)).map((o) => o && { ...o, x: o.x + p * screenW }))
         }
@@ -393,9 +407,47 @@ export default function ProjectThumbs({ open = false, onSelect, items = projects
       ro.disconnect()
       mo.disconnect()
     }
-  }, [items.length, tileCells.desktop, tileCells.phone, rows, stepped, columns?.phone, sizes?.desktop?.[0], sizes?.desktop?.[1], sizes?.phone?.join(), phoneRows])
+  }, [items.length, tileCells.desktop, tileCells.phone, rows, stepped, columns?.phone, sizes?.desktop?.[0], sizes?.desktop?.[1], sizes?.phone?.join(), phoneRows, phoneLift])
+  // Phones (nothing to hover with): a tile's clip plays while at least AUTOPLAY_SEEN of
+  // the tile is on screen and the tiles are open, and stops when it slides off or they
+  // close. New tiles are watched as they mount (the render effect below).
+  const autoplay = useRef(null)
+  const openNow = useRef(open)
+  openNow.current = open
+  useEffect(() => {
+    if (CAN_HOVER) return undefined
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const { target: v, isIntersecting, intersectionRatio } of entries) {
+          if (openNow.current && isIntersecting && intersectionRatio >= AUTOPLAY_SEEN) {
+            v.play().catch(() => {})
+            showClip(v)
+          } else stopClip(v)
+        }
+      },
+      { threshold: [0, AUTOPLAY_SEEN] },
+    )
+    autoplay.current = io
+    return () => {
+      io.disconnect()
+      autoplay.current = null
+    }
+  }, [])
+  useEffect(() => {
+    // Opened or closed: look at every clip afresh (re-observing reports its state again).
+    const io = autoplay.current
+    if (!io || !track.current) return
+    for (const v of track.current.querySelectorAll('.project_thumb_hover')) {
+      if (open) {
+        io.unobserve(v)
+        io.observe(v)
+      } else stopClip(v)
+    }
+  }, [open])
   useEffect(() => {
     dull(pos.current.cur)
+    // Phones: clips of tiles mounted since the last render come under watch (observe is a no-op for the rest).
+    if (autoplay.current && track.current) for (const v of track.current.querySelectorAll('.project_thumb_hover')) autoplay.current.observe(v)
   }) // after every render: the tiles near the panel (or under the open list) get their --seen as soon as they exist
 
   // Desktop, when scrollable: a tile that has slid left past the menu panel's edge is
@@ -786,31 +838,27 @@ export default function ProjectThumbs({ open = false, onSelect, items = projects
                 onSelect(p, e)
               }}
               // Hover clip: the whole tile (glass margin included) starts and stops it, the
-              // same area as the hover opacity in custom.css. Mouse only: a finger never starts it.
+              // same area as the hover opacity in custom.css. Mouse only: a finger never starts
+              // it (on phones the clip plays by itself while the tile is on screen; above).
               onPointerEnter={(e) => {
                 if (e.pointerType !== 'mouse') return
                 const v = e.currentTarget.querySelector('.project_thumb_hover')
                 if (!v) return
                 v.currentTime = 0
                 v.play().catch(() => {})
-                // Shown the instant it has a frame to show (at once when preloaded), so the
-                // still is never swapped for a blank.
-                const show = () => { if (!v.paused) v.classList.add('is-playing') }
-                if (v.readyState >= 2) show()
-                else v.addEventListener('playing', show, { once: true })
+                showClip(v)
               }}
               onPointerLeave={(e) => {
                 const v = e.currentTarget.querySelector('.project_thumb_hover')
-                if (!v) return
-                v.pause()
-                v.classList.remove('is-playing')
+                if (v) stopClip(v)
               }}
             >
               <span className="project_thumb_media">
                 {p.thumb?.image || p.image ? <img src={p.thumb?.image || p.image} alt="" loading="lazy" /> : null}
                 {/* Hover clip (thumb-hover.mp4 in the project folder): a few seconds of the
                     project's video, over the still, while the mouse is on the tile (the
-                    tile's pointer handlers above; custom.css .project_thumb_hover). */}
+                    tile's pointer handlers above; custom.css .project_thumb_hover), or on
+                    phones while the tile is on screen. */}
                 {p.thumb?.hover && (
                   <video className={`project_thumb_hover${p.thumb.hover.alpha ? ' project_thumb_hover--alpha' : ''}`} muted loop playsInline preload={CAN_HOVER ? 'auto' : 'none'} disablePictureInPicture>
                     {/* A transparent clip comes as a pair; only one plays with its alpha in each

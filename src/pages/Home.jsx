@@ -147,7 +147,8 @@ export default function Home() {
   const [sortListOpen, setSortListOpen] = useState({ visuals: null, systems: null }) // which dropdown's list is showing ('show' | 'sort' | null): the tiles under it are dulled
   const onListOpen = (kind) => (which) => setSortListOpen((o) => (o[kind] === which ? o : { ...o, [kind]: which }))
   const pickLayout = (kind) => (id) => setLayout((l) => ({ ...l, [kind]: id }))
-  // (Phones, random layout: tiles of 2x2 and 3x3 cells, with no titles on them.)
+  // (Phones: the grid shows one project per screen, a row above the centre of the space
+  // under the panel; the random layout tiles of 2x2 and 3x3 cells, with no titles on them.)
   // Desktop Systems layout: rows of the grid, tile size in grid cells, the tiles'
   // opacity at rest and the others' while one is hovered. Phones keep their own layout
   // and opacity. In the random layout the tiles come in mixed sizes, 1 to 5 cells.
@@ -410,7 +411,7 @@ export default function Home() {
             ))
           )}
         </div>
-        <ProjectThumbs open={active === 'systems' && !project} keep={active === 'systems' && !!project} items={PROJECT_LIST} onSelect={openProject} cells={{ desktop: tweak.cells }} columns={{ phone: 3 }} rows={layout.systems === 'grid' ? tweak.rows : false} sizes={layout.systems === 'grid' ? null : { desktop: [1, 5], phone: [2, 3] }} titles={!(isPhone && layout.systems === 'scatter')} opacity={isPhone ? null : tweak.opacity} dim={isPhone ? null : tweak.dim} grow={false} phoneRows={layout.systems === 'grid' ? 2 : null} dimBehind={sortListOpen.systems} arrowLabels={sortEnds('systems', sort.systems, sort.rev)} stepped={layout.systems === 'grid'} />
+        <ProjectThumbs open={active === 'systems' && !project} keep={active === 'systems' && !!project} items={PROJECT_LIST} onSelect={openProject} cells={{ desktop: tweak.cells }} columns={{ phone: 1 }} rows={layout.systems === 'grid' ? tweak.rows : false} sizes={layout.systems === 'grid' ? null : { desktop: [1, 5], phone: [2, 3] }} titles={!(isPhone && layout.systems === 'scatter')} opacity={isPhone ? null : tweak.opacity} dim={isPhone ? null : tweak.dim} grow={false} phoneRows={layout.systems === 'grid' ? 1 : null} phoneLift={layout.systems === 'grid' ? 1 : 0} dimBehind={sortListOpen.systems} arrowLabels={sortEnds('systems', sort.systems, sort.rev)} stepped={layout.systems === 'grid'} />
         <VisualsSort kind="systems" open={active === 'systems' && !project} value={sort.systems} rev={sort.rev} onChange={pickSort('systems')} subsets={SHOW.systems} subset={sort.show.systems} onSubset={pickShow('systems')} layout={layout.systems} onLayout={pickLayout('systems')} onListOpen={onListOpen('systems')} />
         <ProjectThumbs open={active === 'visuals' && !project} keep={active === 'visuals' && !!project} focus={visualAt} items={VISUAL_LIST} label="Visuals" onSelect={openProject} bounce={visualsFresh} titles={SHOW_VISUAL_TITLES} rows={layout.visuals === 'grid'} phoneRows={3} dimBehind={sortListOpen.visuals} arrowLabels={sortEnds('visuals', sort.visuals, sort.rev)} />
         <VisualsSort open={active === 'visuals' && !project} value={sort.visuals} rev={sort.rev} onChange={pickSort('visuals')} subsets={SHOW.visuals} subset={sort.show.visuals} onSubset={pickShow('visuals')} layout={layout.visuals} onLayout={pickLayout('visuals')} onListOpen={onListOpen('visuals')} />
