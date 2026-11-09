@@ -208,11 +208,12 @@ const projectList = [
     title: 'End of Signal',
     heading: ['END OF SIGNAL', 'CEZAR MOCAN'],
     role: 'Visualist, Technologist',
-    mediums: 'Live-rendered AI visuals',
+    mediums: 'TouchDesigner, ComfyUI, custom-trained model, web app, live-rendered AI visuals',
     tags: ['ai'],
     // One string per paragraph: description: ['First paragraph.', 'Second paragraph.']
     description: [
       'I built the live-rendered AI visuals system for artist Cezar Mocan’s End of Signal. The installation won the SOLO AI ’25 award and has shown across multiple venues.',
+      'The piece simulates islands evolving over different scales of time, from tides to erosion. A custom web app runs the simulation and exposes an API to control it; TouchDesigner ties everything together, taking the contour maps of the evolving islands from the web app, pre-processing them and feeding them to ComfyUI, which runs a custom workflow on a model trained on satellite imagery to generate the islands’ colour and surface features. TouchDesigner then post-processes and renders the result live.',
     ],
   },
   {
