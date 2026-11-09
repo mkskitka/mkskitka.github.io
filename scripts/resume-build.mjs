@@ -4,11 +4,27 @@
 // The generated pages carry data-path / data-list attributes so the browser editor
 // (scripts/resume-edit.mjs) can save edits back into the JSON.
 import { readFile, writeFile } from 'node:fs/promises'
+import { execFileSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 export const DATA = path.join(ROOT, 'resume', 'resume.json')
+
+// When the resume last changed, from git: the day of the last commit that touched
+// resume.json, or today while the file has edits not yet committed. Shown on the site's
+// resume page (the `site` variant) as "Last updated ...". Null outside a git checkout.
+const lastUpdated = () => {
+  const git = (...args) => execFileSync('git', args, { cwd: ROOT, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim()
+  try {
+    const iso = git('status', '--porcelain', '--', DATA) ? new Date().toISOString().slice(0, 10) : git('log', '-1', '--format=%cs', '--', DATA)
+    if (!iso) return null
+    const text = new Date(`${iso}T12:00:00`).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
+    return { iso, text }
+  } catch {
+    return null
+  }
+}
 
 const esc = (s) => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
 // [text](url) -> <a href="url">text</a>, *text* -> <em>text</em>, everything else escaped
@@ -177,6 +193,7 @@ const page = (d, cv, variant = null) => {
     cv: d.cv.map((s, i) => section(s.heading, yearList(s.items, `cv.${i}.items`))).join('\n'),
   }
   const order = cv ? ['profile', 'jobs', 'education', 'cv'] : v?.sections ?? ['profile', 'jobs', 'education'] // the base resume folds the teaching list into the Research Fellow entry; variants list it
+  const updated = variant === 'site' ? lastUpdated() : null
   return `<!-- page:start -->${header(d, v, vpath)}
 
     <div class="cols">
@@ -187,7 +204,8 @@ const page = (d, cv, variant = null) => {
         <section>${skills(d, v, keep)}
         </section>${cv || v?.sideProjects === false ? '' : sideProjects(d)}
       </aside>
-    </div>
+    </div>${updated ? `
+    <p class="updated">Last updated <time datetime="${updated.iso}">${updated.text}</time></p>` : ''}
     <!-- page:end -->`
 }
 

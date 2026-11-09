@@ -170,11 +170,13 @@
   margin-bottom: 0;
 }
 
-/* Labels: the write-up's dt style. */
+/* Labels: the write-up's dt style (and the "Last updated" line at the foot of the page,
+   which scripts/resume-build.mjs dates from git). */
 .resume_page .label,
 .resume_page .skills dt,
 .resume_page .entry_when,
-.resume_page .teaching .year {
+.resume_page .teaching .year,
+.resume_page .updated {
   font-size: 0.72rem;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -347,4 +349,9 @@
 }
 .resume_page .entry_sub .entry_title {
   font-size: 0.95rem;
+}
+
+.resume_page .updated {
+  margin: calc(var(--cell) * 0.5) 0 0;
+  text-align: right;
 }

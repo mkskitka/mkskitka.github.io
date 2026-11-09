@@ -26,8 +26,9 @@ import { BOUNCE } from './GridInkBackdrop.jsx'
  * Systems uses double-size tiles in rows (three across on phones); Visuals keeps the scatter.
  * `rows` true lays the tiles out in as many rows as fit; a number caps the rows at that
  * (Systems: 1 on desktop), so a long list runs across more screens instead of growing
- * downward. `sizes` ({ desktop: [min, max] }) gives the scatter layout tiles of mixed
- * sizes, each drawn at random between the two. `opacity` / `dim` set the tiles'
+ * downward. `sizes` ({ desktop: [min, max], phone: [2, 3] }) gives the scatter layout
+ * tiles of mixed sizes: on desktop each drawn at random between the two, on phones
+ * half the tiles of each size listed. `opacity` / `dim` set the tiles'
  * opacity at rest and the others' while one is hovered (custom.css --thumb-opacity,
  * --thumb-opacity-dim), for this set of tiles only. `grow` false turns off the hover
  * enlargement (the tile growing a cell and its image zooming), as on Systems.
@@ -227,6 +228,7 @@ export default function ProjectThumbs({ open = false, onSelect, items = projects
             panelBottom,
             rnd,
             cells: pc,
+            mixed: rows ? null : sizes?.phone, // scatter with `sizes.phone` ([2, 3]): tiles of both sizes
             scatter: !rows, // rows: the centred lattice, filled in order
             shuffle: !rows,
             centered: rows,
@@ -391,7 +393,7 @@ export default function ProjectThumbs({ open = false, onSelect, items = projects
       ro.disconnect()
       mo.disconnect()
     }
-  }, [items.length, tileCells.desktop, tileCells.phone, rows, stepped, columns?.phone, sizes?.desktop?.[0], sizes?.desktop?.[1], phoneRows])
+  }, [items.length, tileCells.desktop, tileCells.phone, rows, stepped, columns?.phone, sizes?.desktop?.[0], sizes?.desktop?.[1], sizes?.phone?.join(), phoneRows])
   useEffect(() => {
     dull(pos.current.cur)
   }) // after every render: the tiles near the panel (or under the open list) get their --seen as soon as they exist

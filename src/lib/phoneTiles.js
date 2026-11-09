@@ -29,6 +29,10 @@ const SCATTER_TRIES = 200 // whole random layouts to try before falling back to 
  * @param {() => number} o.rnd   random source (seeded, so a resize keeps the same layout)
  * @param {boolean} [o.distinctRows] scatter only: no two tiles start on the same horizontal
  *                                line, so their tops are all at different heights
+ * @param {number[]} [o.mixed]    scatter only: tile sizes in cells to mix ([2, 3]: half the
+ *                                tiles 2x2, half 3x3, which ones at random), tried before
+ *                                the single size `cells`; a screen that cannot take the
+ *                                mix gets the single size
  * @param {boolean|number} [o.centerY] slide the block down whole rows so it is centred
  *                                between the row under the panel and the bottom
  *                                (`height`, or this many px when a number)
@@ -61,6 +65,7 @@ export function phoneSpots({
   columns = 0,
   distinctRows = false,
   centerY = false,
+  mixed = null,
 }) {
   // Grid lines sit at origin + k * spacing on each axis (origin is 0 when the grid is
   // fitted to the page, half a cell otherwise).
@@ -72,25 +77,27 @@ export function phoneSpots({
   const firstRow = Math.ceil((panelBottom - originY) / sy) + 1 // one clear row under the panel
   const spot = (i, j, n) => ({ x: LX(i), y: LY(j), s: n * s, sh: n * sy, dx: 0, dy: 0 })
 
-  // One random scatter. Placing tiles one at a time can paint itself into a corner, so
-  // `scatter` below tries this many times over before giving up.
-  const scatterOnce = (n) => {
-    if (cols < n || rows - firstRow < n) return null
+  // One random scatter of tiles `n` cells square (or each its own size, `pick[t]`).
+  // Placing tiles one at a time can paint itself into a corner, so `scatter` below
+  // tries this many times over before giving up.
+  const scatterOnce = (n, pick = null, distinct = distinctRows) => {
     const used = new Set()
     const tops = new Set() // rows a tile already starts on (distinctRows)
     const out = []
     for (let t = 0; t < count; t++) {
+      const m = pick ? pick[t] : n
+      if (cols < m || rows - firstRow < m) return null
       let placed = null
       for (let tries = 0; tries < 400 && !placed; tries++) {
-        const i = Math.floor(rnd() * (cols - n + 1))
-        const j = firstRow + Math.floor(rnd() * (rows - firstRow - n + 1))
-        let ok = !(distinctRows && tops.has(j))
-        for (let a = -PAD; a < n + PAD && ok; a++)
-          for (let b = -PAD; b < n + PAD && ok; b++) if (used.has(`${i + a},${j + b}`)) ok = false
+        const i = Math.floor(rnd() * (cols - m + 1))
+        const j = firstRow + Math.floor(rnd() * (rows - firstRow - m + 1))
+        let ok = !(distinct && tops.has(j))
+        for (let a = -PAD; a < m + PAD && ok; a++)
+          for (let b = -PAD; b < m + PAD && ok; b++) if (used.has(`${i + a},${j + b}`)) ok = false
         if (!ok) continue
-        for (let a = 0; a < n; a++) for (let b = 0; b < n; b++) used.add(`${i + a},${j + b}`)
+        for (let a = 0; a < m; a++) for (let b = 0; b < m; b++) used.add(`${i + a},${j + b}`)
         tops.add(j)
-        placed = spot(i, j, n)
+        placed = spot(i, j, m)
       }
       if (!placed) return null
       out.push(placed)
@@ -102,6 +109,22 @@ export function phoneSpots({
     for (let k = 0; k < SCATTER_TRIES; k++) {
       const out = scatterOnce(n)
       if (out) return out
+    }
+    return null
+  }
+  // The mixed sizes: as even a share of each as the count allows, dealt out at random
+  // (a fresh deal each try), scattered with distinct rows first, then without.
+  const scatterMixed = () => {
+    for (const distinct of distinctRows ? [true, false] : [false]) {
+      for (let k = 0; k < SCATTER_TRIES; k++) {
+        const pick = Array.from({ length: count }, (_, t) => mixed[t % mixed.length])
+        for (let a = pick.length - 1; a > 0; a--) {
+          const b = Math.floor(rnd() * (a + 1))
+          ;[pick[a], pick[b]] = [pick[b], pick[a]]
+        }
+        const out = scatterOnce(0, pick, distinct)
+        if (out) return out
+      }
     }
     return null
   }
@@ -173,10 +196,11 @@ export function phoneSpots({
   // distinctRows: a smaller tile on its own line beats a full-size one sharing a line, so
   // every size is tried as a scatter first; the rows and lattice are the last resort.
   const sizes = []
+  if (wantScatter && mixed?.length) sizes.push(['mixed'])
   for (let n = cells; n >= 1; n--) sizes.push([n, true])
   if (wantScatter && distinctRows) for (let n = cells; n >= 1; n--) sizes.push([n, false])
   for (const [n, strict] of sizes) {
-    const out = wantScatter && distinctRows && strict ? scatter(n) : ((wantScatter ? (scatter(n) ?? loose(n)) : null) ?? lattice(n))
+    const out = n === 'mixed' ? scatterMixed() : wantScatter && distinctRows && strict ? scatter(n) : ((wantScatter ? (scatter(n) ?? loose(n)) : null) ?? lattice(n))
     if (!out) continue
     // centerY: slide the whole block down by whole rows so it sits centred between the
     // clear row under the panel and the bottom (`centerY` px, or `height` when true),

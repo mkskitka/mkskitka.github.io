@@ -310,6 +310,12 @@ a:hover,
   -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
   backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
 }
+/* Phones: the rows are small there, so an option takes a whole one (easier to tap). */
+@media (max-width: 767px) {
+  .visuals_sort_option {
+    height: var(--grid-spacing-y, 2.3em);
+  }
+}
 /* (The tiles behind the open list are dulled by ProjectThumbs.jsx, as behind the menu panel.) */
 .visuals_sort_main.is-open .visuals_sort_list {
   display: block;
