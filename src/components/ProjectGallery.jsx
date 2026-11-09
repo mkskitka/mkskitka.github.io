@@ -44,6 +44,23 @@ export default function ProjectGallery({ images = [], label = 'Gallery' }) {
   const [index, setIndex] = useState(-1) // -1 = closed
   const [drag, setDrag] = useState(0) // px the open photo is pulled sideways by a swipe
   const touch = useRef(null)
+  const row = useRef(null)
+
+  // The row is one line that scrolls sideways when it overflows (custom.css). A mouse
+  // wheel only goes up and down, so over the row that movement scrolls it sideways
+  // (trackpads and touch scroll it sideways on their own). Set natively: React's own
+  // wheel events are passive, so they could not cancel the page's handling.
+  useEffect(() => {
+    const el = row.current
+    if (!el) return undefined
+    const onWheel = (e) => {
+      if (el.scrollWidth <= el.clientWidth || Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return
+      e.preventDefault()
+      el.scrollLeft += e.deltaY
+    }
+    el.addEventListener('wheel', onWheel, { passive: false })
+    return () => el.removeEventListener('wheel', onWheel)
+  }, [images.length])
 
   const step = (dir) => setIndex((i) => (i + dir + images.length) % images.length)
 
@@ -89,7 +106,7 @@ export default function ProjectGallery({ images = [], label = 'Gallery' }) {
   return (
     <div className="gallery">
       <h3 className="gallery_label">{label}</h3>
-      <div className="gallery_row">
+      <div ref={row} className="gallery_row">
         {images.map((img, i) => (
           <button key={img.src + i} type="button" className="gallery_thumb" onClick={() => setIndex(i)} aria-label={`Open photo ${i + 1}`}>
             {img.video ? (
