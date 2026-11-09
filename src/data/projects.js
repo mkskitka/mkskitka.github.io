@@ -3,7 +3,9 @@
 //
 // Photos and videos for each project go in src/assets/projects/<slug>/ (see the
 // README there). A file named hero.jpg / hero.mp4 becomes that project's hero
-// backdrop, or set `hero: 'file.jpg'` here to pick one by name.
+// backdrop, or set `hero: 'file.jpg'` here to pick one by name. The backdrop is
+// darkened by 0.35 so the write-up reads over it; `heroDim: 0.6` on a project darkens
+// a bright one more (0 none, 1 black).
 //
 // Fill in `role`, `mediums`, `description`, and swap the placeholder `featured` images
 // per project as you build them out. Delete a project's `featured` list to have the
@@ -145,6 +147,7 @@ const projectList = [
   {
     slug: 'realtor-savings-simulator',
     thumbGlass: true,
+    heroDim: 0.6, // a bright, pale image: darkened more than most so the write-up reads over it
     date: year('realtor-savings-simulator', '2026'),
     title: 'Realtor.com Savings Simulator',
     heading: ['REALTOR.COM', 'SAVINGS SIMULATOR'],

@@ -172,6 +172,9 @@ export default function ProjectBackdrop({ project, from, onClosed, host, fit = '
         '--depth': DEPTH.strength,
         '--depth-w': `${Math.round(DEPTH.width * 100)}%`,
         '--depth-hi': DEPTH.highlight,
+        // How much the image is darkened (custom.css .project_backdrop::after): the
+        // project's own `heroDim` (src/data/projects.js), or the site-wide default.
+        ...(project?.heroDim != null ? { '--hero-dim': project.heroDim } : null),
       }}
       aria-hidden="true"
     >

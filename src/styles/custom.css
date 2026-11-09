@@ -1397,12 +1397,14 @@ a:hover,
   display: none;
 }
 
-/* Darken the image a little so the lines, menu and smoke stay legible over it. */
+/* Darken the image a little so the lines, menu and write-up stay legible over it:
+   0.35 by default, or the project's own `heroDim` (src/data/projects.js) for a
+   bright image. */
 .project_backdrop::after {
   content: '';
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, 0.35);
+  background: rgba(0, 0, 0, var(--hero-dim, 0.35));
   pointer-events: none;
 }
 /* The sketch sits above the image. */
