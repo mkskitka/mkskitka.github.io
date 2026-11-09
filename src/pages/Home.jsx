@@ -11,7 +11,7 @@ import ProjectGallery from '../components/ProjectGallery.jsx'
 import ProjectBackdrop from '../components/ProjectBackdrop.jsx'
 import ProjectLock, { isUnlocked } from '../components/ProjectLock.jsx'
 import { revealSections } from '../lib/animations.js'
-import { DEFAULT_SORT, isSort, sortEnds, sortItems } from '../lib/sortItems.js'
+import { DEFAULT_SORT, isSort, sortEnds, sortItems, subsetItems, subsetsOf } from '../lib/sortItems.js'
 import VisualsSort from '../components/VisualsSort.jsx'
 
 // The site is currently just the hero, fixed to one screen with no scrolling: wheel,
@@ -37,11 +37,12 @@ import VisualsSort from '../components/VisualsSort.jsx'
 //   /contact     the contact tiles
 // (<slug> and <id> are from src/data/projects.js and src/data/visuals.js.) The old
 // /#systems style still works and is turned into /systems.
-// The Visuals and Systems tiles can be sorted (the dropdown at the top right while they
-// are open, components/VisualsSort.jsx; orders in src/lib/sortItems.js: for Systems,
-// Newest / Oldest or only the AI or Web projects). A non-default order is part of the
-// address, /visuals?sort=newest or /systems?sort=ai (&rev=1 when flipped), so a sorted
-// view can be sent too; swiping through the visuals follows the chosen order.
+// The Visuals and Systems tiles can be sorted, and narrowed to a subset (the Sort and
+// Show dropdowns at the top right while they are open, components/VisualsSort.jsx;
+// orders and subsets in src/lib/sortItems.js: for Systems, Newest / Oldest, and All or
+// only the AI or Web projects). What is not the default is part of the address,
+// /visuals?sort=newest or /systems?show=ai&sort=newest&rev=1 (rev: flipped), so a view
+// can be sent too; swiping through the visuals follows the chosen order.
 // Clicking SYSTEMS (to open it) sends a band of light along the grid lines, left to right;
 // clicking VISUALS pours a stream of ink/smoke into the backdrop (GridInkBackdrop SETTINGS.glow / .pour).
 // Only those menu clicks do it: coming back to the tiles from a project or visual does not.
@@ -74,22 +75,37 @@ const MENU = [
   { id: 'visuals', label: 'VISUALS', path: '/visuals' },
   { id: 'contact', label: 'CONTACT', path: '/contact' },
 ]
+// The subsets each kind of tiles can be narrowed to (the Show dropdown): All, and each
+// tag some item carries.
+const SHOW = { systems: subsetsOf('systems', projects), visuals: subsetsOf('visuals', VISUAL_ITEMS) }
+const isShow = (kind, id) => !!SHOW[kind]?.some((s) => s.id === id)
 // The address for a state of the page, and the state an address asks for.
 const pathFor = (active, project, sort = DEFAULT_SORT) => {
   if (project) return project.kind === 'visual' ? `/visuals/${project.slug}` : `/projects/${project.slug}`
   const path = MENU.find((m) => m.id === active)?.path ?? '/'
   const order = sort[active]
-  if (!order || (order === DEFAULT_SORT[active] && !sort.rev)) return path
-  return `${path}?sort=${order}${sort.rev ? '&rev=1' : ''}`
+  if (!order) return path
+  const query = []
+  const show = sort.show?.[active]
+  if (show && show !== DEFAULT_SORT.show[active]) query.push(`show=${show}`)
+  if (order !== DEFAULT_SORT[active] || sort.rev) query.push(`sort=${order}`)
+  if (sort.rev) query.push('rev=1')
+  return query.length ? `${path}?${query.join('&')}` : path
 }
-// The sort order an address asks for: the default, unless the address opens a kind of
-// tiles that can be sorted and names an order for it.
+// The view an address asks for (order, flipped or not, subset): the default, unless
+// the address opens a kind of tiles and names an order or a subset for them.
 const parseSort = (pathname, search) => {
   const { active } = parsePath(pathname)
+  const view = { ...DEFAULT_SORT }
+  if (!active || !(active in DEFAULT_SORT.show)) return view
   const params = new URLSearchParams(search)
-  const want = params.get('sort')
-  if (!active || !isSort(active, want)) return { ...DEFAULT_SORT }
-  return { ...DEFAULT_SORT, [active]: want, rev: params.get('rev') === '1' && want !== 'shuffle' }
+  const order = params.get('sort')
+  // Older links name a subset as the order (/systems?sort=ai): read it as the subset.
+  const show = params.get('show') ?? (isSort(active, order) ? null : order)
+  if (isShow(active, show)) view.show = { ...DEFAULT_SORT.show, [active]: show }
+  if (isSort(active, order)) view[active] = order
+  view.rev = params.get('rev') === '1' && view[active] !== 'shuffle' && (isSort(active, order) || isShow(active, show))
+  return view
 }
 const parsePath = (pathname) => {
   const menu = MENU.find((m) => m.path === pathname.replace(/\/$/, '') || m.path === pathname)
@@ -122,14 +138,14 @@ export default function Home() {
   // Sort order per kind of tiles (src/lib/sortItems.js), and the seed behind a shuffle.
   const [sort, setSort] = useState(() => parseSort(location.pathname, location.search))
   const [shuffleSeed, setShuffleSeed] = useState(() => Math.random())
-  const VISUAL_LIST = useMemo(() => sortItems(VISUAL_ITEMS, sort.visuals, { seed: shuffleSeed, rev: sort.rev }), [sort.visuals, sort.rev, shuffleSeed])
-  const PROJECT_LIST = useMemo(() => sortItems(projects, sort.systems, { rev: sort.rev }), [sort.systems, sort.rev])
+  const VISUAL_LIST = useMemo(() => sortItems(subsetItems(VISUAL_ITEMS, 'visuals', sort.show.visuals), sort.visuals, { seed: shuffleSeed, rev: sort.rev }), [sort.visuals, sort.show.visuals, sort.rev, shuffleSeed])
+  const PROJECT_LIST = useMemo(() => sortItems(subsetItems(projects, 'systems', sort.show.systems), sort.systems, { rev: sort.rev }), [sort.systems, sort.show.systems, sort.rev])
   // How each kind of tiles is laid out: 'grid' (rows on the lattice) or 'scatter'
   // (random spots). Systems opens as a grid, Visuals scattered; the icons beside the
   // Sort button switch.
   const [layout, setLayout] = useState({ visuals: 'scatter', systems: 'grid' })
-  const [sortListOpen, setSortListOpen] = useState({ visuals: false, systems: false }) // the dropdown's list showing: the tiles under it are dulled
-  const onListOpen = (kind) => (isOpen) => setSortListOpen((o) => (o[kind] === isOpen ? o : { ...o, [kind]: isOpen }))
+  const [sortListOpen, setSortListOpen] = useState({ visuals: null, systems: null }) // which dropdown's list is showing ('show' | 'sort' | null): the tiles under it are dulled
+  const onListOpen = (kind) => (which) => setSortListOpen((o) => (o[kind] === which ? o : { ...o, [kind]: which }))
   const pickLayout = (kind) => (id) => setLayout((l) => ({ ...l, [kind]: id }))
   // Desktop Systems layout: rows of the grid, tile size in grid cells, the tiles'
   // opacity at rest and the others' while one is hovered. Phones keep their own layout
@@ -204,6 +220,12 @@ export default function Home() {
     setSort(next)
     navigate(pathFor(kind, null, next), { replace: true })
   }
+  // The Show dropdown: which of the set are shown. The order stays as it was.
+  const pickShow = (kind) => (id) => {
+    const next = { ...sort, show: { ...sort.show, [kind]: id } }
+    setSort(next)
+    navigate(pathFor(kind, null, next), { replace: true })
+  }
 
   // Visuals are shown as the piece itself: the whole image as large as it fits, no
   // write-up, just the back arrow and its title. Projects keep the write-up, and on
@@ -253,7 +275,7 @@ export default function Home() {
     // A sent link, or back / forward, naming an order.
     if (!want.item) {
       const order = parseSort(location.pathname, location.search)
-      if (want.active && (order[want.active] !== sort[want.active] || order.rev !== sort.rev)) setSort(order)
+      if (want.active && (order[want.active] !== sort[want.active] || order.rev !== sort.rev || order.show[want.active] !== sort.show[want.active])) setSort(order)
     }
     if (want.item) {
       if (project?.slug !== want.item.slug && locked?.project.slug !== want.item.slug) openProject(want.item)
@@ -388,9 +410,9 @@ export default function Home() {
           )}
         </div>
         <ProjectThumbs open={active === 'systems' && !project} keep={active === 'systems' && !!project} items={PROJECT_LIST} onSelect={openProject} cells={{ desktop: tweak.cells }} columns={{ phone: 3 }} rows={layout.systems === 'grid' ? tweak.rows : false} sizes={layout.systems === 'grid' ? null : { desktop: [1, 5] }} opacity={isPhone ? null : tweak.opacity} dim={isPhone ? null : tweak.dim} grow={false} phoneRows={layout.systems === 'grid' ? 2 : null} dimBehind={sortListOpen.systems} arrowLabels={sortEnds('systems', sort.systems, sort.rev)} stepped={layout.systems === 'grid'} />
-        <VisualsSort kind="systems" open={active === 'systems' && !project} value={sort.systems} rev={sort.rev} onChange={pickSort('systems')} layout={layout.systems} onLayout={pickLayout('systems')} onListOpen={onListOpen('systems')} />
+        <VisualsSort kind="systems" open={active === 'systems' && !project} value={sort.systems} rev={sort.rev} onChange={pickSort('systems')} subsets={SHOW.systems} subset={sort.show.systems} onSubset={pickShow('systems')} layout={layout.systems} onLayout={pickLayout('systems')} onListOpen={onListOpen('systems')} />
         <ProjectThumbs open={active === 'visuals' && !project} keep={active === 'visuals' && !!project} focus={visualAt} items={VISUAL_LIST} label="Visuals" onSelect={openProject} bounce={visualsFresh} titles={SHOW_VISUAL_TITLES} rows={layout.visuals === 'grid'} phoneRows={3} dimBehind={sortListOpen.visuals} arrowLabels={sortEnds('visuals', sort.visuals, sort.rev)} />
-        <VisualsSort open={active === 'visuals' && !project} value={sort.visuals} rev={sort.rev} onChange={pickSort('visuals')} layout={layout.visuals} onLayout={pickLayout('visuals')} onListOpen={onListOpen('visuals')} />
+        <VisualsSort open={active === 'visuals' && !project} value={sort.visuals} rev={sort.rev} onChange={pickSort('visuals')} subsets={SHOW.visuals} subset={sort.show.visuals} onSubset={pickShow('visuals')} layout={layout.visuals} onLayout={pickLayout('visuals')} onListOpen={onListOpen('visuals')} />
         <ContactTiles open={active === 'contact'} />
         {/* The hope_wide loop beside the menu while nothing is selected is off for now:
             components/HomeVideo.jsx, <HomeVideo open={!active && !project} /> here. */}

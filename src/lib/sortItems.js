@@ -1,8 +1,11 @@
-// Sort orders for the Visuals tiles on the home page (components/VisualsSort.jsx is
-// the dropdown; the choice is kept in the address as ?sort=<id>, plus &rev=1 when the
-// order is flipped, so a sorted view can be sent as a link). Written per kind of
-// tiles, so the Systems tiles can get orders too: add a `systems` list here and a
-// control in pages/Home.jsx.
+// Two separate things the tiles on the home page can be asked for, each with its own
+// dropdown in the top right corner (components/VisualsSort.jsx):
+//   Sort: the ORDER the whole set is put in (SORTS below): newest first, by colour...
+//   Show: WHICH of the set are shown (SUBSETS below): all of them, or only those
+//         carrying a tag (AI, Web...).
+// Both are kept in the address, ?show=<id>&sort=<id> (plus &rev=1 when the order is
+// flipped), so a view can be sent as a link. Written per kind of tiles ('visuals',
+// 'systems').
 //
 // Visuals carry the Instagram post's `timestamp` and the numbers measured from the
 // image by scripts/image-metrics.mjs (hue, light, vivid, busy, glitch). Every order
@@ -22,13 +25,37 @@ export const SORTS = {
     { id: 'light', label: 'Dark → Light', flipped: 'Light → Dark', ends: ['darker', 'lighter'] },
     { id: 'shuffle', label: 'Shuffle' }, // a new order each time it is picked
   ],
-  // Systems (the project tiles): by date, or only the projects carrying a tag (`tags`
-  // in src/data/projects.js), newest first. Picking the active one again flips it.
+  // Systems (the project tiles): by date. Picking it again flips it.
+  systems: [{ id: 'newest', label: 'Newest', flipped: 'Oldest', ends: ['newer', 'older'] }],
+}
+// Subsets (the Show dropdown): 'all', only the items carrying `tag`, or every item but
+// those carrying `without` (an item's `tags`, a list of strings: for projects, `tags`
+// in src/data/projects.js). Featured works the second way round, so a project is
+// featured unless it is tagged 'unfeatured', and a newly added one shows up without
+// being tagged. A subset no item's tags bear on is not offered, and with nothing but
+// All to offer the dropdown is not shown at all (Visuals, until the pieces carry
+// tags). To add one: a line here, and the tag on the items. Which subset the tiles
+// open in is in DEFAULT_SORT below.
+export const SUBSETS = {
   systems: [
-    { id: 'newest', label: 'Newest', flipped: 'Oldest', ends: ['newer', 'older'] },
-    { id: 'ai', label: 'AI', flipped: 'AI, oldest first', tag: 'ai', ends: ['newer', 'older'] },
-    { id: 'web', label: 'Web', flipped: 'Web, oldest first', tag: 'web', ends: ['newer', 'older'] },
+    { id: 'all', label: 'All' },
+    { id: 'featured', label: 'Featured', without: 'unfeatured' },
+    { id: 'ai', label: 'AI', tag: 'ai' },
+    { id: 'web', label: 'Web', tag: 'web' },
+    { id: 'installation', label: 'Installation', tag: 'installation' },
   ],
+  visuals: [{ id: 'all', label: 'All' }],
+}
+const tagged = (tag) => (item) => Array.isArray(item.tags) && item.tags.includes(tag)
+// The subsets on offer for these items: All, and each one whose tag at least one of
+// them carries.
+export const subsetsOf = (kind, items) => (SUBSETS[kind] ?? []).filter((s) => (!s.tag && !s.without) || items.some(tagged(s.tag ?? s.without)))
+// The items of a subset, in the order given (all of them for 'all' or an unknown id).
+export const subsetItems = (items, kind, id) => {
+  const subset = SUBSETS[kind]?.find((s) => s.id === id)
+  if (subset?.tag) return items.filter(tagged(subset.tag))
+  if (subset?.without) return items.filter((item) => !tagged(subset.without)(item))
+  return items
 }
 // What lies left and right of the tiles under an order, as written on the scroll
 // arrows: ['darker', 'lighter'], or null when the order has no ends (Shuffle).
@@ -36,7 +63,9 @@ export const sortEnds = (kind, id, rev = false) => {
   const ends = SORTS[kind]?.find((s) => s.id === id)?.ends
   return ends ? (rev ? [ends[1], ends[0]] : ends) : null
 }
-export const DEFAULT_SORT = { visuals: 'color', systems: 'newest', rev: false }
+// The view the tiles open in: the order per kind, whether it is flipped, and the
+// subset per kind (`show`).
+export const DEFAULT_SORT = { visuals: 'color', systems: 'newest', rev: false, show: { visuals: 'all', systems: 'featured' } }
 export const isSort = (kind, id) => !!SORTS[kind]?.some((s) => s.id === id)
 
 // The number each order sorts by (null when the item does not have it), and which
@@ -49,8 +78,6 @@ const when = (item) => {
 }
 const KEYS = {
   newest: [when, -1],
-  ai: [when, -1], // the tag orders: only items tagged so (see below), newest first
-  web: [when, -1],
   color: [num('hue'), 1],
   light: [num('light'), 1],
   busy: [num('busy'), 1],
@@ -82,10 +109,7 @@ export function sortItems(items, id, { seed = 0, rev = false } = {}) {
   const entry = KEYS[id]
   if (!entry) return items.slice()
   const [key, dir] = entry
-  // An order with a tag keeps only the items carrying it (item.tags, a list of strings).
-  const tag = Object.values(SORTS).flat().find((s) => s.id === id)?.tag
-  const pool = tag ? items.filter((item) => Array.isArray(item.tags) && item.tags.includes(tag)) : items
-  const keyed = pool.filter((item) => key(item) != null).sort(by(key, rev ? -dir : dir))
-  const rest = pool.filter((item) => key(item) == null)
+  const keyed = items.filter((item) => key(item) != null).sort(by(key, rev ? -dir : dir))
+  const rest = items.filter((item) => key(item) == null)
   return keyed.concat(rest)
 }

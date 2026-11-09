@@ -182,12 +182,13 @@ a:hover,
   opacity: 1;
 }
 
-/* Sort dropdown (components/VisualsSort.jsx, orders in lib/sortItems.js). A glass
-   button in the top right corner of the page, filling the first grid row so its bottom
-   edge sits on the first line and the controls are centred in the row. The list drops
-   below it, two orders per grid row (half a row each), so it stays on the lattice
-   without taking much height; the tiles behind it are dulled (ProjectThumbs.jsx), so
-   the options read over them. It fades in and out with the tiles. */
+/* The tools in the top right corner of the page (components/VisualsSort.jsx; orders
+   and subsets in lib/sortItems.js): the layout icons, then the Show and Sort dropdowns,
+   filling the first grid row so the controls are centred in it. The tiles keep that row
+   clear, so the bar has no backing of its own. A dropdown's list drops below its button,
+   two options per grid row (half a row each), so it stays on the lattice without taking
+   much height; the list is glass, and the tiles behind it are dulled (ProjectThumbs.jsx),
+   so the options read over them. The tools fade in and out with the tiles. */
 .visuals_sort {
   position: absolute;
   z-index: 3;
@@ -207,8 +208,8 @@ a:hover,
   opacity: 1;
   pointer-events: auto;
 }
-/* The layout icons (grid / random) sit to the left of the Sort button in the same
-   band; the Sort button and its list are one block so the list hangs from it. */
+/* The layout icons (grid / random) sit to the left of the dropdowns in the same band;
+   each dropdown's button and list are one block so the list hangs from its button. */
 .visuals_sort {
   display: flex;
   align-items: stretch;
@@ -220,10 +221,6 @@ a:hover,
 .visuals_sort_layout {
   display: flex;
   align-items: stretch;
-  margin-right: 1px;
-  background-color: var(--glass-tint);
-  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
-  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
 }
 .visuals_sort_icon {
   margin: 0;
@@ -283,11 +280,6 @@ a:hover,
   cursor: pointer;
   touch-action: manipulation;
 }
-.visuals_sort_button {
-  background-color: var(--glass-tint);
-  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
-  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
-}
 .visuals_sort_prefix {
   opacity: var(--menu-dim);
 }
@@ -302,7 +294,7 @@ a:hover,
   opacity: 0.6;
   transition: transform 0.25s ease;
 }
-.visuals_sort.is-open .visuals_sort_chevron {
+.visuals_sort_main.is-open .visuals_sort_chevron {
   transform: rotate(180deg);
 }
 .visuals_sort_list {
@@ -319,7 +311,7 @@ a:hover,
   backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
 }
 /* (The tiles behind the open list are dulled by ProjectThumbs.jsx, as behind the menu panel.) */
-.visuals_sort.is-open .visuals_sort_list {
+.visuals_sort_main.is-open .visuals_sort_list {
   display: block;
 }
 .visuals_sort_option {

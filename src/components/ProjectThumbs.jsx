@@ -8,7 +8,10 @@ import { BOUNCE } from './GridInkBackdrop.jsx'
  * Visuals (`items` + `external`: each tile links out in a new tab).
  * One square per item, TILE_CELLS backdrop cells across, scattered over random
  * grid cells beside the menu panel (never overlapping, always on the
- * lines, chosen once per page load). Hovering a tile grows it by one cell each way,
+ * lines, chosen once per page load). The spots are random but who gets which is not:
+ * on each screen the items take them in order from the left (leftToRight below), so a
+ * sort order reads left to right here too. The page's top and bottom grid rows are
+ * left empty. Hovering a tile grows it by one cell each way,
  * expanding away from the nearest page edge so it stays on screen; the other
  * tiles dim. Clicking opens the project (`onSelect(project, event)`).
  *
@@ -29,7 +32,8 @@ import { BOUNCE } from './GridInkBackdrop.jsx'
  * --thumb-opacity-dim), for this set of tiles only. `grow` false turns off the hover
  * enlargement (the tile growing a cell and its image zooming), as on Systems.
  * `phoneRows` caps the rows of tiles under the panel on phones (Systems 2, Visuals 3).
- * `dimBehind`: the sort dropdown's list is open, so the tiles under it are dulled.
+ * `dimBehind`: one of the corner dropdowns' lists is open (which one, or falsy), so the
+ * tiles under it are dulled.
  * `stepped` (Systems grid view, desktop): the wheel moves the tiles a screen's worth of
  * columns at a time (as many as stand beside the menu panel: two tiles showing, a swipe
  * moves two). Each step lands the next column of tiles exactly where the first one
@@ -117,6 +121,15 @@ const mulberry32 = (a) => () => {
   return ((t ^ (t >>> 14)) >>> 0) / 4294967296
 }
 
+// A screen's scattered spots, handed out in the items' order: the first item gets the
+// spot furthest left, the next the second furthest left, and so on (two spots starting on
+// the same column: the upper one first), so the sort order reads left to right across the
+// scatter as it does in the rows. Tiles that found no spot (null) come last.
+const leftToRight = (spots) => {
+  const placed = spots.filter(Boolean).sort((a, b) => a.x - b.x || a.y - b.y)
+  return placed.concat(spots.filter((o) => !o))
+}
+
 // The tiles' hop: one per beat, for about as long as the lines take to bounce and settle.
 const BEAT = 60 / BOUNCE.bpm
 const BEATS = Math.max(1, Math.round((BOUNCE.seconds + 0.6) / BEAT))
@@ -198,6 +211,9 @@ export default function ProjectThumbs({ open = false, onSelect, items = projects
         const per = rows ? pperRow * pmaxRows : MAX_PER_SCREEN.phone
         const screens = Math.max(1, Math.ceil(items.length / per))
         const rnd = mulberry32(seed.current)
+        // The bottom grid row stays clear of tiles: it is the arrows' when scrollable,
+        // and the scatter leaves it empty either way (the top row is the panel's).
+        const clearBottom = screens > 1 || !rows
         const out = []
         for (let p = 0; p < screens; p++) {
           const placed = phoneSpots({
@@ -207,7 +223,7 @@ export default function ProjectThumbs({ open = false, onSelect, items = projects
             originX,
             originY: poy,
             width: section.clientWidth,
-            height: pHeight - (screens > 1 && pHeight === section.clientHeight ? psy : 0), // the bottom row is the arrows'
+            height: clearBottom ? Math.min(pHeight, section.clientHeight - psy) : pHeight,
             panelBottom,
             rnd,
             cells: pc,
@@ -219,9 +235,9 @@ export default function ProjectThumbs({ open = false, onSelect, items = projects
             distinctRows: !rows, // scatter: every tile's top edge on a different grid line
             // The block sits centred between the panel and the screen's bottom (above
             // the arrows' row when scrollable), even when `phoneRows` caps its height.
-            centerY: section.clientHeight - (screens > 1 ? psy : 0),
+            centerY: section.clientHeight - (clearBottom ? psy : 0),
           })
-          out.push(...placed.map((o) => o && { ...o, x: o.x + p * screenW }))
+          out.push(...(rows ? placed : leftToRight(placed)).map((o) => o && { ...o, x: o.x + p * screenW }))
         }
         setSpots(out)
         setStrip({
@@ -266,26 +282,35 @@ export default function ProjectThumbs({ open = false, onSelect, items = projects
       const pitch = dc + PAD
       const perRow = Math.max(1, Math.floor(span / pitch)) // a clear cell at the page's right edge too
       const latticeRows = (free) => Math.max(1, Math.floor((free + PAD) / pitch))
-      // Everything on one screen if the lattice holds it; otherwise the bottom grid row
-      // goes to the arrows and the lattice is sized on what is left.
-      let maxRows = latticeRows(gridRows)
-      if (rows && items.length > perRow * maxRows) maxRows = latticeRows(gridRows - 1)
+      // The page's top grid row is left to the corner tools (components/VisualsSort.jsx),
+      // which have no backing of their own. Everything on one screen if the lattice
+      // holds it; otherwise the bottom grid row goes to the arrows and the lattice is
+      // sized on what is left.
+      let maxRows = latticeRows(gridRows - 1)
+      if (rows && items.length > perRow * maxRows) maxRows = latticeRows(gridRows - 2)
       // `rows` as a number caps the rows (Systems: two), the rest going on further screens.
       if (typeof rows === 'number') {
         maxRows = Math.min(maxRows, rows)
-        if (items.length > perRow * maxRows) maxRows = Math.min(rows, latticeRows(gridRows - 1))
+        if (items.length > perRow * maxRows) maxRows = Math.min(rows, latticeRows(gridRows - 2))
       }
       // A scatter of mixed sizes holds fewer per screen: about what the area allows
       // for tiles of the average size, each with its clear cell around it.
       const avg = sizes?.desktop ? (sizes.desktop[0] + sizes.desktop[1]) / 2 + PAD : 0
-      const per = rows ? perRow * maxRows : sizes?.desktop ? Math.max(3, Math.floor((span * Math.max(1, gridRows - 1)) / (avg * avg))) : MAX_PER_SCREEN.desktop
+      // The scatter keeps the page's top and bottom grid rows clear (the bottom one is
+      // the arrows' when scrollable in any case): tiles go on rows scatterTop and down,
+      // scatterRows of them. A window too short to spare the rows uses what it has.
+      const scatterTop = gridRows >= 3 ? 1 : 0
+      const scatterRows = Math.max(1, gridRows - 2)
+      const per = rows ? perRow * maxRows : sizes?.desktop ? Math.max(3, Math.floor((span * scatterRows) / (avg * avg))) : MAX_PER_SCREEN.desktop
       const screens = Math.max(1, Math.ceil(items.length / per))
       const tileRows = screens > 1 ? gridRows - 1 : gridRows // when scrollable the bottom row is the arrows'
       const rowCount = Math.min(maxRows, Math.ceil(Math.min(per, items.length) / perRow))
       // The block of rows is centred on the whole page height (so it balances the menu
       // panel, not the space above the arrows), then kept clear of the arrows' row.
       const blockRows = rowCount * pitch - PAD
-      const row0 = Math.max(0, Math.min(tileRows - blockRows, Math.floor((gridRows - blockRows) / 2))) // a half-row tie goes up, toward the menu panel
+      // (A half-row tie goes up, toward the menu panel; never into the top row, unless
+      // the window is too short for the block to fit under it.)
+      const row0 = Math.max(0, Math.min(tileRows - blockRows, Math.max(1, Math.floor((gridRows - blockRows) / 2))))
       // ...and centred (to the nearest column) between the panel and the right edge.
       const rowCols = Math.min(perRow, items.length) * pitch - PAD
       const col0 = Math.max(0, Math.floor((span - rowCols) / 2))
@@ -294,7 +319,7 @@ export default function ProjectThumbs({ open = false, onSelect, items = projects
       // space when it locks. With an odd number of spare columns that puts its edges
       // half a cell off the grid lines; the rows still sit on the lines.
       const shift = stepped && rows ? panelRight + (W - panelRight - rowCols * sx) / 2 - LX(firstCol + col0) : 0
-      const out = items.map((_, n) => {
+      const drawn = items.map((_, n) => {
         const first = firstCol + Math.floor(n / per) * span
         if (rows) {
           const k = n % per
@@ -313,10 +338,10 @@ export default function ProjectThumbs({ open = false, onSelect, items = projects
         // random between the two (the same draw each time, from the seed).
         const want = sizes?.desktop ? sizes.desktop[0] + Math.floor(rnd() * (sizes.desktop[1] - sizes.desktop[0] + 1)) : dc
         for (let c = want; c >= 1; c--) {
-          if (span < c || tileRows < c) continue
+          if (span < c || scatterRows < c) continue
           for (let tries = 0; tries < 500; tries++) {
             const i = first + Math.floor(rnd() * (span - c + 1))
-            const j = Math.floor(rnd() * (tileRows - c + 1))
+            const j = scatterTop + Math.floor(rnd() * (scatterRows - c + 1))
             let ok = i + c <= cols || screens > 1
             for (let a = -PAD; a < c + PAD && ok; a++) for (let b = -PAD; b < c + PAD && ok; b++) if (used.has(`${i + a},${j + b}`)) ok = false
             if (!ok) continue
@@ -330,6 +355,8 @@ export default function ProjectThumbs({ open = false, onSelect, items = projects
         }
         return null
       })
+      // Scatter: each screen's spots go to its items in order, left to right.
+      const out = rows ? drawn : drawn.flatMap((_, n) => (n % per ? [] : leftToRight(drawn.slice(n, n + per))))
       setSpots(out)
       // How far the tiles can scroll: to where the last tile (plus a clear cell) meets
       // the page's right edge, on a whole column, rather than a whole screen past the
@@ -373,12 +400,12 @@ export default function ProjectThumbs({ open = false, onSelect, items = projects
   // dulled (its --seen, which custom.css multiplies into the media and title opacity:
   // SEEN_MIN behind the panel, 1 fully clear of it, in between while crossing), so the
   // menu stays readable over it and half-hidden tiles do not pull the eye.
-  // With `dimBehind` (the sort dropdown's list is open) the tiles under that list are
+  // With `dimBehind` (a corner dropdown's list is open) the tiles under that list are
   // dulled too.
   const dull = (scrolled) => {
     const edge = strip?.fadeFrom
     if (!track.current) return
-    const list = dimBehind ? document.querySelector('.visuals_sort.is-open .visuals_sort_list')?.getBoundingClientRect() : null
+    const list = dimBehind ? document.querySelector('.visuals_sort_main.is-open .visuals_sort_list')?.getBoundingClientRect() : null
     if (edge == null && !list) return
     for (const el of track.current.querySelectorAll('.project_thumb')) {
       let seen = 1

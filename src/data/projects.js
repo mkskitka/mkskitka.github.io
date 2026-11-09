@@ -18,8 +18,10 @@ import { folderImages, folderMedia, heroFor, isVideo, resolveMedia, thumbFor } f
 import resume from '../../resume/resume.json'
 // A project's year, from resume/resume.json when it is listed there (the resume, the CV
 // and the site then always agree); otherwise the `date` written below.
-// `tags` on a project (['ai'], ['web']) are what the Systems sort dropdown filters by
-// (src/lib/sortItems.js); a project without them only shows under Newest / Oldest.
+// `tags` on a project (['ai'], ['web', 'installation']...) are the subsets the Systems
+// "Show" dropdown offers (SUBSETS in src/lib/sortItems.js); a subset appears once a
+// project carries its tag. Featured, the subset the tiles open in, is every project
+// but those tagged 'unfeatured', which only show under All.
 const year = (slug, fallback) => resume.projects.find((p) => p.slug === slug)?.year ?? fallback
 
 const img = (name) => `/images/${name}`
@@ -327,6 +329,7 @@ const projectList = [
     slug: 'devolving-spam',
     date: year('devolving-spam', '2023'),
     title: 'Devolving Spam',
+    tags: ['unfeatured'], // shown under All only, not in Featured
     heading: ['DEVOLVING', 'SPAM'],
     role: 'Artist',
     mediums: 'TouchDesigner, real-time renders, prints',
@@ -411,6 +414,7 @@ const projectList = [
     slug: 'untitled-crt',
     date: year('untitled-crt', '2022'),
     title: 'Untitled (CRT)',
+    tags: ['unfeatured'], // shown under All only, not in Featured
     heading: ['UNTITLED', '(CRT)'],
     role: 'Technologist, Installation Design',
     mediums: 'TouchDesigner, ten CRT TVs, robotic arms, A/V',
