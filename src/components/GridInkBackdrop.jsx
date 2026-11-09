@@ -75,8 +75,8 @@ const PALETTES = {
 const PALETTE = 'mk-original' // <- active palette: 'mk-original' | 'cyan' | 'signal' | 'neon'
 const ACTIVE = PALETTES[PALETTE] ?? PALETTES['mk-original']
 
-// GLOW STYLES: the three looks a moving light on the lines can have. Each is named after
-// the animation it was first made for; any animation can use any of them (GLOW_STYLE).
+// GLOW STYLES: the looks a light on the lines can have. Each is named after the
+// animation it was first made for; any animation can use any of them (GLOW_STYLE).
 //   shape  'tip'  = lit at a leading end, with the light trailing off behind it
 //          'band' = a soft band of light, fading equally in front and behind
 //   light  'point' = a round glow sitting on the leading end
@@ -90,12 +90,14 @@ const GLOW_STYLES = {
   contact: { shape: 'tip', light: 'point', length: 0.18, brightness: 1, thicken: 0.6, halo: 7, haloStrength: 0.7 },
   load: { shape: 'tip', light: 'line', length: 0.12, brightness: 0.9, thicken: 0.6, halo: 5, haloStrength: 0.5 },
   systems: { shape: 'band', light: 'line', length: 0.14, brightness: 0.45, thicken: 0.5, halo: 3.5, haloStrength: 0.25 },
+  ambient: { shape: 'band', light: 'line', length: 0, brightness: 0.75, thicken: 0.35, halo: 5, haloStrength: 0.4 }, // (shape, light and length do not apply: the ambient light is patches, not a travelling light)
 }
-// Which style each animation uses: 'contact', 'load' or 'systems'.
+// Which style each animation uses: 'contact', 'load', 'systems' or 'ambient'.
 const GLOW_STYLE = {
   load: 'contact', // the lines growing across when the page loads
   systems: 'contact', // the light that crosses the page when SYSTEMS opens
   contact: 'contact', // the lines that come down when CONTACT opens
+  ambient: 'ambient', // the patches of light that come and go on the lines all the time
 }
 const glowLook = (which) => GLOW_STYLES[GLOW_STYLE[which]] ?? GLOW_STYLES.contact
 
@@ -260,12 +262,11 @@ const SETTINGS = {
   // of a line and the lines next to it; it swells up where it is and fades again, with
   // only a little of the page lit at a time. The light also spreads onto the ground
   // between the lines (`surface`), where the grain (below) shows up more.
-  // brightness, thicken (px), halo (px) and haloStrength mean the same as in GLOW_STYLES above.
+  // What the light itself looks like is set by GLOW_STYLE.ambient, above SETTINGS.
   ambient: {
     enabled: true,
-    strength: 1, // overall amount of light, lines and ground together (0 none, 1 as set below, 2 double)
+    strength: 1, // overall amount of light, lines and ground together (0 none, 1 as set, 2 double)
     fade: 0.02, // how quickly it comes in once the lines have arrived (0.02 slow, 0.3 quick)
-    brightness: 0.75, thicken: 0.35, halo: 5, haloStrength: 0.4, // the light on the lines
     size: 0.45, // size of a patch of light, as a fraction of the page height
     seconds: 8, // roughly how long one swell takes, up and down (lower = quicker)
     share: 0.09, // how much of the page is lit at a time, on average (0.05 one small patch, 0.3 a lot)
@@ -286,7 +287,7 @@ const SETTINGS = {
   // proportion, so where the ambient light falls on the ground the grain shows up more.
   grain: {
     enabled: true,
-    amount: 0.03, // how much lighter / darker a typical speck makes the ground under it (0 none, 0.05 barely there, 0.2 heavy)
+    amount: 0.03, // how much lighter / darker a typical speck makes the ground under it (0.05 barely there, 0.2 heavy)
     size: 1, // size of a speck, in screen pixels (1 = the finest the screen can show; 2 = twice that)
   },
 
@@ -476,6 +477,15 @@ const NOISE_GLSL = /* glsl */ `
   }
 `
 
+// Contact traces, as the display shader and the simulation read them. Each is a vec4
+// packed by newTraces(): column x, turn y (css px), from * 2 + right (from: 0 = sets off
+// from the top edge, 1 = the bottom; right: 1 = turns right, 0 = left), and how far it
+// has travelled (css px; 0 = not set off).
+const TRACE_GLSL = /* glsl */ `
+  float traceY0(vec4 tr) { return tr.z >= 2.0 ? uSize.y : 0.0; } // the edge it sets off from
+  float traceColumn(vec4 tr) { return abs(tr.y - traceY0(tr)); } // the length of its column part
+`
+
 // --- Simulation: R = wetness/pressure. Spreads from wet neighbours, losing pressure
 // with distance (more through dense fibres). Grid lines are dams: ink only crosses a
 // line where the neighbour's pressure exceeds the threshold, and loses some crossing.
@@ -509,6 +519,7 @@ const SIM_FRAG = /* glsl */ `
   uniform vec4 uTrace[${MAX_TRACES}];
   uniform float uTraceDams;
   ${NOISE_GLSL}
+  ${TRACE_GLSL}
 
   vec2 toPx(vec2 uv) { return vec2(uv.x, 1.0 - uv.y) * uSize; }
   // Does the step from a to b (css px) cross a grid line that exists there?
@@ -519,18 +530,18 @@ const SIM_FRAG = /* glsl */ `
       if (x >= uHx.x && x <= uHx.y) return true;
     }
     // vertical lines (x = origin.x + k * spacing.x) exist for y in [y0, y1]
-    if (floor((a.x - uOrigin.x) / uSpacing.x) != floor((b.x - uOrigin.x) / uSpacing.x)) {
+    float ka = floor((a.x - uOrigin.x) / uSpacing.x);
+    float kb = floor((b.x - uOrigin.x) / uSpacing.x);
+    if (ka != kb) {
       float y = 0.5 * (a.y + b.y);
       if (y >= uVy.x && y <= uVy.y) return true;
       // Contact: the column part of a trace on this grid line, as far as it has been drawn.
       if (uTraceDams > 0.5) {
-        float lineX = uOrigin.x + max(floor((a.x - uOrigin.x) / uSpacing.x), floor((b.x - uOrigin.x) / uSpacing.x)) * uSpacing.x;
+        float lineX = uOrigin.x + max(ka, kb) * uSpacing.x;
         for (int i = 0; i < ${MAX_TRACES}; i++) {
           vec4 tr = uTrace[i];
           if (tr.w <= 0.0 || abs(tr.x - lineX) > 0.25 * uSpacing.x) continue;
-          float y0 = tr.z >= 2.0 ? uSize.y : 0.0;      // the edge it sets off from (top or bottom)
-          float drawn = min(tr.w, abs(tr.y - y0));     // how much of the column part is there
-          if (abs(y - y0) <= drawn) return true;
+          if (abs(y - traceY0(tr)) <= min(tr.w, traceColumn(tr))) return true;
         }
       }
     }
@@ -713,14 +724,15 @@ const DISPLAY_FRAG = /* glsl */ `
   uniform vec4 uColumns[${MAX_COLUMNS}];
   uniform vec3 uColumnsColor;
   uniform float uColumnsMatch; // 1 = the horizontal lines' colour at that x instead of uColumnsColor
-  uniform vec3 uAmbient;     // ambient light (SETTINGS.ambient): amount 0..1, brightness, thicken px
-  uniform vec2 uAmbientHalo; // halo px, halo strength
+  // Ambient light (SETTINGS.ambient): amount 0..1, brightness, thicken px, and where in
+  // the pattern it starts (seconds added to uTime; random per page load).
+  uniform vec4 uAmbient;
+  // Its look: halo px, halo strength, and on the ground between the lines (ambient.surface)
+  // how strong the light is and how much further than the lines' own light it reaches.
+  uniform vec4 uAmbientLook;
   uniform vec4 uAmbientP;    // the pattern's numbers (see ambientLight)
-  uniform float uAmbientTime; // seconds, from a random start
-  // Ambient light on the ground between the lines (SETTINGS.ambient.surface): how
-  // strong, and how much further than the lines' own light it reaches.
-  uniform vec2 uAmbientSurface;
   ${NOISE_GLSL}
+  ${TRACE_GLSL}
   // Ambient light: how lit horizontal line k is at x (css px) right now, as (the light
   // on the line 0..1, the same light reaching a little further, for the ground around
   // the line). It works from the line number, the place and the time alone (no loops,
@@ -734,14 +746,13 @@ const DISPLAY_FRAG = /* glsl */ `
   vec2 ambientLight(float k, float x) {
     vec4 p = uAmbientP;
     vec2 q = vec2(x, uOrigin.y + k * uSpacing.y) / max(1.0, p.x);
-    float c = uAmbientTime * p.y + 2.0 * vnoise(q * 0.3 + 20.0) + p.w * hash21(vec2(k + 0.37, 3.7));
+    float c = (uTime + uAmbient.w) * p.y + 2.0 * vnoise(q * 0.3 + 20.0) + p.w * hash21(vec2(k + 0.37, 3.7));
     float n = floor(c);
-    float f = c - n;
-    f = f * f * (3.0 - 2.0 * f);
+    float f = smoothstep(0.0, 1.0, c - n);
     float a = vnoise(q + mod(n, 64.0) * vec2(37.7, 17.3));
     float b = vnoise(q + mod(n + 1.0, 64.0) * vec2(37.7, 17.3));
     float v = 0.7 * mix(a, b, f) + 0.3 * vnoise(q * 1.9 + 11.0);
-    return vec2(smoothstep(p.z, p.z + 0.16, v), smoothstep(p.z - uAmbientSurface.y, p.z + 0.16, v));
+    return vec2(smoothstep(p.z, p.z + 0.16, v), smoothstep(p.z - uAmbientLook.w, p.z + 0.16, v));
   }
   // How far horizontal line k is pushed (roughly -1..1, before amplitude) at x (0..1 across the page).
   float bounceRow(float k, float x, float t) {
@@ -765,14 +776,14 @@ const DISPLAY_FRAG = /* glsl */ `
     float alpha = uBgAlpha;
 
     // Grid colour at this point (used by the ink and the lines).
+    // Each gradient runs along its lines' extent; the vertical one over the whole page
+    // height while the vertical lines are switched off (zero length), so the colour is
+    // defined at every point for the ink, the tile faces and the Contact traces.
     float hx = clamp((px.x - uHx.x) / max(1.0, uHx.y - uHx.x), 0.0, 1.0);
-    float vy = clamp((px.y - uVy.x) / max(1.0, uVy.y - uVy.x), 0.0, 1.0);
+    vec2 vSpan = uVy.y - uVy.x > 1.0 ? uVy : vec2(0.0, uSize.y);
+    float vy = clamp((px.y - vSpan.x) / (vSpan.y - vSpan.x), 0.0, 1.0);
     vec3 hCol = mix(uHFrom, uHTo, hx);
     vec3 vCol = mix(uVFrom, uVTo, vy);
-    // The vertical gradient over the whole page height, for the Contact traces. (vCol
-    // follows the grid's own vertical lines, which are switched off, zero length: that
-    // pins it to the gradient's far end, one flat colour all the way down.)
-    vec3 vPageCol = mix(uVFrom, uVTo, clamp(px.y / max(1.0, uSize.y), 0.0, 1.0));
 
     // Depth: the whole page is one lifted surface (the tile face) from the start, and
     // the lines cut into it as they grow, bevelling the edges they reach.
@@ -831,10 +842,7 @@ const DISPLAY_FRAG = /* glsl */ `
       dens *= mix(1.0, tear, uWisps);
       dens = clamp(dens, 0.0, 1.0);
 
-      // The ink takes the average of the two line colours here. While Contact's vertical
-      // lines are up, the vertical half is their colour at this height (the top-to-bottom
-      // gradient), so the smoke changes hue down the page as well as across it.
-      vec3 inkCol = mix(hCol, mix(vCol, vPageCol, uTraceLook.x), 0.5);
+      vec3 inkCol = mix(hCol, vCol, 0.5);
       // A touch brighter where the gas is thin, like light catching the edge.
       float front = (1.0 - body) * smoothstep(0.0, 0.03, w);
       inkCol *= 0.85 + uRim * 0.6 * front;
@@ -880,20 +888,22 @@ const DISPLAY_FRAG = /* glsl */ `
     float amb = 0.0;
     float surf = 0.0; // the same light on the ground between the lines
     float ambOn = uAmbient.x * hMask * (1.0 - smoothstep(0.0, 0.3, uBounce.x));
-    if (ambOn > 0.001 && uBgAlpha > 0.5 && uAmbientSurface.x > 0.0) {
-      // Light on the ground too: work out the line above and the line below, and blend
-      // between them down the row, so the light spreads off each lit line across the
-      // surface and meets the next line's light.
-      float kf = (px.y - uOrigin.y) / uSpacing.y;
-      float k0 = floor(kf);
-      float fy = kf - k0;
-      vec2 a0 = ambientLight(k0, px.x);
-      vec2 a1 = ambientLight(k0 + 1.0, px.x);
-      amb = (fy < 0.5 ? a0.x : a1.x) * ambOn;
-      surf = mix(a0.y, a1.y, fy * fy * (3.0 - 2.0 * fy)) * ambOn;
-    } else if (ambOn > 0.001 && dh < uAmbientHalo.x * 3.5 + uWeight) {
-      float kh = floor((px.y - uOrigin.y) / uSpacing.y + 0.5);
-      amb = ambientLight(kh, px.x).x * ambOn;
+    if (ambOn > 0.001) {
+      float kf = (px.y - uOrigin.y) / uSpacing.y; // rows down from the first line
+      if (uBgAlpha > 0.5 && uAmbientLook.z > 0.0) {
+        // Light on the ground too: work out the line above and the line below, and blend
+        // between them down the row, so the light spreads off each lit line across the
+        // surface and meets the next line's light.
+        float k0 = floor(kf);
+        float fy = kf - k0;
+        vec2 a0 = ambientLight(k0, px.x);
+        vec2 a1 = ambientLight(k0 + 1.0, px.x);
+        amb = (fy < 0.5 ? a0.x : a1.x) * ambOn;
+        surf = mix(a0.y, a1.y, smoothstep(0.0, 1.0, fy)) * ambOn;
+      } else if (dh < uAmbientLook.x * 3.5 + uWeight) {
+        // Lines only: the nearest one, worked out just close enough to it to show.
+        amb = ambientLight(floor(kf + 0.5), px.x).x * ambOn;
+      }
     }
     float wth = wt + uTipGlow.y * tg + uAmbient.z * amb;
     float hLine = (1.0 - smoothstep(wth * 0.5 - aa, wth * 0.5 + aa, dh)) * hMask;
@@ -951,10 +961,10 @@ const DISPLAY_FRAG = /* glsl */ `
     }
     // Ambient light on the ground: a soft glow in the line's colour. (The grain layer
     // over the canvas then shows up more there, since it works in proportion.)
-    if (surf > 0.001) col += hCol * surf * uAmbientSurface.x;
+    if (surf > 0.001) col += hCol * surf * uAmbientLook.z;
     // Ambient halo: soft light either side of a lit line, wider the more lit it is.
     if (amb > 0.001) {
-      float aH = exp(-dh / max(0.5, uAmbientHalo.x * (0.35 + 0.65 * amb))) * uLineAlpha * uAmbientHalo.y * amb;
+      float aH = exp(-dh / max(0.5, uAmbientLook.x * (0.35 + 0.65 * amb))) * uLineAlpha * uAmbientLook.y * amb;
       col += hCol * aH;
       alpha = min(1.0, alpha + aH);
     }
@@ -971,18 +981,17 @@ const DISPLAY_FRAG = /* glsl */ `
       // The traces take the grid lines' own colours: a column part the vertical lines'
       // colour at this height, a row part the horizontal lines' colour at this x, so
       // Contact's lines match the grid on the other pages.
-      vec3 tColV = vPageCol; // over the whole page height (see vPageCol above)
-      vec3 tColH = hCol; // the horizontal lines' colour at this x (computed above)
+      vec3 tColV = vCol; // the grid's own colours at this point (computed above)
+      vec3 tColH = hCol;
       float ta = uTraceLook.x * uLineAlpha;
       for (int i = 0; i < ${MAX_TRACES}; i++) {
         vec4 tr = uTrace[i];
         float len = tr.w;
         if (len <= 0.0) continue;
-        float from = tr.z >= 2.0 ? 1.0 : 0.0;              // 0 = from the top edge, 1 = from the bottom
+        float y0 = traceY0(tr);                            // the edge it set off from
         float turn = mod(tr.z, 2.0) >= 1.0 ? 1.0 : -1.0;   // 1 = turns right, -1 = turns left
-        float y0 = from * uSize.y;
-        float sgn = 1.0 - 2.0 * from;
-        float lenV = abs(tr.y - y0);                       // the column part
+        float sgn = y0 > 0.0 ? -1.0 : 1.0;                 // which way the column part runs
+        float lenV = traceColumn(tr);                      // the column part
         float lenH = turn > 0.0 ? uSize.x - tr.x : tr.x;   // the row part, to the page edge
         float done = min(len, lenV + lenH);
         float lv = min(done, lenV);
@@ -1235,29 +1244,21 @@ export default function GridInkBackdrop({ className = '', transparent = false, p
         uBounceBeat: { value: new THREE.Vector2(S.bounce.bpm / 60, S.bounce.kick) },
         uBounceReach: { value: Math.min(2.5, Math.max(0.1, S.bounce.reach)) },
         uTipGlow: { value: new THREE.Vector4(glowLook('load').brightness, glowLook('load').thicken, glowLook('load').halo, glowLook('load').haloStrength) },
-        uAmbient: { value: new THREE.Vector3(0, 0, 0) },
-        uAmbientHalo: { value: new THREE.Vector2(1, 0) },
-        uAmbientP: { value: new THREE.Vector4(1, 1, 1, 1) },
-        uAmbientTime: { value: 0 },
-        uAmbientSurface: { value: new THREE.Vector2(0, 0) },
+        // Ambient light (SETTINGS.ambient, look from GLOW_STYLE.ambient). uAmbient.w: a
+        // random starting point in the pattern, so no two page loads look the same.
+        uAmbient: { value: new THREE.Vector4(0, glowLook('ambient').brightness * S.ambient.strength, glowLook('ambient').thicken, Math.random() * 600) },
+        uAmbientLook: { value: new THREE.Vector4(glowLook('ambient').halo, glowLook('ambient').haloStrength * S.ambient.strength, S.ambient.surface.glow * S.ambient.strength, S.ambient.surface.reach) },
+        uAmbientP: { value: new THREE.Vector4(1, 1, 1, 1) }, // set in resize()
       },
     })
-    // Ambient light (SETTINGS.ambient). from: a random starting point in the pattern, so
-    // no two page loads look the same.
-    const ambient = { amount: 0, from: Math.random() * 600 }
-    if (S.ambient.enabled) {
-      const A = S.ambient
-      dispMat.uniforms.uAmbient.value.set(0, A.brightness * A.strength, A.thicken)
-      dispMat.uniforms.uAmbientHalo.value.set(A.halo, A.haloStrength * A.strength)
-      dispMat.uniforms.uAmbientSurface.value.set(A.surface.glow * A.strength, A.surface.reach)
-    }
+    let ambientAmount = 0 // how far the ambient light has faded in (0..1)
     // Grain (SETTINGS.grain): a layer over the canvas, filled with a small tile of random
     // greys repeated across the page, one tile pixel per screen pixel. 'overlay' blending
     // makes a grey lighter than mid-grey brighten what is under it and a darker one dim
     // it, in proportion, so mid-grey changes nothing and brighter ground gets more grain.
     let grainEl = null
     let grainShown = 1 // the layer's current opacity
-    if (S.grain.enabled && S.grain.amount > 0) {
+    if (S.grain.enabled) {
       const tile = document.createElement('canvas')
       tile.width = tile.height = 256
       const ctx = tile.getContext('2d')
@@ -1270,7 +1271,7 @@ export default function GridInkBackdrop({ className = '', transparent = false, p
         img.data[i + 3] = 255
       }
       ctx.putImageData(img, 0, 0)
-      const speck = Math.max(1, S.grain.size) / (window.devicePixelRatio || 1) // css px per speck
+      const speck = Math.max(1, S.grain.size) / dpr // css px per speck
       grainEl = document.createElement('div')
       // isolation on the host keeps the blending to the backdrop itself.
       el.style.isolation = 'isolate'
@@ -1359,6 +1360,7 @@ export default function GridInkBackdrop({ className = '', transparent = false, p
     let simW = -1
     let simH = -1
     const measure = document.createElement('canvas').getContext('2d') // for the menu text's cap height (below)
+    let probe = null // stands in for the menu text where there is none (see resize)
     const resize = () => {
       cssW = Math.max(1, el.clientWidth)
       cssH = Math.max(1, el.clientHeight)
@@ -1367,9 +1369,18 @@ export default function GridInkBackdrop({ className = '', transparent = false, p
       renderer.domElement.style.height = '100%'
       let spacing = Math.min(S.maxSpacing, Math.max(S.minSpacing, Math.min(cssW, cssH) * S.spacing))
       // The grid follows the hero text: one row per line of the menu (all screen sizes).
-      const link = el.closest('.section')?.querySelector('.hero_menu_text_color')
-      if (S.rowsFromText > 0 && link) {
-        const fs = parseFloat(getComputedStyle(link).fontSize)
+      // A page without the menu (/resume) measures the size the menu would have there
+      // (--hero-menu-size, custom.css) on a hidden probe, so its rows match the home page's.
+      const host = el.closest('.section')
+      const link = host?.querySelector('.hero_menu_text_color')
+      if (S.rowsFromText > 0 && (link || host)) {
+        if (!link && !probe) {
+          probe = document.createElement('span')
+          probe.setAttribute('aria-hidden', 'true')
+          probe.style.cssText = 'position:absolute;visibility:hidden;pointer-events:none;font-size:var(--hero-menu-size)'
+          host.appendChild(probe)
+        }
+        const fs = parseFloat(getComputedStyle(link ?? probe).fontSize)
         if (fs > 0) spacing = Math.round(fs * S.rowsFromText)
       }
       // Fit the grid to the page: round the cell size so a whole number of cells spans
@@ -1396,6 +1407,9 @@ export default function GridInkBackdrop({ className = '', transparent = false, p
         m.uniforms.uSpacing.value.set(spacingX, spacingY)
         m.uniforms.uOrigin.value.set(originX, originY)
       })
+      // Ambient light pattern: patch size px, patterns per second, the level a point must
+      // reach to light (fitted so that `share` of the page is lit on average), stagger.
+      dispMat.uniforms.uAmbientP.value.set(Math.max(1, S.ambient.size * cssH), 1.6 / Math.max(0.1, S.ambient.seconds), 0.79 - 0.47 * Math.sqrt(clamp01(S.ambient.share)), S.ambient.stagger)
       // Tell the CSS about the grid so the hero menu panel can sit on it: the text
       // takes one row per line, and the glass panel's edges land on grid lines with
       // PANEL_PAD_ROWS rows of glass above/below the text and PANEL_PAD_COLS columns
@@ -1773,7 +1787,8 @@ export default function GridInkBackdrop({ className = '', transparent = false, p
         }
       }
       if (lock.active && seconds - lockStart >= S.scrollLock.seconds) lock.active = false
-      const [x0, x1] = extentFor(S.horizontal, cssW, progressFor(S.horizontal, seconds))
+      const hProgress = progressFor(S.horizontal, seconds)
+      const [x0, x1] = extentFor(S.horizontal, cssW, hProgress)
       const [y0, y1] = extentFor(S.vertical, cssH, progressFor(S.vertical, seconds))
       gridMats.forEach((m) => {
         m.uniforms.uHx.value.set(x0, x1)
@@ -1824,7 +1839,6 @@ export default function GridInkBackdrop({ className = '', transparent = false, p
 
       // Tip glow: on while the horizontal lines' end is moving, easing off as it stops.
       const tipMoving = S.tipGlow.enabled && tipX >= 0 && Math.abs(x1 - tipX) > 0.05 && x1 < cssW - 0.5
-      const linesSettled = tipX >= 0 && Math.abs(x1 - tipX) <= 0.05 && x1 - x0 > 1 // the lines are there and no longer growing
       tipX = x1
       tipAmount += ((tipMoving ? 1 : 0) - tipAmount) * S.tipGlow.fade
       dispMat.uniforms.uTip.value.set(glowLook('load').length * cssW, tipAmount < 0.002 ? 0 : tipAmount)
@@ -1837,17 +1851,10 @@ export default function GridInkBackdrop({ className = '', transparent = false, p
       bounceAmount += (bounceTarget - bounceAmount) * (1 - Math.pow(1 - S.bounce.fade, bounceDt * 60))
       dispMat.uniforms.uBounce.value.x = bounceAmount < 0.002 ? 0 : bounceAmount
 
-      // Ambient light: eases in once the lines have stopped growing, then runs for good.
-      {
-        const A = S.ambient
-        const on = A.enabled && linesSettled && !still ? 1 : 0
-        ambient.amount += (on - ambient.amount) * (1 - Math.pow(1 - A.fade, bounceDt * 60))
-        const u = dispMat.uniforms
-        u.uAmbient.value.x = ambient.amount < 0.002 ? 0 : ambient.amount
-        u.uAmbientTime.value = ambient.from + seconds
-        // The level to light at is fitted to the pattern so that `share` of the page is lit on average.
-        u.uAmbientP.value.set(Math.max(1, A.size * cssH), 1.6 / Math.max(0.1, A.seconds), 0.79 - 0.47 * Math.sqrt(clamp01(A.share)), A.stagger)
-      }
+      // Ambient light: eases in once the lines have grown all the way across, then runs for good.
+      const ambientOn = S.ambient.enabled && hProgress >= 1 && !still ? 1 : 0
+      ambientAmount += (ambientOn - ambientAmount) * (1 - Math.pow(1 - S.ambient.fade, bounceDt * 60))
+      dispMat.uniforms.uAmbient.value.x = ambientAmount < 0.002 ? 0 : ambientAmount
 
       // Contact traces: a new set each time Contact opens (and after a resize, since they
       // sit on the grid); they travel on their own, and fade with the page.
@@ -1864,7 +1871,7 @@ export default function GridInkBackdrop({ className = '', transparent = false, p
         traceSlots[n].w = t ? Math.max(0, seconds - traces.at - t.delay) * S.trace.speed * cssH : 0
       }
       dispMat.uniforms.uTraceLook.value.x = traces.amount
-      simMat.uniforms.uTraceDams.value = INK.dams && tracing ? 1 : 0 // the ink is held by the traces while Contact is open
+      simMat.uniforms.uTraceDams.value = tracing ? 1 : 0 // the ink is held by the traces while Contact is open (under the uDams switch)
       dispMat.uniforms.uTraceLook.value.y = Math.max(1, glowLook('contact').length * cssH)
 
       // Visuals pour: a new spot each click, with puffs heading off around a random
@@ -2082,6 +2089,7 @@ export default function GridInkBackdrop({ className = '', transparent = false, p
       rtB?.dispose()
       smA?.dispose()
       smB?.dispose()
+      probe?.remove()
       smokeMat.dispose()
       simMat.dispose()
       dispMat.dispose()
