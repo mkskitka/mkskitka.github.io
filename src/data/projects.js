@@ -196,6 +196,8 @@ const projectList = [
       'Audible Story House was Audible’s first physical pop-up, open for the month of May 2026, where visitors could listen to audiobooks, with a dedicated listening room in the back. I built the audio-reactive visualizer that played in that room for the length of the pop-up.',
       "The visuals evolved over the course of the day and responded to the voices and sounds of whatever was playing. Alongside the visualizer, I built a web interface that Audible's brand ambassadors used to further customize the audio-visual experience.",
     ],
+    // The finished room and the TouchDesigner network instead of the shaky install-day clips.
+    gallery: [{ src: 'IMG_4512.jpeg' }, { src: 'IMG_4532.mp4' }, { src: 'IMG_4515.mp4' }, { src: 'IMG_4529.jpeg' }],
     // Tall portrait on the left, big screen top right, two short strips under it.
     featured: [
       tile(P2, { width: '30vw', aspect: '3 / 4', top: '4vh', left: '4vw' }),
