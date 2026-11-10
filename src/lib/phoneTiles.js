@@ -50,9 +50,11 @@ const SCATTER_TRIES = 200 // whole random layouts to try before falling back to 
  *                                free space, a short last row left-aligned under the
  *                                first column, every tile on the grid lines;
  *                                already centred vertically, so it needs no centerY
- * @param {number} [o.columns]    centered only: this many tiles across, more if the
- *                                rows run short, fewer if they will not fit; the edge
- *                                cells are given up before the tiles shrink
+ * @param {number} [o.columns]    centered only: this many tiles across (fewer if they
+ *                                will not fit), the edge margin allowed to go under a
+ *                                cell
+ * @param {boolean} [o.widen]     columns only: more than `columns` across when there are
+ *                                too few rows for them, rather than smaller tiles
  * @returns {Array<{x:number,y:number,s:number,dx:number,dy:number}|null>}
  */
 export function phoneSpots({
@@ -71,6 +73,7 @@ export function phoneSpots({
   centerX = false,
   centered = false,
   columns = 0,
+  widen = false,
   distinctRows = false,
   centerY = false,
   lift = 0,
@@ -184,14 +187,13 @@ export function phoneSpots({
     if (centered) {
       const maxRows = Math.floor((rows - firstRow + PAD) / pitch)
       if (maxRows < 1) return null
-      const fit = (margin) => Math.floor((cols - 2 * margin + PAD) / pitch) // tiles across, `margin` clear cells at each edge
-      // `columns` across, or more when there are too few rows for that (a short screen
-      // takes one wider row of full-size tiles rather than smaller ones).
-      const want = columns ? Math.max(columns, Math.ceil(count / maxRows)) : Infinity
-      let perRow = Math.min(want, fit(1))
-      // With `columns`, a screen too narrow for the edge cells may give them up before
-      // the tiles shrink.
-      if (columns && perRow * maxRows < count) perRow = Math.min(want, fit(0))
+      // Tiles across: a clear cell kept at each edge, or with `columns` that many (as
+      // many as fit edge to edge, if fewer; ProjectThumbs counts on exactly this). With
+      // `widen` too, more than `columns` when there are too few rows for them (a short
+      // screen takes one wider row of full-size tiles rather than smaller ones).
+      const edgeToEdge = Math.floor((cols + PAD) / pitch)
+      let perRow = Math.floor((cols - 2 + PAD) / pitch)
+      if (columns) perRow = Math.min(widen ? Math.max(columns, Math.ceil(count / maxRows)) : columns, edgeToEdge)
       if (perRow < 1 || perRow * maxRows < count) return null
       perRow = Math.min(perRow, count)
       const rowCount = Math.ceil(count / perRow)
