@@ -3,13 +3,13 @@
 // screen drift right and THANKS FOR PLAYING blinks, with the thumbnail's transparent
 // background kept. Renders PNG frames, which become the transparent clip pair with:
 //   node scripts/thumb-hover-realtor.mjs <frames-dir>
-//   ffmpeg -framerate 30 -i <frames-dir>/%04d.png -c:v libvpx-vp9 -pix_fmt yuva420p -b:v 0 -crf 32 -auto-alt-ref 0 -an src/assets/projects/realtor-savings-simulator/thumb-hover.webm
-//   ffmpeg -framerate 30 -i <frames-dir>/%04d.png -c:v hevc_videotoolbox -pix_fmt bgra -alpha_quality 0.8 -q:v 60 -tag:v hvc1 -an -movflags +faststart src/assets/projects/realtor-savings-simulator/thumb-hover.mp4
+//   ffmpeg -framerate 30 -i <frames-dir>/%04d.png -c:v libvpx-vp9 -pix_fmt yuva420p -b:v 0 -crf 32 -auto-alt-ref 0 -an src/assets/projects/realtor-savings-simulator/used/thumb-hover.webm
+//   ffmpeg -framerate 30 -i <frames-dir>/%04d.png -c:v hevc_videotoolbox -pix_fmt bgra -alpha_quality 0.8 -q:v 60 -tag:v hvc1 -an -movflags +faststart src/assets/projects/realtor-savings-simulator/used/thumb-hover.mp4
 // (VP9 for Chrome and Firefox, HEVC for Safari; src/data/media.js treats the pair as a clip with alpha.)
 import sharp from 'sharp'
 import { mkdirSync } from 'node:fs'
 const [,, outDir, only] = process.argv
-const src = 'src/assets/projects/realtor-savings-simulator/thumb.png'
+const src = 'src/assets/projects/realtor-savings-simulator/used/thumb.png'
 const { data, info } = await sharp(src).ensureAlpha().raw().toBuffer({ resolveWithObject: true })
 const W = info.width, H = info.height
 const px = (x, y) => (y * W + x) * 4

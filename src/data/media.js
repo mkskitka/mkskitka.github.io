@@ -1,4 +1,4 @@
-// Per-project photos and videos. Drop files into src/assets/projects/<slug>/ and
+// Per-project photos and videos. Drop files into src/assets/projects/<slug>/used/ and
 // they are picked up here at build time (see src/assets/projects/README.md).
 //
 // What the site actually ships are the web-sized copies in src/assets/web/<slug>/,

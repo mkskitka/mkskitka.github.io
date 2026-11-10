@@ -1,8 +1,8 @@
-// One-off: the Realtor.com hero (src/assets/projects/realtor-savings-simulator/hero.png)
+// One-off: the Realtor.com hero (src/assets/projects/realtor-savings-simulator/used/hero.png)
 // lifted everywhere but the arcade screen, so the cabinet and hands read through the
 // page darkening while the screen stays as it was. Made from hero.source.png:
 //   node scripts/hero-brighten-realtor.mjs <in.png> <out.png> [gamma=2]
-// (hero.source.png is the untouched photo; hero.png is the result, gamma 2.)
+// (unused/hero.source.png is the untouched photo; used/hero.png is the result, gamma 2.)
 import { createRequire } from 'node:module'
 const sharp = createRequire(import.meta.url)('sharp')
 const [src, out, gainArg, liftArg] = process.argv.slice(2)

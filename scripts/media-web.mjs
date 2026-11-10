@@ -1,12 +1,14 @@
 #!/usr/bin/env node
 // Makes web-sized copies of the project media.
 //
-//   src/assets/projects/<slug>/*   (your originals: drop files in, any size)
-//   src/assets/web/<slug>/*        (what the site ships; made by this script)
+//   src/assets/projects/<slug>/used/*     (your originals the site uses: any size)
+//   src/assets/projects/<slug>/unused/*   (kept but not on the site: never read here)
+//   src/assets/web/<slug>/*               (what the site ships; made by this script)
 //
 // The site reads src/assets/web (src/data/media.js), never the originals, so nothing
-// here changes how you add a project: drop files into src/assets/projects/<slug>/ and
-// run `npm run media` (it also runs by itself before `npm run dev` / `npm run build`).
+// here changes how you add a project: drop files into src/assets/projects/<slug>/used/
+// (loose files in <slug>/ itself are read too) and run `npm run media` (it also runs
+// by itself before `npm run dev` / `npm run build`).
 // Only files whose original is newer than the copy are redone, so a run is quick.
 //
 //   images   -> .webp, no wider / taller than MAX_IMAGE px (thumb.* -> MAX_THUMB px);
@@ -112,9 +114,10 @@ async function main() {
     if (!statSync(dir).isDirectory()) continue
     const outDir = join(OUT, slug)
     mkdirSync(outDir, { recursive: true })
-    for (const name of readdirSync(dir)) {
-      const src = join(dir, name)
-      if (SKIP.test(name) || !(IMAGE.test(name) || VIDEO.test(name))) continue
+    // The used/ folder, plus any loose files dropped straight into the project folder.
+    const sources = [join(dir, 'used'), dir].filter((d) => existsSync(d)).flatMap((d) => readdirSync(d).map((name) => [name, join(d, name)]))
+    for (const [name, src] of sources) {
+      if (SKIP.test(name) || !(IMAGE.test(name) || VIDEO.test(name)) || !statSync(src).isFile()) continue
       const isVideo = VIDEO.test(name)
       const outName = isVideo ? `${stem(name)}${/\.webm$/i.test(name) ? '.webm' : '.mp4'}` : /\.gif$/i.test(name) ? name : `${stem(name)}.webp`
       const out = join(outDir, outName)

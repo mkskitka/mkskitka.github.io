@@ -1,7 +1,7 @@
 // The "Systems" project list. Order matches the menu on the home page, and every
 // project gets its own page at /projects/<slug>.
 //
-// Photos and videos for each project go in src/assets/projects/<slug>/ (see the
+// Photos and videos for each project go in src/assets/projects/<slug>/used/ (see the
 // README there). A file named hero.jpg / hero.mp4 becomes that project's hero
 // backdrop, or set `hero: 'file.jpg'` here to pick one by name. The backdrop is
 // darkened by 0.55 so the write-up reads over it; `heroDim: 0.75` on a project darkens
@@ -115,7 +115,7 @@ const GALLERY_MAX = 8
 // `date` is free text shown in the write-up (e.g. '2024', 'Spring 2023', 'Oct 2022').
 // `gallery` (optional) is the list of photos for the Gallery row in the write-up:
 //   gallery: [{ src: 'photo1.jpg' }, { src: 'photo2.jpg', alt: 'Caption' }]
-// Bare file names resolve from the project's folder in src/assets/projects/<slug>/,
+// Bare file names resolve from the project's folder in src/assets/projects/<slug>/used/,
 // or use a full path like '/images/x.png'. Without it, the first GALLERY_MAX photos in the
 // folder are used (any names, sorted; hero.* and thumb.* skipped); an empty folder shows no gallery.
 // `role`, `mediums` and `description` are the rest of the write-up, set on each project
@@ -196,8 +196,10 @@ const projectList = [
       'Audible Story House was Audible’s first physical pop-up, open for the month of May 2026, where visitors could listen to audiobooks, with a dedicated listening room in the back. I built the audio-reactive visualizer that played in that room for the length of the pop-up.',
       "The visuals evolved over the course of the day and responded to the voices and sounds of whatever was playing. Alongside the visualizer, I built a web interface that Audible's brand ambassadors used to further customize the audio-visual experience.",
     ],
-    // The finished room and the TouchDesigner network instead of the shaky install-day clips.
-    gallery: [{ src: 'IMG_4512.jpeg' }, { src: 'IMG_4532.mp4' }, { src: 'IMG_4515.mp4' }, { src: 'IMG_4529.jpeg' }],
+    // The finished room only (no install-day ladder or gear): clips cut from the phone
+    // footage in unused/ (clip-1 from IMG_4533, clip-3 from IMG_4531), with the
+    // TouchDesigner network between them. clip-2-clouds (pink) was dropped; it's in unused/.
+    gallery: [{ src: 'clip-1-room.mp4' }, { src: 'IMG_4529.jpeg' }, { src: 'clip-3-palm.mp4' }],
     // Tall portrait on the left, big screen top right, two short strips under it.
     featured: [
       tile(P2, { width: '30vw', aspect: '3 / 4', top: '4vh', left: '4vw' }),
@@ -381,6 +383,8 @@ const projectList = [
       "This installation, along with the web application and data visualization, was on display as part of the Open Call 2023 group exhibition at The Shed, NYC.",
       "'Evidence 071: Frederick Douglass and The Commission of Inquiry is a multimedia installation, based on Cruz's research in the Dominican Republic, that explores the role of US imperialism and asks audiences to consider their relation to ongoing processes of colonization.'",
     ],
+    // The screen recording of the web app leads, then the photos of the installation.
+    gallery: [{ src: 'app_demo.mp4', alt: 'Demo of the archive web app' }, { src: '01.png' }, { src: '02.jpg' }, { src: '03.jpg' }, { src: '04.jpg' }],
     // Offset two-column grid: tall frame + strip left, screen + strip right.
     featured: [
       tile(P1, { width: '44vw', aspect: '4 / 3', top: '4vh', left: '4vw' }),

@@ -1,17 +1,30 @@
 # Project photos and videos
 
 One folder per project, named by the project's slug (the part of its URL after
-`/projects/`). Drop files straight into the folder; nothing else needs registering.
+`/projects/`), with two folders inside it:
+
+- `used/`: the files the site uses. Drop new files in here; nothing else needs
+  registering. (Loose files in the project folder itself are picked up too.)
+- `unused/`: files kept for the project but not on the site: originals a still or
+  clip was made from (`*.source.*`), earlier thumbnails, spare photos and videos.
+  The site never reads this folder; move a file into `used/` to put it on the site.
 
     src/assets/projects/
       pgn-immersive-mobility-rehab/
-        hero.mp4          <- plays behind the title (optional)
-        hero.jpg          <- still hero, or the poster frame for hero.mp4
-        01.jpg            <- showcase photos, in name order
-        02.png
-        ...
+        used/
+          hero.mp4        <- plays behind the title (optional)
+          hero.jpg        <- still hero, or the poster frame for hero.mp4
+          01.jpg          <- showcase photos, in name order
+          02.png
+          ...
+        unused/
+          thumb.source.png
       realtor-savings-simulator/
       ...
+
+Everything below about names (hero, thumb, gallery order) is about the files in
+`used/`. Since the gallery takes the first files by name, a photo or video you don't
+want on the site belongs in `unused/`.
 
 ## Hero (the full-screen backdrop behind the project title)
 
@@ -59,7 +72,7 @@ ship these files as they are.
 ## Web copies (what the site actually ships)
 
 `npm run media` (scripts/media-web.mjs; it also runs by itself before `npm run dev`
-and `npm run build`) makes a web-sized copy of every file here in
+and `npm run build`) makes a web-sized copy of every file in the `used/` folders in
 `src/assets/web/<slug>/`, and the site reads only those:
 
 - images become `.webp`, no larger than 2000 px (thumb.* 640 px); gifs are copied as

@@ -524,6 +524,11 @@ a:hover,
     opacity: var(--seen, 1);
   }
 }
+/* Too big for its tile (random positions; ProjectThumbs.jsx measures): left out rather
+   than cut off. Still laid out, so it can be measured again as the tile grows. */
+.project_thumb_title.is-clipped {
+  visibility: hidden;
+}
 /* The project's categories, in a row under its name: smaller, dimmer, a dot between. */
 .project_thumb_tags {
   display: flex;

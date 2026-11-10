@@ -267,8 +267,9 @@ export default function Home() {
     const r = e?.currentTarget?.getBoundingClientRect()
     const host = heroRef.current?.getBoundingClientRect()
     const from = r && host ? { left: r.left - host.left, top: r.top - host.top, width: r.width, height: r.height } : null
-    if (!isUnlocked(p)) return setLocked({ project: p, from })
     show(p, from)
+    // Locked: the page opens as usual, behind the password prompt's frosted glass.
+    if (!isUnlocked(p)) setLocked({ project: p, from })
   }
 
   const show = (p, from) => {
@@ -467,9 +468,10 @@ export default function Home() {
       </header>
       <ProjectLock
         project={locked?.project}
-        onUnlock={() => show(locked.project, locked.from)}
+        onUnlock={() => setLocked(null)} // the page is already open behind the prompt
         onCancel={() => {
           setLocked(null)
+          setProject(null)
           navigate('/systems', { replace: true }) // declined: back to the tiles (and their address)
         }}
       />

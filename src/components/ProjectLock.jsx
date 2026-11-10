@@ -3,7 +3,8 @@ import { createPortal } from 'react-dom'
 import { sha256 } from '../lib/sha256.js'
 
 /**
- * Password prompt for a locked project (one with `lock` set in src/data/projects.js).
+ * Password prompt for a locked project (one with `lock` set in src/data/projects.js),
+ * over the project's page, which opens behind it (pages/Home.jsx) under the blur.
  * `lock` is the SHA-256 of the password, so the password itself is not in the code;
  * make one with  node scripts/lock-password.mjs "the password".
  *
@@ -32,7 +33,9 @@ export default function ProjectLock({ project, onUnlock, onCancel }) {
     setValue('')
     setWrong(false)
     setShake(false)
-    if (project) input.current?.focus()
+    // Ready to type on a computer; on a touch screen (phone, iPad) the keyboard would
+    // pop up over the page, so it waits for a tap on the field.
+    if (project && !window.matchMedia('(hover: none), (pointer: coarse)').matches) input.current?.focus()
   }, [project])
 
   useEffect(() => {

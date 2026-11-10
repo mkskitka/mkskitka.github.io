@@ -12,7 +12,7 @@
 //   node scripts/thumb-knockout.mjs <slug> glow   brightness becomes opacity, like light on
 //                                                 black (particles, glows): black goes,
 //                                                 dim things go see-through
-import { readdirSync, renameSync, existsSync } from 'node:fs'
+import { readdirSync, renameSync, existsSync, mkdirSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
 import sharp from 'sharp'
@@ -23,18 +23,22 @@ if (!slug || !['edge', 'glow'].includes(mode)) {
   console.error('usage: node scripts/thumb-knockout.mjs <slug> [edge|glow]')
   process.exit(1)
 }
-const dir = path.join(ROOT, 'src/assets/projects', slug)
-const names = readdirSync(dir)
-let src = names.find((n) => /^thumb\.source\./i.test(n)) // already knocked out once: start again from the original
+// The tile still is in the project's used/ folder; the untouched original is kept in
+// unused/ as thumb.source.*.
+const dir = path.join(ROOT, 'src/assets/projects', slug, 'used')
+const keep = path.join(ROOT, 'src/assets/projects', slug, 'unused')
+mkdirSync(keep, { recursive: true })
+let src = readdirSync(keep).find((n) => /^thumb\.source\./i.test(n)) // already knocked out once: start again from the original
 if (!src) {
-  const cur = names.find((n) => /^thumb\.(png|jpe?g|webp)$/i.test(n))
+  const cur = readdirSync(dir).find((n) => /^thumb\.(png|jpe?g|webp)$/i.test(n))
   if (!cur) throw new Error(`no thumb.png / thumb.jpg in ${dir}`)
   src = cur.replace(/^thumb\./i, 'thumb.source.')
-  renameSync(path.join(dir, cur), path.join(dir, src))
+  renameSync(path.join(dir, cur), path.join(keep, src))
 }
+src = path.join(keep, src)
 const out = path.join(dir, 'thumb.png')
 
-const { data, info } = await sharp(path.join(dir, src)).ensureAlpha().raw().toBuffer({ resolveWithObject: true })
+const { data, info } = await sharp(src).ensureAlpha().raw().toBuffer({ resolveWithObject: true })
 const { width: W, height: H } = info
 const px = W * H
 const bright = (i) => Math.max(data[i * 4], data[i * 4 + 1], data[i * 4 + 2])

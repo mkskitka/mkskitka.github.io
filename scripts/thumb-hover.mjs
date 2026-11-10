@@ -19,13 +19,14 @@ if (!slug || !video || (crop && !/^\d+:\d+:\d+:\d+$/.test(crop))) {
   console.error('usage: node scripts/thumb-hover.mjs <slug> <video> <start-seconds> [seconds] [w:h:x:y]')
   process.exit(1)
 }
+// The video can be in the project's used/ or unused/ folder; the clip goes in used/.
 const dir = path.join(ROOT, 'src/assets/projects', slug)
-const src = path.join(dir, video)
-if (!existsSync(src)) {
-  console.error(`no ${video} in ${dir}`)
+const src = ['used', 'unused', '.'].map((d) => path.join(dir, d, video)).find((f) => existsSync(f))
+if (!src) {
+  console.error(`no ${video} in ${dir}/used or ${dir}/unused`)
   process.exit(1)
 }
-const out = path.join(dir, 'thumb-hover.mp4')
+const out = path.join(dir, 'used', 'thumb-hover.mp4')
 // Never enlarged: a cropped window keeps its own pixels (the browser scales it to the
 // tile, as it does the still), so the file stays small.
 const scale = "scale='if(gt(iw,ih),min(720,iw),-2)':'if(gt(iw,ih),-2,min(720,ih))'"

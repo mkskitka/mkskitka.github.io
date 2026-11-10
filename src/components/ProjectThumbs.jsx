@@ -409,6 +409,29 @@ export default function ProjectThumbs({ open = false, onSelect, items = projects
       mo.disconnect()
     }
   }, [items.length, tileCells.desktop, tileCells.phone, rows, stepped, columns?.phone, sizes?.desktop?.[0], sizes?.desktop?.[1], sizes?.phone?.join(), phoneRows, phoneLift])
+  // Random positions: a title that does not fit its tile (a word wider than the tile,
+  // or the name and tags taller than it) is left out rather than shown cut off. Checked
+  // by measuring, again whenever a tile changes size (the hover grow included, so a
+  // title that fits the grown tile shows there), and once the fonts have loaded.
+  useEffect(() => {
+    const el = nav.current
+    if (!el || !titles || rows) return undefined
+    const check = (t) => {
+      const tile = t.parentElement
+      const over = t.scrollWidth > t.clientWidth + 1 || t.offsetHeight > tile.clientHeight + 1
+      t.classList.toggle('is-clipped', over)
+    }
+    const all = () => el.querySelectorAll('.project_thumb_title').forEach(check)
+    const ro = new ResizeObserver((entries) => entries.forEach((e) => check(e.target)))
+    el.querySelectorAll('.project_thumb_title').forEach((t) => ro.observe(t))
+    all()
+    document.fonts?.ready.then(all)
+    return () => {
+      ro.disconnect()
+      el.querySelectorAll('.project_thumb_title.is-clipped').forEach((t) => t.classList.remove('is-clipped'))
+    }
+  }, [spots, titles, rows, items])
+
   // Phones (nothing to hover with): a tile's clip plays while at least AUTOPLAY_SEEN of
   // the tile is on screen and the tiles are open, and stops when it slides off or they
   // close. New tiles are watched as they mount (the render effect below).
