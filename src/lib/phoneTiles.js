@@ -197,7 +197,9 @@ export function phoneSpots({
       if (perRow < 1 || perRow * maxRows < count) return null
       perRow = Math.min(perRow, count)
       const rowCount = Math.ceil(count / perRow)
-      const row0 = firstRow + Math.floor((rows - firstRow - (rowCount * pitch - PAD)) / 2)
+      // Down the free space: centred here, or with `centerY` left at the top for that
+      // pass to centre (once, against its own bottom).
+      const row0 = centerY ? firstRow : firstRow + Math.floor((rows - firstRow - (rowCount * pitch - PAD)) / 2)
       // The block centred by its full rows; a short last row starts under the first
       // column, left-aligned with the rows above.
       const col0 = Math.floor((cols - (perRow * pitch - PAD)) / 2)
@@ -251,6 +253,27 @@ export function phoneSpots({
   return Array.from({ length: count }, () => null)
 }
 
+// The hero menu panel the tiles keep clear of.
+export const PANEL = '.header.margin-bottom_none'
+
+/**
+ * Keeps `ro` (a ResizeObserver) watching the section's menu panel. Call the returned
+ * function at the start of each layout: it looks the panel up again, so a panel that
+ * mounts late or is replaced is watched too, and returns it (or null).
+ */
+export function panelWatcher(section, ro) {
+  let seen = null
+  return () => {
+    const el = section.querySelector(PANEL)
+    if (el !== seen) {
+      if (seen) ro.unobserve(seen)
+      if (el) ro.observe(el)
+      seen = el
+    }
+    return el
+  }
+}
+
 /**
  * React hook: phone positions for the tiles inside `navRef` (a nav inside the hero
  * section), re-laid out when the hero or the menu panel changes size and when the
@@ -259,20 +282,31 @@ export function phoneSpots({
 export function usePhoneSpots(navRef, count, opts = {}) {
   const [spots, setSpots] = useState(null)
   const seed = useRef(Math.floor(Math.random() * 1e9))
-  // Callers pass a fresh object every render; re-run only when what is in it changes.
-  const optsKey = JSON.stringify(opts)
+  // Callers pass a fresh object every render: re-run only when one of its values
+  // changes (compared one by one, so functions and elements are fine as options).
+  const lastOpts = useRef(opts)
+  const optsVersion = useRef(0)
+  const prev = lastOpts.current
+  const keys = new Set([...Object.keys(prev), ...Object.keys(opts)])
+  if ([...keys].some((k) => !Object.is(prev[k], opts[k]))) {
+    lastOpts.current = opts
+    optsVersion.current++
+  }
+  const version = optsVersion.current
   useLayoutEffect(() => {
     const el = navRef.current
     const section = el?.closest('.section')
     if (!el || !section) return undefined
+    let trackPanel = () => section.querySelector(PANEL)
     const layout = () => {
+      const panelEl = trackPanel()
       if (window.matchMedia('(min-width: 768px)').matches) {
         setSpots(null)
         return
       }
       const cs = getComputedStyle(section)
       const s = parseFloat(cs.getPropertyValue('--grid-spacing')) || 33
-      const panel = section.querySelector('.header.margin-bottom_none')?.getBoundingClientRect()
+      const panel = panelEl?.getBoundingClientRect()
       const panelBottom = panel ? panel.bottom - section.getBoundingClientRect().top : 0
       setSpots(
         phoneSpots({
@@ -285,22 +319,21 @@ export function usePhoneSpots(navRef, count, opts = {}) {
           height: section.clientHeight,
           panelBottom,
           rnd: mulberry32(seed.current),
-          ...opts,
+          ...lastOpts.current,
         }),
       )
     }
-    layout()
     const ro = new ResizeObserver(layout)
     ro.observe(section)
-    const panelEl = section.querySelector('.header.margin-bottom_none')
-    if (panelEl) ro.observe(panelEl)
+    trackPanel = panelWatcher(section, ro) // the panel too: the tiles sit under it
+    layout()
     const mo = new MutationObserver(layout)
     mo.observe(section, { attributes: true, attributeFilter: ['style'] })
     return () => {
       ro.disconnect()
       mo.disconnect()
     }
-  }, [navRef, count, optsKey]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [navRef, count, version]) // eslint-disable-line react-hooks/exhaustive-deps
   return spots
 }
 

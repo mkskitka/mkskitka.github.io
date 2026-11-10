@@ -1,7 +1,7 @@
 import { useLayoutEffect, useRef } from 'react'
 import { contactLinks } from '../data/contact.js'
 import { contactIcons } from './contactIcons.jsx'
-import { usePhoneSpots } from '../lib/phoneTiles.js'
+import { panelWatcher, usePhoneSpots } from '../lib/phoneTiles.js'
 
 /**
  * The Contact grid: one tile per contact link (Instagram, email, GitHub), shown
@@ -17,7 +17,9 @@ export default function ContactTiles({ open = false }) {
   // first), the block centred to the nearest cell so every tile stays on the columns. A
   // screen too short for two rows of 3x3 tiles gets them all in one row instead.
   const spots = usePhoneSpots(nav, contactLinks.length, { cells: 3, scatter: false, centered: true, columns: 2, widen: true })
-  const scatter = Array.isArray(spots)
+  // A phone too short for even 1x1 tiles under the panel gets no spots: the tiles then
+  // stay in the plain row (as on desktop) rather than vanish.
+  const scatter = Array.isArray(spots) && spots.every(Boolean)
   // Desktop: the row of tiles is centred in the space beside the menu panel, on the
   // grid: the same number of clear columns between the panel and the first tile as
   // between the last tile and the right edge, and the row on the page's middle rows.
@@ -25,7 +27,9 @@ export default function ContactTiles({ open = false }) {
     const el = nav.current
     const section = el?.closest('.section')
     if (!el || !section) return undefined
+    let trackPanel = () => null
     const place = () => {
+      const panelEl = trackPanel()
       if (!window.matchMedia('(min-width: 768px)').matches) {
         el.style.marginLeft = ''
         el.style.marginTop = ''
@@ -39,7 +43,7 @@ export default function ContactTiles({ open = false }) {
       const cells = parseFloat(cs.getPropertyValue('--thumb-cells')) || 2
       const gapCells = parseFloat(cs.getPropertyValue('--thumb-gap-cells')) || 1
       const secRect = section.getBoundingClientRect()
-      const panel = section.querySelector('.header.margin-bottom_none')?.getBoundingClientRect()
+      const panel = panelEl?.getBoundingClientRect()
       const panelRight = panel ? panel.right - secRect.left : 0
       const lastLine = ox + Math.floor((secRect.width - ox) / s + 1e-6) * s
       const free = Math.round((lastLine - panelRight) / s) // whole columns beside the panel
@@ -51,9 +55,11 @@ export default function ContactTiles({ open = false }) {
       const padTop = parseFloat(cs.paddingTop) || 0 // the section's own top padding, as the panel's --hero-panel-top allows for
       el.style.marginTop = `${top - padTop}px`
     }
-    place()
     const ro = new ResizeObserver(place)
     ro.observe(section)
+    // The panel too: the row is centred between its right edge and the page's.
+    trackPanel = panelWatcher(section, ro)
+    place()
     const mo = new MutationObserver(place)
     mo.observe(section, { attributes: true, attributeFilter: ['style'] })
     return () => {
@@ -71,7 +77,6 @@ export default function ContactTiles({ open = false }) {
       {contactLinks.map((c, i) => {
         const external = !c.url.startsWith('mailto:')
         const spot = scatter ? spots[i] : null
-        if (scatter && !spot) return null
         return (
           <a
             key={c.id}

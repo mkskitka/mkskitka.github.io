@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { projects, TAG_LABELS } from '../data/projects.js'
-import { phoneSpots } from '../lib/phoneTiles.js'
+import { panelWatcher, phoneSpots } from '../lib/phoneTiles.js'
 import { BOUNCE } from './GridInkBackdrop.jsx'
 
 /**
@@ -191,7 +191,9 @@ export default function ProjectThumbs({ open = false, onSelect, items = projects
     const section = el?.closest('.section')
     if (!el || !section) return undefined
 
+    let trackPanel = () => null
     const layout = () => {
+      trackPanel() // keep watching the panel, should it be replaced
       if (!window.matchMedia('(min-width: 768px)').matches) {
         const pcs = getComputedStyle(section)
         const s = parseFloat(pcs.getPropertyValue('--grid-spacing')) || 33
@@ -395,12 +397,11 @@ export default function ProjectThumbs({ open = false, onSelect, items = projects
       })
     }
 
-    layout()
     const ro = new ResizeObserver(layout)
     ro.observe(section)
-    // Phones: the tiles sit under the panel, so re-lay them out when the panel's size changes.
-    const panelEl = section.querySelector('.header.margin-bottom_none')
-    if (panelEl) ro.observe(panelEl)
+    // The panel too: on phones the tiles sit under it, on desktop beside it.
+    trackPanel = panelWatcher(section, ro)
+    layout()
     const mo = new MutationObserver(layout) // --grid-spacing is set as an inline style by the backdrop
     mo.observe(section, { attributes: true, attributeFilter: ['style'] })
     return () => {
