@@ -8,13 +8,14 @@ import { usePhoneSpots } from '../lib/phoneTiles.js'
  * beside the hero menu when CONTACT is selected. Same grid as the Systems tiles
  * (components/ProjectThumbs.jsx) but every tile is a 2x2 block of backdrop cells,
  * with the icon in the middle and the handle along the bottom.
- * Phones: 3x3-cell blocks in a row under the panel, placed on the grid by
+ * Phones: 3x3-cell blocks, two per row under the panel, placed on the grid by
  * lib/phoneTiles.js (--x/--y/--s per tile) so they always fit the screen.
  */
 export default function ContactTiles({ open = false }) {
   const nav = useRef(null)
-  // Phones: one row of tiles, on the grid rows but centred across the page.
-  const spots = usePhoneSpots(nav, contactLinks.length, { cells: 3, scatter: false, shuffle: false, centerX: true, centerY: true })
+  // Phones: two tiles per row, filled left to right (an odd one out sits under the
+  // first), the block centred to the nearest cell so every tile stays on the columns.
+  const spots = usePhoneSpots(nav, contactLinks.length, { cells: 3, scatter: false, centered: true, columns: 2, centerY: true })
   const scatter = Array.isArray(spots)
   // Desktop: the row of tiles is centred in the space beside the menu panel, on the
   // grid: the same number of clear columns between the panel and the first tile as
