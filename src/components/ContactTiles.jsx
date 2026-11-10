@@ -13,9 +13,10 @@ import { usePhoneSpots } from '../lib/phoneTiles.js'
  */
 export default function ContactTiles({ open = false }) {
   const nav = useRef(null)
-  // Phones: two tiles per row, filled left to right (an odd one out sits under the
-  // first), the block centred to the nearest cell so every tile stays on the columns.
-  const spots = usePhoneSpots(nav, contactLinks.length, { cells: 3, scatter: false, centered: true, columns: 2, centerY: true })
+  // Phones: two tiles per row, filled left to right (an odd one out centred on its own
+  // row), each row centred to the nearest cell so every tile stays on the columns. A
+  // screen too short for two rows of 3x3 tiles gets them all in one row instead.
+  const spots = usePhoneSpots(nav, contactLinks.length, { cells: 3, scatter: false, centered: true, columns: 2 })
   const scatter = Array.isArray(spots)
   // Desktop: the row of tiles is centred in the space beside the menu panel, on the
   // grid: the same number of clear columns between the panel and the first tile as
