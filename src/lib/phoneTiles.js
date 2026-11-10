@@ -12,7 +12,8 @@ import { useLayoutEffect, useRef, useState } from 'react'
 // rows unevenly spaced), and failing that a regular lattice, so nothing is ever dropped
 // and nothing ever leaves the screen.
 // The Contact tiles use the centred lattice directly (`scatter: false, centered: true,
-// columns: 2`): tidy rows of two under the panel, each row centred, on the grid lines.
+// columns: 2`): tidy rows of two under the panel, the odd one under the first, on the
+// grid lines.
 export const PHONE_TILE_CELLS = 2 // tile size in backdrop cells (2 = a 2x2 block)
 const PAD = 1 // empty cells kept between tiles
 const SCATTER_TRIES = 200 // whole random layouts to try before falling back to rows
@@ -43,10 +44,11 @@ const SCATTER_TRIES = 200 // whole random layouts to try before falling back to 
  * @param {boolean} [o.centerX]   slide the whole block to be centred horizontally
  *                                (rows stay on the grid, tiles may cut across columns)
  * @param {boolean} [o.centered]  lattice only: tidy rows filled in order, a clear cell
- *                                kept at the left and right edges, each row centred
+ *                                kept at the left and right edges, the block centred
  *                                (to the nearest cell, so an odd leftover column puts
- *                                it half a cell off) across the page and the block
- *                                down the free space, every tile on the grid lines;
+ *                                it half a cell off) across the page and down the
+ *                                free space, a short last row left-aligned under the
+ *                                first column, every tile on the grid lines;
  *                                already centred vertically, so it needs no centerY
  * @param {number} [o.columns]    centered only: this many tiles across, more if the
  *                                rows run short, fewer if they will not fit; the edge
@@ -194,14 +196,10 @@ export function phoneSpots({
       perRow = Math.min(perRow, count)
       const rowCount = Math.ceil(count / perRow)
       const row0 = firstRow + Math.floor((rows - firstRow - (rowCount * pitch - PAD)) / 2)
-      // Each row centred on its own (to the nearest cell), so a short last row sits in
-      // the middle rather than under the first tile.
-      return Array.from({ length: count }, (_, k) => {
-        const r = Math.floor(k / perRow)
-        const inRow = Math.min(perRow, count - r * perRow)
-        const col0 = Math.floor((cols - (inRow * pitch - PAD)) / 2)
-        return spot(col0 + (k % perRow) * pitch, row0 + r * pitch, n)
-      })
+      // The block centred by its full rows; a short last row starts under the first
+      // column, left-aligned with the rows above.
+      const col0 = Math.floor((cols - (perRow * pitch - PAD)) / 2)
+      return Array.from({ length: count }, (_, k) => spot(col0 + (k % perRow) * pitch, row0 + Math.floor(k / perRow) * pitch, n))
     }
     const slots = []
     for (let j = firstRow; j + n <= rows; j += pitch) for (let i = 0; i + n <= cols; i += pitch) slots.push([i, j])
