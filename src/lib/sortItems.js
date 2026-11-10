@@ -33,8 +33,7 @@ export const SORTS = {
 // in src/data/projects.js). Featured works the second way round, so a project is
 // featured unless it is tagged 'unfeatured', and a newly added one shows up without
 // being tagged. A subset no item's tags bear on is not offered, and with nothing but
-// All to offer the dropdown is not shown at all (Visuals, until the pieces carry
-// tags). To add one: a line here, and the tag on the items. Which subset the tiles
+// All to offer the dropdown is not shown at all. To add one: a line here, and the tag on the items. Which subset the tiles
 // open in is in DEFAULT_SORT below.
 export const SUBSETS = {
   systems: [
@@ -44,7 +43,13 @@ export const SUBSETS = {
     { id: 'web', label: 'Web', tag: 'web' },
     { id: 'installation', label: 'Installation', tag: 'installation' },
   ],
-  visuals: [{ id: 'all', label: 'All' }],
+  // Visuals' tags are in src/data/visuals-tags.json.
+  visuals: [
+    { id: 'all', label: 'All' },
+    { id: 'text', label: 'Text', tag: 'text' },
+    { id: 'ai', label: 'AI', tag: 'ai' },
+    { id: 'generative', label: 'Generative', tag: 'generative' },
+  ],
 }
 const tagged = (tag) => (item) => Array.isArray(item.tags) && item.tags.includes(tag)
 // The subsets on offer for these items: All, and each one whose tag at least one of

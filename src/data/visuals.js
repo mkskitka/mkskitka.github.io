@@ -14,6 +14,7 @@
 // visuals:review (scripts/visuals-review.mjs).
 import instagram from './instagram.json'
 import review from './visuals-review.json'
+import tags from './visuals-tags.json'
 
 const placeholders = [
   { id: 'gem-vertahorizlines', title: 'gem vertahorizlines', url: 'https://www.instagram.com/rgb__tears/', image: '/images/Screenshot-2026-01-27-195710.png' },
@@ -29,4 +30,10 @@ const placeholders = [
 // Posts taken off the site in the review tool (npm run visuals:review) are listed in
 // visuals-review.json as `hidden`; the sync never touches that file.
 const hidden = new Set(review.hidden ?? [])
-export const visuals = (instagram.length ? instagram : placeholders).filter((v) => !hidden.has(v.id))
+// Each post's tags ('text', 'ai', 'generative': the Show dropdown's subsets, listed in
+// src/lib/sortItems.js), by post id in visuals-tags.json. Kept apart from
+// instagram.json and visuals-review.json because the sync and the review tool
+// rewrite those. A post that is not listed carries no tags (shown under All only).
+export const visuals = (instagram.length ? instagram : placeholders)
+  .filter((v) => !hidden.has(v.id))
+  .map((v) => (tags[v.id] ? { ...v, tags: tags[v.id] } : v))
