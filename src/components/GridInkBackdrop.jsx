@@ -1358,6 +1358,7 @@ export default function GridInkBackdrop({ className = '', transparent = false, p
     let simH = -1
     const measure = document.createElement('canvas').getContext('2d') // for the menu text's cap height (below)
     let probe = null // stands in for the menu text where there is none (see resize)
+    let menuLines = 4 // lines in the hero menu, last measured (sets the desktop row parity in resize)
     const resize = () => {
       cssW = Math.max(1, el.clientWidth)
       cssH = Math.max(1, el.clientHeight)
@@ -1394,7 +1395,22 @@ export default function GridInkBackdrop({ className = '', transparent = false, p
         // snaps to pixels, sits at the same place in each row. Fitted rows: exactly a
         // whole number of rows down the page (so fractional; the text's snapping can
         // then differ between rows by up to half a device pixel).
-        spacingY = S.squareCells ? Math.max(1, Math.round(spacingX)) : cssH / Math.max(1, Math.round(cssH / spacing))
+        let rowCount = Math.max(1, Math.round(cssH / spacing))
+        // Desktop: the menu panel is centred down the page on whole rows, so the page
+        // gets a row count of the same parity as the panel (its lines plus the glass
+        // rows above and below), whichever such count keeps the rows nearest their
+        // size; otherwise the panel would sit half a row off centre.
+        if (!window.matchMedia('(max-width: 767px)').matches && host?.querySelector('.header.margin-bottom_none')) {
+          const links = host.querySelectorAll('.header.margin-bottom_none .hero_menu_text_color').length
+          if (links && !host.querySelector('.project_back')) menuLines = links // remembered while a project's title replaces the menu
+          const parity = (menuLines + 2 * PANEL_PAD_ROWS) % 2
+          if (rowCount % 2 !== parity) {
+            const up = rowCount + 1
+            const down = rowCount - 1
+            rowCount = down < 1 || Math.abs(cssH / up - spacing) <= Math.abs(cssH / down - spacing) ? up : down
+          }
+        }
+        spacingY = S.squareCells ? Math.max(1, Math.round(spacingX)) : cssH / rowCount
         originX = 0
         originY = 0
       }
