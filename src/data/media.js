@@ -112,7 +112,8 @@ export function heroFor(slug, override) {
   if (videoName && f[videoName]) {
     const mp4 = /\.mp4$/i.test(videoName) ? f[videoName] : f[find(/^hero\.mp4$/i)]
     const webm = /\.webm$/i.test(videoName) ? f[videoName] : f[find(/^hero\.webm$/i)]
-    return { video: { mp4, webm, poster: f[imageName] } }
+    // A gallery clip named as the hero ('02.mp4') brings its own poster frame (02-poster.webp).
+    return { video: { mp4, webm, poster: f[imageName] ?? f[`${stem(videoName)}-poster.webp`] } }
   }
   if (imageName && f[imageName]) return { still: f[imageName] }
   return {}

@@ -139,6 +139,8 @@ const GALLERY_MAX = 8
 const projectList = [
   {
     slug: 'pgn-immersive-mobility-rehab',
+    // Wide shot of the room in use first, then the particles and the details.
+    gallery: [{ src: '02.mp4' }, { src: '01.mp4' }, { src: '03.png' }, { src: '04.mp4' }, { src: '05.jpg' }, { src: '06.jpg' }, { src: '07.mp4' }, { src: '07.png' }],
     date: year('pgn-immersive-mobility-rehab', '2026'),
     title: 'PGN - Immersive Mobility Rehab',
     heading: ['PGN', 'IMMERSIVE MOBILITY REHAB'],
@@ -232,6 +234,8 @@ const projectList = [
   {
     // Files live in src/assets/projects/end-of-signal/ (01.mp4, 02.mp4, thumb.jpg).
     slug: 'end-of-signal',
+    hero: '02.mp4', // the installation view (the island footage is only 360 px, too small for the full page)
+    gallery: [{ src: '02.mp4' }, { src: '01.mp4' }],
     date: year('end-of-signal', '2025'),
     title: 'End of Signal',
     heading: ['END OF SIGNAL', 'CEZAR MOCAN'],
@@ -284,6 +288,8 @@ const projectList = [
   },
   {
     slug: '370-botanic-gardens',
+    // 01.mp4 is the same footage as the hero backdrop, so it is left out here.
+    gallery: [{ src: '02.mp4' }, { src: '03.mp4' }],
     date: year('370-botanic-gardens', '2024'),
     title: '370 BOTANIC GARDENS',
     heading: ['370', 'BOTANIC GARDENS'],
@@ -341,6 +347,7 @@ const projectList = [
   {
     // Files live in src/assets/projects/wild-birds/ (from the old mks.computer site).
     slug: 'wild-birds',
+    hero: '01.mp4', // the projection-mapped room
     date: year('wild-birds', '2023'),
     title: 'Wild Birds',
     heading: ['WILD BIRDS'],
@@ -356,6 +363,9 @@ const projectList = [
   {
     // Files live in src/assets/projects/devolving-spam/ (from the old mks.computer site).
     slug: 'devolving-spam',
+    hero: '04.mp4',
+    // The wall at the show first; 03 (the nine renders) is left out, it repeats the tile.
+    gallery: [{ src: '02.jpg' }, { src: '01.mp4' }, { src: '04.mp4' }],
     date: year('devolving-spam', '2023'),
     title: 'Devolving Spam',
     tags: ['print', 'unfeatured'], // shown under All only, not in Featured
@@ -370,6 +380,7 @@ const projectList = [
   },
   {
     slug: 'evidence-71-the-shed',
+    hero: 'app_demo.mp4', // the archive web app, playing behind the write-up
     thumbGlass: true,
     date: year('evidence-71-the-shed', '2023'),
     title: 'EVIDENCE 071 @ The Shed',
