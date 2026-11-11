@@ -756,6 +756,16 @@ a:hover,
   text-overflow: ellipsis;
 }
 
+/* The menu panel sits over the tiles in every layout, so scrolling tiles pass behind
+   its glass and a tap on a menu link always reaches the link. (On phones and upright
+   tablets the tile layer covers the whole page, menu included; without this, iPad
+   Safari 16 sent menu taps to that layer and the menu stopped working once Systems,
+   Visuals or Contact was open.) */
+.home .section.is-full-screen > .header.margin-bottom_none {
+  position: relative;
+  z-index: 3;
+}
+
 /* Desktop: scattered tiles (components/ProjectThumbs.jsx sets --x/--y/--s per tile,
    --cell = one grid cell, and --dx/--dy = which way to grow). A tile is a block of
    backdrop cells (TILE_CELLS there); hovering it grows it by one cell each way on the
@@ -768,11 +778,6 @@ a:hover,
     display: block;
     margin: 0;
     z-index: 2;
-  }
-  /* The menu panel sits over the tiles, so scrolling tiles pass behind its glass. */
-  .home .section.is-full-screen > .header.margin-bottom_none {
-    position: relative;
-    z-index: 3;
   }
   .project_thumbs--scatter .project_thumb {
     position: absolute;
