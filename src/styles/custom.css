@@ -109,9 +109,14 @@ a:hover,
 .home .section.is-full-screen {
   --hero-menu-size: clamp(1.4rem, 7vw, 4rem);
 }
-@media (min-width: 768px) {
+/* Side-by-side layout (landscape tablets, laptops, desktops): the menu scales with the
+   width (about 55px on a 1194px iPad in landscape), reaching the full 4rem at 1366px, so
+   the panel leaves room beside it for the write-up and the tiles. Phones and upright
+   tablets stack the content under the menu instead (lib/layout.js STACKED_QUERY, the
+   same query as the stacked @media blocks below). */
+@media (min-width: 1101px), (min-width: 768px) and (orientation: landscape) {
   .home .section.is-full-screen {
-    --hero-menu-size: 4rem;
+    --hero-menu-size: clamp(2.25rem, 5.26vw - 0.5rem, 4rem);
   }
 }
 .home .section.is-full-screen > .header.margin-bottom_none .heading_primary.hero_menu_text_color {
@@ -306,7 +311,7 @@ a:hover,
   backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
 }
 /* Phones: the rows are small there, so an option takes a whole one (easier to tap). */
-@media (max-width: 767px) {
+@media (max-width: 767px), (orientation: portrait) and (max-width: 1100px) {
   .visuals_sort_option {
     height: var(--grid-spacing-y, 2.3em);
   }
@@ -756,7 +761,7 @@ a:hover,
    backdrop cells (TILE_CELLS there); hovering it grows it by one cell each way on the
    grid lines and lifts it over its neighbours. The contact
    tiles keep the regular grid layout below. */
-@media (min-width: 768px) {
+@media (min-width: 1101px), (min-width: 768px) and (orientation: landscape) {
   .home .section.is-full-screen > .project_thumbs--scatter {
     position: absolute;
     inset: 0;
@@ -827,7 +832,7 @@ a:hover,
    panel: Systems / Visuals tiles are 2x2-cell blocks scattered over the grid like on
    desktop, and Contact tiles are 3x3-cell blocks in a row, a cell apart, on the
    lines (lib/phoneTiles.js sets --x/--y/--s per tile, so nothing can leave the screen). */
-@media (max-width: 767px) {
+@media (max-width: 767px), (orientation: portrait) and (max-width: 1100px) {
   .home .section.is-full-screen {
     flex-wrap: wrap;
   }
@@ -1018,7 +1023,7 @@ a:hover,
   background: rgba(255, 255, 255, 0.3);
   border-radius: 3px;
 }
-@media (min-width: 768px) {
+@media (min-width: 1101px), (min-width: 768px) and (orientation: landscape) {
   .home .section.is-full-screen > .writeup {
     flex: none; /* keep the exact cell width even when the menu panel is wide */
     align-self: flex-start;
@@ -1062,7 +1067,7 @@ a:hover,
     margin-top: 0;
   }
 }
-@media (max-width: 767px) {
+@media (max-width: 767px), (orientation: portrait) and (max-width: 1100px) {
   .home .section.is-full-screen > .writeup {
     /* the basis must allow for the side margins, or the panel runs off the screen */
     flex: 1 0 calc(100% - 2 * var(--_typography---hero_menu_margin, 20px));
@@ -1096,6 +1101,15 @@ a:hover,
   }
   .writeup_foot .gallery {
     margin-top: 0;
+  }
+}
+/* Upright tablets: a grid column of margin either side of the write-up (phones keep
+   their 20px), so the lines of text are not too long. */
+@media (orientation: portrait) and (min-width: 768px) and (max-width: 1100px) {
+  .home .section.is-full-screen > .writeup {
+    flex-basis: calc(100% - 2 * var(--grid-spacing, 64px));
+    margin-left: var(--grid-spacing, 64px);
+    margin-right: var(--grid-spacing, 64px);
   }
 }
 

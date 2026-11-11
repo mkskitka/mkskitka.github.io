@@ -13,6 +13,7 @@ import ProjectLock, { isUnlocked } from '../components/ProjectLock.jsx'
 import { revealSections } from '../lib/animations.js'
 import { DEFAULT_SORT, isSort, sortEnds, sortItems, subsetItems, subsetsOf } from '../lib/sortItems.js'
 import VisualsSort from '../components/VisualsSort.jsx'
+import { STACKED_QUERY } from '../lib/layout.js'
 
 // The site is currently just the hero, fixed to one screen with no scrolling: wheel,
 // touch and keys drive the backdrop animation instead (GridInkBackdrop SETTINGS.scroll).
@@ -127,6 +128,15 @@ export default function Home() {
   useEffect(() => {
     const mq = window.matchMedia(PHONE_QUERY)
     const onChange = (e) => setIsPhone(e.matches)
+    mq.addEventListener('change', onChange)
+    return () => mq.removeEventListener('change', onChange)
+  }, [])
+  // Menu on top, content under it (phones and upright tablets: lib/layout.js): the
+  // tiles take their phone layout there.
+  const [stacked, setStacked] = useState(() => window.matchMedia(STACKED_QUERY).matches)
+  useEffect(() => {
+    const mq = window.matchMedia(STACKED_QUERY)
+    const onChange = (e) => setStacked(e.matches)
     mq.addEventListener('change', onChange)
     return () => mq.removeEventListener('change', onChange)
   }, [])
@@ -436,7 +446,7 @@ export default function Home() {
             ))
           )}
         </div>
-        <ProjectThumbs open={active === 'systems' && !project} keep={active === 'systems' && !!project} items={PROJECT_LIST} onSelect={openProject} cells={{ desktop: tweak.cells }} columns={{ phone: 1 }} rows={layout.systems === 'grid' ? tweak.rows : false} sizes={layout.systems === 'grid' ? null : { desktop: [1, 5], phone: [2, 3] }} titles={!(isPhone && layout.systems === 'scatter')} opacity={isPhone ? null : tweak.opacity} dim={isPhone ? null : tweak.dim} grow={false} phoneRows={layout.systems === 'grid' ? 1 : null} phoneLift={layout.systems === 'grid' ? 1 : 0} dimBehind={sortListOpen.systems} arrowLabels={sortEnds('systems', sort.systems, sort.rev)} stepped={layout.systems === 'grid'} />
+        <ProjectThumbs open={active === 'systems' && !project} keep={active === 'systems' && !!project} items={PROJECT_LIST} onSelect={openProject} cells={{ desktop: tweak.cells }} columns={{ phone: 1 }} rows={layout.systems === 'grid' ? tweak.rows : false} sizes={layout.systems === 'grid' ? null : { desktop: [1, 5], phone: [2, 3] }} titles={!(stacked && layout.systems === 'scatter')} opacity={stacked ? null : tweak.opacity} dim={stacked ? null : tweak.dim} grow={false} phoneRows={layout.systems === 'grid' ? 1 : null} phoneLift={layout.systems === 'grid' ? 1 : 0} dimBehind={sortListOpen.systems} arrowLabels={sortEnds('systems', sort.systems, sort.rev)} stepped={layout.systems === 'grid'} />
         <VisualsSort kind="systems" open={active === 'systems' && !project} value={sort.systems} rev={sort.rev} onChange={pickSort('systems')} subsets={SHOW.systems} subset={sort.show.systems} onSubset={pickShow('systems')} layout={layout.systems} onLayout={pickLayout('systems')} onListOpen={onListOpen('systems')} />
         <ProjectThumbs open={active === 'visuals' && !project} keep={active === 'visuals' && !!project} focus={visualAt} items={VISUAL_LIST} label="Visuals" onSelect={openProject} bounce={visualsFresh} titles={SHOW_VISUAL_TITLES} rows={layout.visuals === 'grid'} phoneRows={3} dimBehind={sortListOpen.visuals} arrowLabels={sortEnds('visuals', sort.visuals, sort.rev)} />
         <VisualsSort open={active === 'visuals' && !project} value={sort.visuals} rev={sort.rev} onChange={pickSort('visuals')} subsets={SHOW.visuals} subset={sort.show.visuals} onSubset={pickShow('visuals')} layout={layout.visuals} onLayout={pickLayout('visuals')} onListOpen={onListOpen('visuals')} />
@@ -444,7 +454,7 @@ export default function Home() {
         {/* The hope_wide loop beside the menu while nothing is selected is off for now:
             components/HomeVideo.jsx, <HomeVideo open={!active && !project} /> here. */}
         {/* MK SKITKA: the bio (src/data/about.js). A project: its write-up (src/data/projects.js). */}
-        <WriteUp open={active === 'home' && !project} heading={about.heading} paragraphs={about.paragraphs} align="center">
+        <WriteUp open={active === 'home' && !project} heading={about.heading} paragraphs={about.paragraphs} align="center" anchor="center">
           <Link to="/contact" className="writeup_link">
             Contact -&gt;
           </Link>
@@ -455,6 +465,7 @@ export default function Home() {
         <WriteUp
           open={!!project && !isVisual}
           align="right"
+          anchor="bottom"
           heading={project?.title}
           lines={[
             { label: 'Date', value: project?.date },

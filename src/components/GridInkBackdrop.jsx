@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react'
 import * as THREE from 'three'
+import { isStacked } from '../lib/layout.js'
 
 /* ============================================================================
    GRID + INK BACKDROP (three.js, GPU) — after the "gem vertahorizlines" piece.
@@ -1400,7 +1401,7 @@ export default function GridInkBackdrop({ className = '', transparent = false, p
         // gets a row count of the same parity as the panel (its lines plus the glass
         // rows above and below), whichever such count keeps the rows nearest their
         // size; otherwise the panel would sit half a row off centre.
-        if (!window.matchMedia('(max-width: 767px)').matches && host?.querySelector('.header.margin-bottom_none')) {
+        if (!isStacked() && host?.querySelector('.header.margin-bottom_none')) {
           const links = host.querySelectorAll('.header.margin-bottom_none .hero_menu_text_color').length
           if (links && !host.querySelector('.project_back')) menuLines = links // remembered while a project's title replaces the menu
           const parity = (menuLines + 2 * PANEL_PAD_ROWS) % 2
@@ -1452,7 +1453,7 @@ export default function GridInkBackdrop({ className = '', transparent = false, p
           section.style.setProperty('--hero-text-nudge', `${Number.isFinite(low) ? (-low).toFixed(2) : 0}px`)
         }
         if (panel) {
-          const phone = window.matchMedia('(max-width: 767px)').matches
+          const phone = isStacked()
           const topRow = Math.floor((padTop - originY) / spacingY) // line at or just above the section padding
           let top = LY(Math.max(0, topRow - (phone ? PANEL_UP_ROWS_PHONE : 0)))
           // Desktop menu: centred down the page instead, on whole rows (the tiles beside

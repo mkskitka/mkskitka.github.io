@@ -2,6 +2,7 @@ import { useLayoutEffect, useRef } from 'react'
 import { contactLinks } from '../data/contact.js'
 import { contactIcons } from './contactIcons.jsx'
 import { panelWatcher, usePhoneSpots } from '../lib/phoneTiles.js'
+import { isStacked } from '../lib/layout.js'
 
 /**
  * The Contact grid: one tile per contact link (Instagram, email, GitHub), shown
@@ -30,7 +31,7 @@ export default function ContactTiles({ open = false }) {
     let trackPanel = () => null
     const place = () => {
       const panelEl = trackPanel()
-      if (!window.matchMedia('(min-width: 768px)').matches) {
+      if (isStacked()) {
         el.style.marginLeft = ''
         el.style.marginTop = ''
         return

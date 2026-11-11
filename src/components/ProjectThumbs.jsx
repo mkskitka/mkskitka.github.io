@@ -2,6 +2,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { projects, TAG_LABELS } from '../data/projects.js'
 import { panelWatcher, phoneSpots } from '../lib/phoneTiles.js'
 import { BOUNCE } from './GridInkBackdrop.jsx'
+import { isStacked } from '../lib/layout.js'
 
 /**
  * Scattered tiles, used for Systems (projects; click opens the project view) and
@@ -79,6 +80,9 @@ const PAD = 1 // empty cells kept around every tile (1 leaves room for the hover
 // Tile size in backdrop grid cells (2 = a 2x2 block). If a tile can't be placed at this
 // size (small window, many tiles) it goes a cell smaller rather than being dropped.
 const TILE_CELLS = { desktop: 1, phone: 2 }
+// Desktop tiles at least this wide (px): on a tablet the grid cells are smaller (the menu
+// text, and so the grid, scales with the width), so a 1-cell tile takes 2 cells there.
+const MIN_TILE_PX = 60
 // The most tiles shown on one screen. With more than this, the rest wait off the right
 // edge and scrolling brings them in.
 const MAX_PER_SCREEN = { desktop: 10, phone: 6 }
@@ -194,7 +198,7 @@ export default function ProjectThumbs({ open = false, onSelect, items = projects
     let trackPanel = () => null
     const layout = () => {
       trackPanel() // keep watching the panel, should it be replaced
-      if (!window.matchMedia('(min-width: 768px)').matches) {
+      if (isStacked()) {
         const pcs = getComputedStyle(section)
         const s = parseFloat(pcs.getPropertyValue('--grid-spacing')) || 33
         const panel = section.querySelector('.header.margin-bottom_none')?.getBoundingClientRect()
@@ -293,7 +297,7 @@ export default function ProjectThumbs({ open = false, onSelect, items = projects
       // Columns beside the panel = one screen. Tiles past MAX_PER_SCREEN go on the
       // screens after it, further along the same grid (off the page until scrolled to).
       const span = Math.max(1, cols - firstCol)
-      const dc = tileCells.desktop
+      const dc = Math.max(tileCells.desktop, Math.ceil(MIN_TILE_PX / sx))
       // Rows: tiles go in order, left to right then top to bottom, in a lattice of
       // dc-cell blocks a clear cell apart, the block of rows centred on the free height...
       // A screen holds as many tiles as the lattice has slots.

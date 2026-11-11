@@ -1,5 +1,6 @@
 import { useLayoutEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { isStacked } from '../lib/layout.js'
 
 // [text](/path) in a paragraph becomes a link: a site route (Link) or, with http(s), an <a>.
 const rich = (text) =>
@@ -31,11 +32,19 @@ const rich = (text) =>
  * number of empty columns either side; the width goes a cell wider or narrower when
  * that is what it takes to be exactly centred) or 'right' (one gap column from the
  * right edge).
+ *
+ * `anchor="bottom"` (project write-ups): on an upright tablet the panel sits one grid
+ * row above the bottom of the page instead of straight under the menu, so the project
+ * image shows between the title and the text; it grows upward as far as one row under
+ * the menu panel, then scrolls. `anchor="center"` (the bio): on an upright tablet it is
+ * centred down the space between the bottom of the menu panel and the bottom of the
+ * page, with at least a grid row clear above and below.
  */
 const MIN_CELLS = 4
 const PHONE_BOTTOM_GAP = 24 // px left below the panel on phones
+const TABLET_QUERY = '(min-width: 768px)' // stacked and this wide: an upright tablet (lib/layout.js)
 
-export default function WriteUp({ open = false, heading, lines = [], paragraphs = [], align = 'left', children }) {
+export default function WriteUp({ open = false, heading, lines = [], paragraphs = [], align = 'left', anchor = 'top', children }) {
   const ref = useRef(null)
   const [place, setPlace] = useState(null) // { cells, below } or null (phones / not measured)
 
@@ -44,7 +53,15 @@ export default function WriteUp({ open = false, heading, lines = [], paragraphs 
     const section = el?.closest('.section')
     if (!el || !section || !open) return undefined
     const measure = () => {
-      if (!window.matchMedia('(min-width: 768px)').matches) {
+      if (isStacked() && anchor !== 'top' && window.matchMedia(TABLET_QUERY).matches) {
+        const sy = parseFloat(getComputedStyle(section).getPropertyValue('--grid-spacing-y')) || 64
+        const panel = section.querySelector('.header.margin-bottom_none')
+        const panelBottom = panel ? panel.getBoundingClientRect().bottom - section.getBoundingClientRect().top : 0
+        const maxHeight = Math.max(140, Math.floor(section.clientHeight - panelBottom - 2 * sy))
+        setPlace(anchor === 'center' ? { phone: true, center: panelBottom, maxHeight } : { phone: true, bottom: sy, maxHeight })
+        return
+      }
+      if (isStacked()) {
         // Phones: the page does not scroll, so cap the panel at the space left under
         // the menu and let it scroll inside instead of running off the bottom.
         const secRect = section.getBoundingClientRect()
@@ -96,10 +113,15 @@ export default function WriteUp({ open = false, heading, lines = [], paragraphs 
       ro.disconnect()
       mo.disconnect()
     }
-  }, [open, heading, align])
+  }, [open, heading, align, anchor])
 
   const style = place?.phone
-    ? { maxHeight: `${place.maxHeight}px` }
+    ? place.bottom != null
+      ? { position: 'absolute', left: 'var(--grid-spacing)', right: 'var(--grid-spacing)', bottom: `${place.bottom}px`, margin: 0, maxHeight: `${place.maxHeight}px` }
+      : place.center != null
+      ? // top/bottom span the free space; a content-tall box with auto margins sits in its middle
+        { position: 'absolute', left: 'var(--grid-spacing)', right: 'var(--grid-spacing)', top: `${place.center}px`, bottom: 0, height: 'max-content', margin: 'auto 0', maxHeight: `${place.maxHeight}px` }
+      : { maxHeight: `${place.maxHeight}px` }
     : place
     ? place.below
       ? { position: 'absolute', left: place.left, top: place.top, width: `calc(var(--grid-spacing) * ${place.cells})`, margin: 0, maxHeight: `${place.maxHeight}px` }

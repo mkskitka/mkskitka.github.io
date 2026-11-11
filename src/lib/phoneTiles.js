@@ -1,4 +1,5 @@
 import { useLayoutEffect, useRef, useState } from 'react'
+import { isStacked } from './layout.js'
 
 // Phone layout for the scattered tiles (components/ProjectThumbs.jsx). On a phone
 // there is no room beside the menu panel, so the tiles go under it: each one a square
@@ -300,7 +301,7 @@ export function usePhoneSpots(navRef, count, opts = {}) {
     let trackPanel = () => section.querySelector(PANEL)
     const layout = () => {
       const panelEl = trackPanel()
-      if (window.matchMedia('(min-width: 768px)').matches) {
+      if (!isStacked()) {
         setSpots(null)
         return
       }
