@@ -407,6 +407,7 @@ const SETTINGS = {
 
 const PANEL_PAD_ROWS = 1 // rows of glass above and below the hero menu text (whole rows keep the panel on grid lines)
 const PANEL_PAD_COLS = 0.5 // columns of glass left of the text (the right edge snaps to the next grid line)
+const PANEL_TOP_ROWS_TABLET = 1 // upright tablets (stacked, 768px+): clear grid rows above the menu panel
 const PANEL_UP_ROWS_PHONE = 1 // phones: grid rows to lift the menu panel above where it would otherwise sit (0 = as on desktop)
 const PANEL_LEFT_COLS = 1 // clear grid columns between the page edge and the menu panel (fitted grid only)
 
@@ -1456,6 +1457,9 @@ export default function GridInkBackdrop({ className = '', transparent = false, p
           const phone = isStacked()
           const topRow = Math.floor((padTop - originY) / spacingY) // line at or just above the section padding
           let top = LY(Math.max(0, topRow - (phone ? PANEL_UP_ROWS_PHONE : 0)))
+          // Upright tablets: one clear row above the panel, as there is one clear column
+          // to its left (PANEL_LEFT_COLS).
+          if (phone && window.matchMedia('(min-width: 768px)').matches) top = LY(PANEL_TOP_ROWS_TABLET)
           // Desktop menu: centred down the page instead, on whole rows (the tiles beside
           // it are centred the same way).
           const menuLines = panel.querySelector('.project_back') ? 0 : panel.querySelectorAll('.hero_menu_text_color').length
