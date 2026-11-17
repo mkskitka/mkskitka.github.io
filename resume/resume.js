@@ -3,24 +3,47 @@
 
 if (new URLSearchParams(location.search).get('theme') === 'light') document.documentElement.classList.add('light')
 
-/* The grid is the page background: an SVG tile exactly one page in size (lines as
-   colour gradients, like the site's canvas). Chrome paints the root background
-   under every printed page. */
+/* The grid (lines as colour gradients, like the site's canvas), drawn as an SVG that
+   is closed on all four sides: the outermost lines frame it, so no line ends in a raw
+   stub. Two versions:
+   - screen: a tile one page in size behind each sheet (--grid-screen), framed one
+     cell in from every edge, where the panels sit;
+   - print: one page area in size (the sheet minus the @page margins), drawn again on
+     every printed page by a fixed layer (--grid-print in resume.css). Its outer lines
+     fall in the same places on the paper as the screen version's. */
 const drawGrid = () => {
   const css = getComputedStyle(document.documentElement)
   const v = (n) => css.getPropertyValue(n).trim()
-  const W = 210, H = 297, cx = 10.5, cy = 11 // mm
+  const W = parseFloat(v('--page-w')), H = parseFloat(v('--page-h')) // mm
+  const cx = parseFloat(v('--cell-x')), cy = parseFloat(v('--cell-y'))
   const w = parseFloat(v('--line-w')) * 0.2646 // px -> mm
   const a = parseFloat(v('--grid-alpha'))
-  let r = ''
-  for (let y = cy; y <= H + 0.01; y += cy) r += `<rect x="0" y="${(y - w).toFixed(3)}" width="${W}" height="${w.toFixed(3)}" fill="url(#h)"/>`
-  for (let x = cx; x <= W + 0.01; x += cx) r += `<rect x="${(x - w).toFixed(3)}" y="0" width="${w.toFixed(3)}" height="${H}" fill="url(#v)" opacity="0.55"/>`
-  const svg =
-    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}"><defs>` +
-    `<linearGradient id="h" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="${v('--red')}"/><stop offset="1" stop-color="${v('--teal')}"/></linearGradient>` +
-    `<linearGradient id="v" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${v('--blue')}"/><stop offset="1" stop-color="${v('--pink')}"/></linearGradient>` +
-    `</defs><g opacity="${a}">${r}</g></svg>`
-  document.documentElement.style.backgroundImage = `url("data:image/svg+xml,${encodeURIComponent(svg)}")`
+  const f = (n) => n.toFixed(3)
+  // Lines at x0, x0 + cx, ... up to x1 (and the same for y); each line is centred on
+  // its position but kept inside the drawing, so the frame lines aren't clipped.
+  const svg = (width, height, x0, x1, y0, y1) => {
+    const at = (from, to, step) => {
+      const out = []
+      for (let p = from; p <= to + 0.01; p += step) out.push(p)
+      return out
+    }
+    const clamp = (p, max) => Math.min(Math.max(p - w / 2, 0), max - w)
+    let r = ''
+    for (const y of at(y0, y1, cy)) r += `<rect x="${f(x0 - w / 2)}" y="${f(clamp(y, height))}" width="${f(x1 - x0 + w)}" height="${f(w)}" fill="url(#h)"/>`
+    for (const x of at(x0, x1, cx)) r += `<rect x="${f(clamp(x, width))}" y="${f(y0 - (y0 > 0 ? w / 2 : 0))}" width="${f(w)}" height="${f(y1 - y0 + (y0 > 0 ? w : 0))}" fill="url(#v)" opacity="0.55"/>`
+    const doc =
+      `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${f(width)} ${f(height)}" preserveAspectRatio="none"><defs>` +
+      `<linearGradient id="h" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="${v('--red')}"/><stop offset="1" stop-color="${v('--teal')}"/></linearGradient>` +
+      `<linearGradient id="v" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${v('--blue')}"/><stop offset="1" stop-color="${v('--pink')}"/></linearGradient>` +
+      `</defs><g opacity="${a}">${r}</g></svg>`
+    return `url("data:image/svg+xml,${encodeURIComponent(doc)}")`
+  }
+  const root = document.documentElement.style
+  // screen: framed one cell in from each edge of the sheet
+  root.setProperty('--grid-screen', svg(W, H, cx, W - cx, cy, H - cy))
+  // print: the page area starts one cell down, so its top and bottom edges are frame lines
+  const ph = H - 2 * cy
+  root.setProperty('--grid-print', svg(W, ph, cx, W - cx, 0, ph))
 }
 drawGrid()
 

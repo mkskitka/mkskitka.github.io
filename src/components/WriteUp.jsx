@@ -38,7 +38,10 @@ const rich = (text) =>
  * image shows between the title and the text; it grows upward as far as one row under
  * the menu panel, then scrolls. `anchor="center"` (the bio): on an upright tablet it is
  * centred down the space between the bottom of the menu panel and the bottom of the
- * page, with at least a grid row clear above and below.
+ * page, with at least a grid row clear above and below. Beside the menu (desktop) it is
+ * centred down the whole page instead, on the grid: a whole number of rows tall (its
+ * text centred inside) and starting on a row line, at least a row clear of the page's
+ * top and bottom.
  */
 const MIN_CELLS = 4
 const PHONE_BOTTOM_GAP = 24 // px left below the panel on phones
@@ -93,6 +96,34 @@ export default function WriteUp({ open = false, heading, lines = [], paragraphs 
           if ((free - cells) % 2) cells += free - cells - 1 >= 2 ? 1 : -1 // same gap both sides
           gap = Math.max(1, (free - cells) / 2)
         }
+        if (anchor === 'center') {
+          // Rows: the fewest whole rows that hold the text (measured at this width with
+          // the panel's own size lifted for a moment) with at least MIN_PAD_ROWS of glass
+          // above and below it, and the same number of rows left clear above and below
+          // the panel, so it is centred on the page with its edges on row lines. The
+          // glass's top and bottom padding takes up what is left, so the text sits in
+          // the middle of it. At most the page's rows less one clear row at each end
+          // (more text than that scrolls).
+          const MIN_PAD_ROWS = 0.25
+          const sy = parseFloat(cs.getPropertyValue('--grid-spacing-y')) || s
+          const oy = parseFloat(cs.getPropertyValue('--grid-origin-y')) || 0
+          const totalRows = Math.floor((secRect.height - oy) / sy + 1e-6)
+          const keep = { width: el.style.width, height: el.style.height, maxHeight: el.style.maxHeight, paddingTop: el.style.paddingTop, paddingBottom: el.style.paddingBottom }
+          Object.assign(el.style, { width: `${cells * s}px`, height: 'auto', maxHeight: 'none', paddingTop: '0px', paddingBottom: '0px' })
+          const text = el.offsetHeight // the content alone, no vertical padding
+          Object.assign(el.style, keep)
+          const maxRows = Math.max(1, totalRows - 2)
+          let rows = Math.ceil(text / sy + 2 * MIN_PAD_ROWS - 1e-3)
+          if ((totalRows - rows) % 2) rows += 1 // same number of clear rows above and below
+          rows = Math.min(rows, maxRows)
+          const topRow = Math.floor((totalRows - rows) / 2)
+          const pad = Math.max(sy * MIN_PAD_ROWS, (rows * sy - text) / 2)
+          // Margin that puts the top on that row line (from where the panel sits now).
+          const margin = parseFloat(getComputedStyle(el).marginTop) || 0
+          const shift = oy + topRow * sy - (el.getBoundingClientRect().top - secRect.top)
+          setPlace({ cells, gap, below: false, top: 0, centred: true, marginTop: margin + shift, height: rows * sy, pad })
+          return
+        }
         setPlace({ cells, gap, below: false, top: 0, maxHeight: capFrom(el.getBoundingClientRect().top - secRect.top) })
       }
       else {
@@ -103,6 +134,7 @@ export default function WriteUp({ open = false, heading, lines = [], paragraphs 
       }
     }
     measure()
+    document.fonts?.ready.then(() => measure()) // the text wraps differently once the webfont is in
     const ro = new ResizeObserver(measure)
     ro.observe(section)
     const mo = new MutationObserver(measure)
@@ -125,6 +157,18 @@ export default function WriteUp({ open = false, heading, lines = [], paragraphs 
     : place
     ? place.below
       ? { position: 'absolute', left: place.left, top: place.top, width: `calc(var(--grid-spacing) * ${place.cells})`, margin: 0, maxHeight: `${place.maxHeight}px` }
+      : place.centred
+      ? // the box is on the grid lines; the glass stops --glass-gap short of them on every side, so the lines show whole
+        {
+          width: `calc(var(--grid-spacing) * ${place.cells} - 2 * var(--glass-gap))`,
+          marginLeft: `calc(var(--grid-spacing) * ${place.gap} + var(--glass-gap))`,
+          marginTop: `calc(${place.marginTop}px + var(--glass-gap))`,
+          height: `calc(${place.height}px - 2 * var(--glass-gap))`,
+          maxHeight: 'none',
+          paddingTop: `calc(${place.pad}px - var(--glass-gap))`,
+          paddingBottom: `calc(${place.pad}px - var(--glass-gap))`,
+          justifyContent: 'center',
+        }
       : { width: `calc(var(--grid-spacing) * ${place.cells})`, marginLeft: `calc(var(--grid-spacing) * ${place.gap})`, maxHeight: `${place.maxHeight}px` }
     : undefined
 

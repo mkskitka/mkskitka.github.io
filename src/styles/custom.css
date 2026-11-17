@@ -937,6 +937,9 @@ a:hover,
   --writeup-cells: 7; /* desktop width in backdrop grid cells */
 }
 .writeup {
+  /* how far the centred bio's glass stops short of the grid lines it sits on, so its
+     blur leaves them whole (WriteUp.jsx; the line weight is set on the section) */
+  --glass-gap: calc(var(--grid-line-weight, 1.1px) / 2 + 2px);
   position: relative;
   z-index: 2;
   color: #fff;

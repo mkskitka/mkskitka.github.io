@@ -64,14 +64,32 @@ a {
   text-decoration: none;
 }
 
-/* The grid is the page background: an SVG tile exactly one page in size,
-   drawn by the script at the bottom (lines as colour gradients, like the
-   site's canvas). Chrome paints the root background under every printed
-   page, margins included, so the lines run edge to edge on each page. */
+/* The grid is the page background, drawn by resume.js (lines as colour
+   gradients, like the site's canvas) and closed on all four sides. On screen
+   it sits behind the sheet itself, one tile per sheet length, so it lines up
+   with the panels at any window width. In print the page background would
+   run through the pages as one strip, so the grid is a fixed layer instead:
+   Chrome draws it again on every printed page, the same each time. */
 html {
   background-color: var(--bg);
-  background-repeat: repeat;
-  background-size: var(--page-w) var(--page-h);
+}
+@media screen {
+  .page {
+    background-image: var(--grid-screen);
+    background-repeat: repeat-y;
+    background-size: var(--page-w) var(--page-h);
+  }
+}
+@media print {
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    background-image: var(--grid-print);
+    background-size: 100% 100%;
+    pointer-events: none;
+  }
 }
 
 /* Page frame: one cell of margin all round, content on the grid. */

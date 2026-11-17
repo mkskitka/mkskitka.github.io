@@ -448,7 +448,7 @@
     "teaching": {
       "_about": "The teaching version: npm run resume:teaching. Education and teaching come first; the NYU roles move into a Teaching Experience section.",
       "title": "Creative Technologist & Educator",
-      "profile": "Educator and creative technologist with over 8 years of experience in generative and interactive media and four years of teaching at NYU, where she designed and taught the undergraduate course [Immersivity Beyond the Display](https://mkskitka.github.io/imbtd/), ran the ITP Coding Lab as a Research Fellow, and led workshops on TouchDesigner, Stable Diffusion, Teachable Machine and p5.js. Industry work includes a multi-room interactive rehabilitation system, a generative AI video system for the Nigerian Pavilion at the 2024 Venice Biennale, and four years building visualization tools for AI research, all of which feed back into the classroom as live examples of how creative technology is practised.",
+      "profile": "Educator and creative technologist with over 8 years of experience in generative and interactive media and four years of teaching at NYU, where she designed and taught the undergraduate course [Immersivity Beyond the Display](https://mkskitka.github.io/imbtd/), ran the ITP Coding Lab as a Research Fellow, and led workshops on TouchDesigner, Stable Diffusion, Teachable Machine and p5.js. Industry work includes a multi-room interactive rehabilitation system, a generative AI video system for the Nigerian Pavilion at the 2024 Venice Biennale, and four years building visualization tools for AI research, all of which bring real industry practice into her teaching.",
       "sections": [
         "profile",
         "education",
@@ -508,7 +508,7 @@
       ]
     },
     "exhibition": {
-      "_about": "For exhibition and experience-design roles at nonprofits and cultural organisations (written for Open Plans’ Director of Exhibition Development post): npm run resume:exhibition. Exhibition work leads: research and data turned into things people walk into, the studios and artists worked with, and projects kept to deadline. Exhibition-specific bullets carry only: [\"exhibition\"].",
+      "_about": "For exhibition and experience-design roles at nonprofits and cultural organizations (written for Open Plans’ Director of Exhibition Development post): npm run resume:exhibition. Exhibition work leads: research and data turned into things people walk into, the studios and artists worked with, and projects kept to deadline. Exhibition-specific bullets carry only: [\"exhibition\"].",
       "title": "Creative Technologist, Exhibitions & Installations",
       "profile": "Creative technologist with 8 years of experience turning research, data and artists’ ideas into exhibitions and installations, from concept through on-site installation. Work has shown at the 2024 Venice Biennale, The Shed and NYU’s Clive Davis Gallery, and in New York pop-ups for Audible and Intel. Works in data visualization, generative video, projection, LED walls, touch screens and body-tracked interactives. Collaborates closely with the studios, artists, clinicians and researchers behind each project. Started in data visualization for policy and research: a federal lobbying visualization at MIT, then four years of tools for government research clients, managing up to 6 projects at a time to deadline. Designed and taught an undergraduate course on experience design at NYU.",
       "sections": [

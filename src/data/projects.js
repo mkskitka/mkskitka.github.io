@@ -151,7 +151,7 @@ const projectList = [
     description: [
       'PGN is a multi-room interactive therapy system for physical, cognitive and vision rehabilitation, built for personalized health care and installed at multiple locations. Each site combines an interactive LED hallway, a full-body projection motion room and an ambient multi-sensory recharge room.',
       'All three rooms run on a single TouchDesigner core. A config file on each machine decides which room it is, and which sensors, displays and experiences come up on boot, so the same system can be deployed to very different spaces. Markerless motion capture, depth cameras, lidar and camera-based body and eye tracking are all smoothed into one common set of player data, so every experience works the same way no matter which sensor is feeding it.',
-      'At the centre is a target-based therapy game. Clinicians run sessions from a control panel, levels are written as simple config files, and a GPU particle system moves the targets in a way that is fully repeatable, so a session can be paused, resumed, replayed and compared over time. Movement and hit data are recorded throughout for later analysis.',
+      'At the center is a target-based therapy game. Clinicians run sessions from a control panel, levels are written as simple config files, and a GPU particle system moves the targets in a way that is fully repeatable, so a session can be paused, resumed, replayed and compared over time. Movement and hit data are recorded throughout for later analysis.',
       'I worked across the whole project: system architecture, sensor integration and calibration, the target and level system, real-time visuals and shaders, communication with the control panel, session recording, and on-site installation and commissioning.',
     ],
     // Password protected: see "To lock a project" above.
@@ -245,7 +245,7 @@ const projectList = [
     // One string per paragraph: description: ['First paragraph.', 'Second paragraph.']
     description: [
       'I built the live-rendered AI visuals system for artist Cezar Mocan’s End of Signal. The installation won the SOLO AI ’25 award and has shown across multiple venues.',
-      'The piece simulates islands evolving over different scales of time, from tides to erosion. A custom web app runs the simulation and exposes an API to control it; TouchDesigner ties everything together, taking the contour maps of the evolving islands from the web app, pre-processing them and feeding them to ComfyUI, which runs a custom workflow on a model trained on satellite imagery to generate the islands’ colour and surface features. TouchDesigner then post-processes and renders the result live.',
+      'The piece simulates islands evolving over different scales of time, from tides to erosion. A custom web app runs the simulation and exposes an API to control it; TouchDesigner ties everything together, taking the contour maps of the evolving islands from the web app, pre-processing them and feeding them to ComfyUI, which runs a custom workflow on a model trained on satellite imagery to generate the islands’ color and surface features. TouchDesigner then post-processes and renders the result live.',
     ],
   },
   {
