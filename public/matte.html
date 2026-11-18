@@ -1,0 +1,415 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Notes on matteprojects.com · MK Skitka</title>
+<meta name="description" content="A short site audit of matteprojects.com by MK Skitka, prepared for the Creative Technologist, Digital and Design application.">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #efefed;
+    --paper: #f7f7f5;
+    --ink: #111;
+    --muted: #5d5d5a;
+    --line: #cfcfcb;
+    --accent: #d8401f;
+    --accent-soft: #f3d9cf;
+    --held: #111;
+    --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+    --sans: "Inter Tight", system-ui, -apple-system, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font: 400 17px/1.55 var(--sans);
+  }
+  a { color: inherit; }
+  .wrap { max-width: 1040px; margin: 0 auto; padding: 0 16px; }
+  @media (min-width: 720px) { .wrap { padding: 0 40px; } }
+
+  .label { font: 500 12px/1.4 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+  .label::before { content: "[ "; } .label::after { content: " ]"; }
+
+  header.top { border-bottom: 1px solid var(--line); }
+  header.top .wrap { display: flex; justify-content: space-between; gap: 16px; padding-top: 18px; padding-bottom: 18px; font: 500 12px/1.4 var(--mono); text-transform: uppercase; letter-spacing: .05em; }
+  header.top a { text-decoration: none; }
+
+  .hero { padding: 72px 0 56px; border-bottom: 1px solid var(--line); }
+  .hero h1 { font: 500 clamp(40px, 7vw, 84px)/0.98 var(--sans); letter-spacing: -0.03em; margin: 18px 0 28px; text-transform: uppercase; }
+  .hero p { max-width: 640px; margin: 0 0 14px; font-size: 19px; }
+  .hero .fine { font: 400 13px/1.5 var(--mono); color: var(--muted); max-width: 640px; margin-top: 28px; }
+
+  .toc { display: grid; grid-template-columns: 1fr; border-bottom: 1px solid var(--line); }
+  @media (min-width: 720px) { .toc { grid-template-columns: repeat(3, 1fr); } }
+  .toc a { display: block; padding: 20px 0; text-decoration: none; border-top: 1px solid var(--line); }
+  @media (min-width: 720px) { .toc a { padding: 22px 20px 22px 0; border-top: 0; } }
+  .toc a:first-child { border-top: 0; }
+  .toc .n { font: 500 12px var(--mono); color: var(--accent); }
+  .toc .t { display: block; font-weight: 500; margin-top: 4px; }
+  .toc a:hover .t { text-decoration: underline; }
+
+  section.finding { padding: 72px 0; border-bottom: 1px solid var(--line); }
+  .finding-head { display: grid; gap: 8px 40px; grid-template-columns: 1fr; margin-bottom: 36px; }
+  @media (min-width: 860px) { .finding-head { grid-template-columns: 260px 1fr; } }
+  .num { font: 500 13px var(--mono); color: var(--accent); }
+  .finding h2 { font: 500 clamp(28px, 4vw, 42px)/1.05 var(--sans); letter-spacing: -0.02em; margin: 6px 0 0; text-transform: uppercase; }
+  .finding .lede { font-size: 20px; line-height: 1.45; margin: 0 0 14px; }
+  .finding p { margin: 0 0 14px; max-width: 680px; }
+  .tag { display: inline-block; font: 500 11px/1 var(--mono); letter-spacing: .05em; text-transform: uppercase; border: 1px solid var(--ink); padding: 6px 8px; margin: 14px 6px 0 0; }
+  .tag.hot { background: var(--ink); color: var(--paper); }
+
+  .cols { display: grid; gap: 24px; grid-template-columns: 1fr; }
+  @media (min-width: 860px) { .cols { grid-template-columns: 1fr 1fr; } }
+  .panel { background: var(--paper); border: 1px solid var(--line); padding: 22px; min-width: 0; }
+  .panel h3 { font: 500 12px/1.4 var(--mono); letter-spacing: .06em; text-transform: uppercase; margin: 0 0 16px; color: var(--muted); }
+  .panel.after h3 { color: var(--accent); }
+  .panel ul { margin: 0; padding-left: 18px; }
+  .panel li { margin-bottom: 8px; }
+
+  /* scroll map */
+  .scrollmap { display: grid; gap: 10px; }
+  .row { display: grid; grid-template-columns: 112px 1fr; gap: 10px; align-items: center; font: 400 12px/1.2 var(--mono); }
+  .row .name { color: var(--muted); text-transform: uppercase; letter-spacing: .03em; }
+  .bar { height: 22px; position: relative; background: transparent; }
+  .bar span { position: absolute; top: 0; bottom: 0; left: 0; background: #b9b9b4; }
+  .bar span.held { background: var(--held); }
+  .bar span.beat { background: var(--accent); }
+  .bar em { position: absolute; left: calc(var(--w) + 8px); top: 3px; font-style: normal; color: var(--muted); white-space: nowrap; }
+  .legend { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 16px; font: 400 12px var(--mono); color: var(--muted); }
+  .legend i { display: inline-block; width: 12px; height: 12px; vertical-align: -1px; margin-right: 6px; background: #b9b9b4; }
+  .legend i.held { background: var(--held); } .legend i.beat { background: var(--accent); }
+
+  /* card mockups */
+  .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .card .img { aspect-ratio: 4/5; background: repeating-linear-gradient(135deg, #d7d7d2 0 10px, #cfcfca 10px 20px); }
+  .card .meta { display: flex; justify-content: space-between; font: italic 400 12px var(--sans); margin-top: 8px; color: var(--muted); }
+  .card .ttl { font: 500 15px/1.15 var(--sans); text-transform: uppercase; margin: 4px 0 8px; }
+  .card .cta { font: 500 10px var(--mono); letter-spacing: .05em; }
+  .caption { font: 400 12px/1.45 var(--mono); color: var(--muted); margin-top: 14px; }
+
+  .cal { border-top: 1px solid var(--ink); }
+  .cal .grp { font: 500 11px var(--mono); letter-spacing: .06em; text-transform: uppercase; padding: 12px 0 6px; color: var(--muted); }
+  .ev { display: grid; grid-template-columns: 62px 1fr auto; gap: 12px; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--line); }
+  .ev .d { text-align: center; border: 1px solid var(--ink); padding: 4px 0; }
+  .ev .d b { display: block; font: 600 22px/1 var(--sans); }
+  .ev .d small { display: block; font: 500 10px/1.4 var(--mono); text-transform: uppercase; }
+  .ev .what { font: 500 14px/1.2 var(--sans); text-transform: uppercase; }
+  .ev .where { font: 400 11px/1.4 var(--mono); color: var(--muted); }
+  .ev .go { font: 500 10px var(--mono); letter-spacing: .04em; border: 1px solid var(--ink); padding: 6px 8px; white-space: nowrap; }
+  .ev.up .d { background: var(--ink); color: var(--paper); }
+  .ev.up .go { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .ev.past .what, .ev.past .d { opacity: .62; }
+
+  table.data { width: 100%; border-collapse: collapse; font: 400 13px/1.4 var(--mono); }
+  table.data th, table.data td { text-align: left; padding: 9px 8px 9px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
+  table.data th { font-weight: 500; color: var(--muted); text-transform: uppercase; font-size: 11px; letter-spacing: .05em; }
+  .bad { color: var(--accent); font-weight: 500; }
+
+  pre { background: var(--ink); color: #eaeae6; padding: 18px; overflow-x: auto; font: 400 13px/1.55 var(--mono); margin: 0; }
+  pre .c { color: #8f8f8a; } pre .k { color: #ff9a7a; }
+
+  .plan { display: grid; gap: 0; grid-template-columns: 1fr; border-top: 1px solid var(--ink); }
+  @media (min-width: 860px) { .plan { grid-template-columns: repeat(3, 1fr); } }
+  .plan > div { padding: 22px 22px 22px 0; border-bottom: 1px solid var(--line); }
+  @media (min-width: 860px) { .plan > div { border-bottom: 0; border-right: 1px solid var(--line); padding-left: 22px; } .plan > div:first-child { padding-left: 0; } .plan > div:last-child { border-right: 0; } }
+  .plan h3 { font: 500 22px/1.1 var(--sans); text-transform: uppercase; margin: 8px 0 12px; }
+  .plan ul { margin: 0; padding-left: 18px; }
+
+  footer { padding: 56px 0 72px; font: 400 13px/1.6 var(--mono); color: var(--muted); }
+  footer a { color: var(--ink); }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .bar span { transform-origin: left; animation: grow .9s cubic-bezier(.2,.7,.2,1) both; }
+    @keyframes grow { from { transform: scaleX(0); } }
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <a href="/">MK Skitka · Creative Technologist</a>
+    <span>Nov 2026 · Brooklyn, NY</span>
+  </div>
+</header>
+
+<main>
+<div class="hero">
+  <div class="wrap">
+    <span class="label">Notes for MATTE Projects</span>
+    <h1>Five notes on<br>matteprojects.com</h1>
+    <p>I'm applying for the Creative Technologist, Digital and Design role, which includes owning MATTE's website. So I spent some time with it, the way I would in my first week.</p>
+    <p>The site already has a strong point of view: the full-bleed film hero, the editorial type, and the decision to put the studio's community on the homepage next to the client work. These notes are about helping that work land, starting with pacing and ending with a few fixes that would take an afternoon.</p>
+    <p class="fine">Independent notes by MK Skitka, not affiliated with or commissioned by MATTE. Everything here was observed on the public homepage on November 18, 2026, in Chrome on a 1512px-wide desktop window.</p>
+  </div>
+</div>
+
+<div class="wrap">
+  <nav class="toc" aria-label="Contents">
+    <a href="#pacing"><span class="n">01</span><span class="t">Scroll pacing</span></a>
+    <a href="#community"><span class="n">02</span><span class="t">Let the community read as community</span></a>
+    <a href="#rsvp"><span class="n">03</span><span class="t">Past events still say RSVP</span></a>
+    <a href="#dates"><span class="n">04</span><span class="t">Dates shift by one day</span></a>
+    <a href="#a11y"><span class="n">05</span><span class="t">Headings and alt text</span></a>
+    <a href="#plan"><span class="n">→</span><span class="t">How I'd sequence it</span></a>
+  </nav>
+</div>
+
+<!-- 01 -->
+<section class="finding" id="pacing">
+  <div class="wrap">
+    <div class="finding-head">
+      <div><span class="num">01 / Experience</span><h2>Scroll pacing</h2></div>
+      <div>
+        <p class="lede">The hero is the only part of the homepage that makes you pause. Everything after it moves past at the same speed, so the featured work goes by as fast as the footer.</p>
+        <p>The opening film sits in a 150vh section with a sticky frame, so the first scroll holds you on MATTE's reel. It's a confident start. After that the page is a flat feed, and the two featured projects (MERCURY and VIBECON) can be passed in a single flick of the trackpad.</p>
+        <p>Giving each section its own short beat, the way the hero already does, would turn the homepage into a guided path through the work. The site already runs Lenis smooth scrolling and uses <code>position: sticky</code>, so this builds on what's there rather than adding a new framework.</p>
+      </div>
+    </div>
+
+    <div class="cols">
+      <div class="panel">
+        <h3>Now · scroll distance per section (px)</h3>
+        <div class="scrollmap" aria-label="Current scroll distance per homepage section">
+          <div class="row"><span class="name">Hero film</span><div class="bar" style="--w:61%"><span class="held" style="width:61%"></span><em>1,208 · held</em></div></div>
+          <div class="row"><span class="name">Who we are</span><div class="bar" style="--w:47%"><span style="width:47%"></span><em>938</em></div></div>
+          <div class="row"><span class="name">What we make</span><div class="bar" style="--w:71%"><span style="width:71%"></span><em>1,394</em></div></div>
+          <div class="row"><span class="name">Get in touch</span><div class="bar" style="--w:26%"><span style="width:26%"></span><em>515</em></div></div>
+          <div class="row"><span class="name">Events</span><div class="bar" style="--w:100%"><span style="width:100%"></span><em></em></div></div>
+          <div class="row"><span class="name"></span><div class="caption" style="margin:0">↑ 1,976 · the longest section on the page</div></div>
+          <div class="row"><span class="name">Newsletter</span><div class="bar" style="--w:34%"><span style="width:34%"></span><em>669</em></div></div>
+        </div>
+        <div class="legend"><span><i class="held"></i>pinned / held</span><span><i></i>free scroll</span></div>
+      </div>
+
+      <div class="panel after">
+        <h3>Proposed · a beat per section</h3>
+        <div class="scrollmap" aria-label="Proposed pacing with a pinned beat per section">
+          <div class="row"><span class="name">Hero film</span><div class="bar" style="--w:61%"><span class="held" style="width:61%"></span><em>unchanged</em></div></div>
+          <div class="row"><span class="name">Who we are</span><div class="bar" style="--w:47%"><span class="beat" style="width:22%"></span><span style="left:22%;width:25%"></span><em>line reveals</em></div></div>
+          <div class="row"><span class="name">Featured ×2</span><div class="bar" style="--w:80%"><span class="beat" style="width:56%"></span><span style="left:56%;width:24%"></span><em>pin each</em></div></div>
+          <div class="row"><span class="name">More work</span><div class="bar" style="--w:40%"><span style="width:40%"></span><em>free</em></div></div>
+          <div class="row"><span class="name">Get in touch</span><div class="bar" style="--w:26%"><span style="width:26%"></span><em>free</em></div></div>
+          <div class="row"><span class="name">Events</span><div class="bar" style="--w:58%"><span class="beat" style="width:18%"></span><span style="left:18%;width:40%"></span><em>title card, then list</em></div></div>
+          <div class="row"><span class="name">Newsletter</span><div class="bar" style="--w:34%"><span style="width:34%"></span><em>free</em></div></div>
+        </div>
+        <div class="legend"><span><i class="held"></i>existing hold</span><span><i class="beat"></i>new beat</span><span><i></i>free scroll</span></div>
+      </div>
+    </div>
+
+    <div class="cols" style="margin-top:24px">
+      <div class="panel">
+        <h3>What a beat would be</h3>
+        <ul>
+          <li><b>Featured projects:</b> each pins for about one screen of scroll. The video plays full-frame while the title and tags come in, then it releases into the grid.</li>
+          <li><b>Section titles</b> (<span style="font-family:var(--mono)">[ What We Make ]</span>, <span style="font-family:var(--mono)">[ What We're Up To ]</span>) become short title cards, the way chapters open in a film.</li>
+          <li><b>The rest stays free.</b> The grid, the CTA and the footer keep normal scrolling, so the pauses feel chosen rather than slow.</li>
+        </ul>
+      </div>
+      <div class="panel after">
+        <h3>Guardrails</h3>
+        <ul>
+          <li>Visitors with <code>prefers-reduced-motion</code> set get plain scrolling with no pins.</li>
+          <li>On phones, beats are shorter (about half a screen) so the page never feels stuck.</li>
+          <li>Prototype it in Figma or a branch first, then test it with someone who has never seen the site before shipping.</li>
+        </ul>
+      </div>
+    </div>
+    <span class="tag hot">High impact</span><span class="tag">Design + front-end</span><span class="tag">~1–2 week sprint</span>
+  </div>
+</section>
+
+<!-- 02 -->
+<section class="finding" id="community">
+  <div class="wrap">
+    <div class="finding-head">
+      <div><span class="num">02 / Content design</span><h2>Let the community read as community</h2></div>
+      <div>
+        <p class="lede">Putting the events MATTE hosts and attends on the homepage is a great idea. Showing the studio's community says something about the brand that a project grid alone can't.</p>
+        <p>The issue is that <span style="font-family:var(--mono)">[ What We're Up To ]</span> uses the same card as the project grid: a poster-sized image, an uppercase title and a small label. When you scroll quickly, a party at Art Basel Paris looks like a client project. It's also the tallest section on the page (1,976px), and events and editorial articles are mixed in one grid.</p>
+        <p>Giving it its own visual language, one built around dates the way a calendar is, would make the difference clear at scrolling speed and give community its own role in the brand story.</p>
+      </div>
+    </div>
+
+    <div class="cols">
+      <div class="panel">
+        <h3>Now · same card as a project</h3>
+        <div class="cards" aria-hidden="true">
+          <div class="card"><div class="img"></div><div class="meta"><span>Event</span><span>10/21/26</span></div><div class="ttl">A Party: Art Basel Paris</div><div class="cta">RSVP EVENT ↗</div></div>
+          <div class="card"><div class="img"></div><div class="meta"><span>Editorial</span><span>11/20/25</span></div><div class="ttl">reSOUND New York at HERO</div><div class="cta">READ ARTICLE ↗</div></div>
+        </div>
+        <p class="caption">Poster image, uppercase title, small italic label: the same structure as the project cards above it on the page.</p>
+      </div>
+      <div class="panel after">
+        <h3>Proposed · a calendar, led by the date</h3>
+        <div class="cal">
+          <div class="grp">Upcoming</div>
+          <div class="ev up"><div class="d"><small>Fri</small><b>20</b><small>Nov</small></div><div><div class="what">Worthless Studios 8-Ball Benefit</div><div class="where">New York</div></div><span class="go">RSVP ↗</span></div>
+          <div class="grp">Recently</div>
+          <div class="ev past"><div class="d"><small>Wed</small><b>21</b><small>Oct</small></div><div><div class="what">A Party: Art Basel Paris</div><div class="where">Paris</div></div><span class="go">Recap ↗</span></div>
+          <div class="ev past"><div class="d"><small>Sun</small><b>16</b><small>Nov '25</small></div><div><div class="what">A Shaded View on Fashion Film</div><div class="where">Paris</div></div><span class="go">Recap ↗</span></div>
+        </div>
+        <p class="caption">The date is the biggest element, upcoming events come first, and editorial gets its own row below or a "Journal" tab. Posters move to the event page and to recaps, where they work better.</p>
+      </div>
+    </div>
+    <span class="tag hot">High impact</span><span class="tag">Design + CMS</span><span class="tag">~1 week</span>
+  </div>
+</section>
+
+<!-- 03 -->
+<section class="finding" id="rsvp">
+  <div class="wrap">
+    <div class="finding-head">
+      <div><span class="num">03 / Content state</span><h2>Past events still say RSVP</h2></div>
+      <div>
+        <p class="lede">Five of the six events on the homepage have already happened, and all six show an RSVP button.</p>
+        <p>When a visitor taps RSVP for something that happened in May 2025, the site looks unattended, which works against the community message in note 02. The CMS already stores a date on each event, so the site can switch the button automatically and nobody has to remember to update it.</p>
+      </div>
+    </div>
+    <div class="cols">
+      <div class="panel">
+        <h3>Events on the homepage, as of Nov 18, 2026</h3>
+        <table class="data">
+          <thead><tr><th>Event</th><th>Date</th><th>Button</th></tr></thead>
+          <tbody>
+            <tr><td>A Party: Art Basel Paris</td><td>10/21/26</td><td class="bad">RSVP · past</td></tr>
+            <tr><td>Worthless Studios 8-Ball Benefit</td><td>11/20/26</td><td>RSVP · upcoming ✓</td></tr>
+            <tr><td>A Shaded View on Fashion Film</td><td>11/16/25</td><td class="bad">RSVP · past</td></tr>
+            <tr><td>Creative Expression in the Age of AI</td><td>11/04/25</td><td class="bad">RSVP · past</td></tr>
+            <tr><td>TV on the Radio</td><td>09/14/25</td><td class="bad">RSVP · past</td></tr>
+            <tr><td>C2C Festival</td><td>05/09/25</td><td class="bad">RSVP · past</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="panel after">
+        <h3>Fix · derive the button from the date</h3>
+<pre><span class="c">// one rule instead of manual edits</span>
+<span class="k">const</span> isPast = event.date &lt; todayInNY()
+
+cta = isPast
+  ? (event.recap ? <span class="k">"See recap"</span> : <span class="k">"Photos"</span>)
+  : <span class="k">"RSVP"</span>
+
+<span class="c">// and sort: upcoming (soonest first),
+// then past (newest first)</span></pre>
+        <p class="caption">This could go further: once an event passes, an AI step could draft a short recap from the event's photos and press for the team to approve.</p>
+      </div>
+    </div>
+    <span class="tag hot">Quick win</span><span class="tag">Front-end</span><span class="tag">~half a day</span>
+  </div>
+</section>
+
+<!-- 04 -->
+<section class="finding" id="dates">
+  <div class="wrap">
+    <div class="finding-head">
+      <div><span class="num">04 / Bug</span><h2>Dates shift by one day</h2></div>
+      <div>
+        <p class="lede">The 8-Ball Benefit is dated 11/20/26 in the page the server sends. A moment later, after the JavaScript loads, the browser shows 11/19/26.</p>
+        <p>The same thing happens on other cards (for example, 11/04/25 becomes 11/03/25). This is a common time-zone bug. A date with no time, like <code>2026-11-20</code>, is read as midnight UTC, which is still the evening of the 19th in New York, so anyone in the Americas sees the wrong day. The server and browser also disagree, which causes a React hydration mismatch.</p>
+      </div>
+    </div>
+    <div class="cols">
+      <div class="panel">
+        <h3>What visitors see</h3>
+        <table class="data">
+          <thead><tr><th>Card</th><th>Server HTML</th><th>After load</th></tr></thead>
+          <tbody>
+            <tr><td>8-Ball Benefit</td><td>11/20/26</td><td class="bad">11/19/26</td></tr>
+            <tr><td>Creative Expression in the Age of AI</td><td>11/04/25</td><td class="bad">11/03/25</td></tr>
+          </tbody>
+        </table>
+        <p class="caption">Seen in Chrome on a machine set to US Eastern time.</p>
+      </div>
+      <div class="panel after">
+        <h3>Fix · format date-only values as dates, not instants</h3>
+<pre><span class="c">// before (probably): new Date("2026-11-20") → Nov 19, 7pm EST</span>
+<span class="c">// after: format it in UTC so the day never moves</span>
+<span class="k">new</span> Intl.DateTimeFormat(<span class="k">"en-US"</span>, {
+  month: <span class="k">"2-digit"</span>, day: <span class="k">"2-digit"</span>,
+  year: <span class="k">"2-digit"</span>, timeZone: <span class="k">"UTC"</span>
+}).format(<span class="k">new</span> Date(event.date))</pre>
+      </div>
+    </div>
+    <span class="tag hot">Quick win</span><span class="tag">Front-end</span><span class="tag">~1 hour</span>
+  </div>
+</section>
+
+<!-- 05 -->
+<section class="finding" id="a11y">
+  <div class="wrap">
+    <div class="finding-head">
+      <div><span class="num">05 / Accessibility + search</span><h2>Headings and alt text</h2></div>
+      <div>
+        <p class="lede">The homepage has no headings in its HTML, and none of its 37 images have alt text.</p>
+        <p>The bracketed section labels look like headings but are marked up as plain text. As a result, screen-reader users can't jump between sections, and search engines have less to work with when deciding what the page is about. Missing alt text also means MATTE's best work is invisible to anyone using a screen reader, and to image search.</p>
+      </div>
+    </div>
+    <div class="cols">
+      <div class="panel">
+        <h3>Measured on the homepage</h3>
+        <table class="data">
+          <tbody>
+            <tr><td>Heading elements (h1–h3)</td><td class="bad">0</td></tr>
+            <tr><td>Images</td><td>37</td></tr>
+            <tr><td>Images with an alt attribute</td><td class="bad">0</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="panel after">
+        <h3>Fix · markup now, alt text built into the CMS workflow</h3>
+        <ul>
+          <li>Render "MATTE" as the page's <code>h1</code> and the bracketed labels as <code>h2</code>s, with no visual change.</li>
+          <li>Add a required <b>alt</b> field to the image type in Sanity.</li>
+          <li>Use AI to draft the alt text when an image is uploaded, and have an editor approve or adjust it. That covers the existing library in one pass and keeps new uploads covered.</li>
+        </ul>
+      </div>
+    </div>
+    <span class="tag hot">Quick win</span><span class="tag">Front-end + CMS + AI</span><span class="tag">~1–2 days</span>
+  </div>
+</section>
+
+<!-- plan -->
+<section class="finding" id="plan">
+  <div class="wrap">
+    <div class="finding-head">
+      <div><span class="num">→ / Sequencing</span><h2>How I'd sequence it</h2></div>
+      <div><p class="lede">Ship the fixes first, then design the bigger changes with the team.</p></div>
+    </div>
+    <div class="plan">
+      <div>
+        <span class="label">Week 1</span>
+        <h3>Fixes</h3>
+        <ul><li>Date bug (04)</li><li>RSVP switches by date (03)</li><li>Headings markup (05)</li></ul>
+      </div>
+      <div>
+        <span class="label">Weeks 2–4</span>
+        <h3>Systems</h3>
+        <ul><li>Required alt field and AI-drafted alt text (05)</li><li>Events vs. editorial split in Sanity (02)</li><li>Recap template for past events</li></ul>
+      </div>
+      <div>
+        <span class="label">Month 2</span>
+        <h3>Experience</h3>
+        <ul><li>Calendar design for the community section (02)</li><li>Scroll pacing prototype, tested, then shipped (01)</li></ul>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p>MK Skitka · Creative Technologist · Brooklyn, NY<br>
+    <a href="https://mkskitka.com">mkskitka.com</a> · <a href="/resume">Resume</a></p>
+    <p>Independent notes prepared for my application to MATTE Projects. Not affiliated with MATTE. Measurements were taken on the public homepage on November 18, 2026, and may have changed since.</p>
+  </div>
+</footer>
+
+</body>
+</html>

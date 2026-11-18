@@ -9,6 +9,12 @@ import ScrollToTop from './components/ScrollToTop.jsx'
 // The tab icon is the same on every address (public/favicon.svg, the backdrop's lines).
 // components/RouteFavicon.jsx, which swapped in a pixel sprite per section
 // (public/icons/), is kept but not mounted: add <RouteFavicon /> below to bring it back.
+// Sends a clean address like /matte to a standalone HTML file in public/.
+function StaticPage({ href }) {
+  if (typeof window !== 'undefined') window.location.replace(href)
+  return null
+}
+
 export default function App() {
   return (
     <>
@@ -22,6 +28,8 @@ export default function App() {
         <Route path="/projects/:slug" element={<Home />} />
         <Route path="/visuals/:id" element={<Home />} />
         <Route path="/resume" element={<Resume />} />
+        {/* Standalone page in public/matte.html (MATTE Projects application notes) */}
+        <Route path="/matte" element={<StaticPage href="/matte.html" />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </>
