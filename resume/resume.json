@@ -245,7 +245,7 @@
         "Designed and taught [Immersivity Beyond the Display](https://mkskitka.github.io/imbtd/), an undergraduate Interactive Media Arts (IMA) course on immersive new media and installation",
         "Managed the ITP/IMA Coding Lab, serving the programs’ roughly 350 students and open to all of NYU",
         {
-          "text": "Led workshops on TouchDesigner, custom Stable Diffusion models, Teachable Machine and p5.js for ITP Camp and NYU’s College and Career Lab",
+          "text": "Led workshops on TouchDesigner, custom Stable Diffusion models, Teachable Machine and p5.js for ITP students during the residency, at ITP Camp and for NYU’s College and Career Lab",
           "not": [
             "teaching"
           ]
@@ -496,7 +496,7 @@
     "ai": {
       "_about": "The generative AI version: npm run resume:ai. For creative technologist / creative lead roles at AI companies, agencies and brand labs. Generative AI skills first; AI-specific bullets carry only: [\"ai\"].",
       "title": "Creative Technologist, Generative AI",
-      "profile": "Creative technologist with 8 years building generative and interactive media for brands, agencies and artists, and hands-on with generative AI in production since 2023. Built the generative AI video system for the Nigerian Pavilion at the 2024 Venice Biennale with Volvox Labs: over 16 hours of content plus an API that generated more across the pavilion’s seven-month run. Trains and steers custom Stable Diffusion models, builds ComfyUI pipelines and live-rendered real-time AI visuals, and works with the Claude, Gemini and OpenAI APIs. Client-facing on every project, from Audible and Intel pop-ups with Smooth Technology to a rehabilitation system designed with NYU Langone clinicians; teaches generative AI workshops at NYU. Background in cognitive brain science and computer science.",
+      "profile": "Creative technologist with 8 years building generative and interactive media for brands, agencies and artists, and hands-on with generative AI in production since 2023. Built the generative AI video system for the Nigerian Pavilion at the 2024 Venice Biennale with Volvox Labs: over 16 hours of content plus an API that generated more across the pavilion’s seven-month run. Trains and steers custom Stable Diffusion models, builds ComfyUI pipelines and live-rendered real-time AI visuals, and works with the Claude, Gemini and OpenAI APIs. Works closely with agencies, studios and specialists, from Audible and Intel pop-ups with Smooth Technology to a rehabilitation system designed with NYU Langone clinicians; teaches generative AI workshops at NYU. Background in cognitive brain science and computer science.",
       "sections": [
         "profile",
         "jobs",
@@ -525,7 +525,7 @@
     "experiential": {
       "_about": "For experiential design and brand activation work at agencies (written for TXG’s freelance Experiential Designer roster): npm run resume:experiential. Pop-ups, live events and installations lead; installation skills first. Bullets for it carry only: [\"experiential\"].",
       "title": "Creative Technologist, Experiential Design",
-      "profile": "Creative technologist with 8 years of experience designing and building interactive environments for brand activations, live events and installations, from concept through on-site installation. Recent work with Smooth Technology includes the listening room of Audible’s first physical pop-up, a real-time dance performance for Intel’s Times Square pop-up and an arcade game for Realtor.com at SXSW. This year built PGN with Studio Elsewhere, a three-room interactive space (LED hallway, full-body projection room, multi-sensory room) now installed at two sites. Designs with the build in mind: projection, LED walls, sensors and the real-time content that runs on them. Client-facing on every project, and used to carrying several at once to deadline.",
+      "profile": "Creative technologist with 8 years of experience designing and building interactive environments for brand activations, live events and installations, from concept through on-site installation. Recent work with Smooth Technology includes the listening room of Audible’s first physical pop-up, a real-time dance performance for Intel’s Times Square pop-up and an arcade game for Realtor.com at SXSW. This year built PGN with Studio Elsewhere, a three-room interactive space (LED hallway, full-body projection room, multi-sensory room) now installed at two sites. Designs with the build in mind: projection, LED walls, sensors and the real-time content that runs on them. Works closely with agency and studio teams, and is used to carrying several projects at once to deadline.",
       "sections": [
         "profile",
         "jobs",

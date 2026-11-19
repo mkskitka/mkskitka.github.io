@@ -109,7 +109,7 @@ export default function WriteUp({ open = false, heading, lines = [], paragraphs 
           const oy = parseFloat(cs.getPropertyValue('--grid-origin-y')) || 0
           const totalRows = Math.floor((secRect.height - oy) / sy + 1e-6)
           const keep = { width: el.style.width, height: el.style.height, maxHeight: el.style.maxHeight, paddingTop: el.style.paddingTop, paddingBottom: el.style.paddingBottom }
-          Object.assign(el.style, { width: `${cells * s}px`, height: 'auto', maxHeight: 'none', paddingTop: '0px', paddingBottom: '0px' })
+          Object.assign(el.style, { width: `calc(${cells * s}px - 2 * var(--glass-gap))`, height: 'auto', maxHeight: 'none', paddingTop: '0px', paddingBottom: '0px' })
           const text = el.offsetHeight // the content alone, no vertical padding
           Object.assign(el.style, keep)
           const maxRows = Math.max(1, totalRows - 2)
@@ -119,8 +119,13 @@ export default function WriteUp({ open = false, heading, lines = [], paragraphs 
           const topRow = Math.floor((totalRows - rows) / 2)
           const pad = Math.max(sy * MIN_PAD_ROWS, (rows * sy - text) / 2)
           // Margin that puts the top on that row line (from where the panel sits now).
-          const margin = parseFloat(getComputedStyle(el).marginTop) || 0
-          const shift = oy + topRow * sy - (el.getBoundingClientRect().top - secRect.top)
+          // The opening animation slides the panel up from translateY(12px), so the
+          // on-screen top is measured without whatever slide is still in progress;
+          // otherwise the first measure lands the panel that far too high.
+          const ecs = getComputedStyle(el)
+          const margin = parseFloat(ecs.marginTop) || 0
+          const slide = ecs.transform && ecs.transform !== 'none' ? new DOMMatrixReadOnly(ecs.transform).m42 : 0
+          const shift = oy + topRow * sy - (el.getBoundingClientRect().top - slide - secRect.top)
           setPlace({ cells, gap, below: false, top: 0, centred: true, marginTop: margin + shift, height: rows * sy, pad })
           return
         }
