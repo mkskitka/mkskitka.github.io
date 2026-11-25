@@ -529,10 +529,10 @@ const projectList = [
       { src: '05.jpg', alt: 'On a wooden shower bench' },
     ],
     description: [
-      'An iPhone art piece in which the phone tries to disappear. While it is carried, it remembers what its camera sees. When it comes to rest, lying on a book, a cushion or a bench, or standing in front of a bottle, its screen shows whatever it is hiding, at true size, as though the phone were a sheet of glass.',
-      'It began with a simple desire to see what would happen if I gave my phone the agency to evade me. The piece treats the phone as an entity in its own right, separate from the person who carries it. A phone is usually thought of as a tool, yet it goes everywhere its owner goes, and each has come to depend on the other. Here it is given one small will of its own, which is to look at wherever it has been put down and hide there. Whether that makes it a tool, a companion or a co-dependent is the question the piece leaves open.',
-      'It is never perfect, and that is part of the piece. The picture is a memory of the surface from a moment earlier, stitched from several glances, with the parts the camera never saw filled in by guesswork. The work is in what makes the illusion hold, which means knowing exactly where the phone landed, drawing at 1:1 scale, and matching the screen\u2019s brightness and colour to the light in the room.',
-      'These photos are from the first tests around my apartment. Still in development.',
+      'iNotFound began as an experiment to see if I could program my phone to try to hide from me and have agency over itself. While it is carried, it remembers what its camera sees. When it comes to rest, lying on a book, a cushion or a bench, or standing in front of a bottle, its screen shows whatever it is obscuring, camouflaged.',
+      'A phone is usually thought of as a tool, yet it goes everywhere its owner goes, and each has come to depend on the other. Here it is given one small will of its own, which is to look at wherever it has been put down and hide there.',
+      'The digital image and perspective are never perfectly tuned to its surroundings. The picture is a memory of the surface from a moment earlier, stitched from several glances, with the parts the camera never saw filled in by guesswork.',
+      'These photos are from the first tests around my apartment. Piece will be displayed as a series of photographs.',
     ],
   },
 ]
