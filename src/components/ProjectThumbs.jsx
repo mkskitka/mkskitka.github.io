@@ -913,7 +913,7 @@ export default function ProjectThumbs({ open = false, onSelect, items = projects
               )}
               {titles && (
                 <span className="project_thumb_title">
-                  {p.title}
+                  {p.keepCase ? <span style={{ textTransform: 'none' }}>{p.title}</span> : p.title}
                   {/* The project's categories (`tags` in src/data/projects.js), under its name. */}
                   {Array.isArray(p.tags) && p.tags.some((t) => TAG_LABELS[t]) && (
                     <span className="project_thumb_tags">

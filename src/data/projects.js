@@ -43,6 +43,8 @@ export const TAG_LABELS = {
   'audio-reactive': 'Audio-reactive',
   '270-projection': '270° projection',
   scrollytelling: 'Scrollytelling',
+  experiment: 'Experiment',
+  'in-development': 'In development',
 }
 
 // Every image from the Webflow export, for picking from (public/images).
@@ -465,6 +467,72 @@ const projectList = [
     description: [
       'Untitled (CRT) is a multi-output A/V interactive installation utilizing ten found CRT TVs. The installation is a homage to the age of old cinema and a reflection on post-modern cinematic experiences. It was displayed at the ITP NYU Spring Show in April 2022. This project was a collaboration with Shanshan Bai (ITP ’23), Xiao Jiang (ITP ’23) and the NYU Tisch Graduate Film department.',
       'On this project I contributed to concept development, resourcing of materials (so many TVs!), TouchDesigner and A/V setup, and installation design. I additionally programmed the turning off and on of all the TVs with small robotic arms within the TouchDesigner environment as part of a two-minute audio-visual experience.',
+    ],
+  },
+  // ---------------------------------------------------------------------------
+  // Experiments: personal pieces, shown under Show > Experiments (and All). Tagged
+  // 'unfeatured' so the default Featured view stays the client and installation work;
+  // delete 'unfeatured' from one to put it in Featured too. `status` adds a Status
+  // line to the write-up. Images: a thumb.* (and gallery files) in
+  // src/assets/projects/<slug>/used/.
+  {
+    slug: 'if-scaffolding-were-trees',
+    date: '2026',
+    title: 'If Scaffolding Were Trees',
+    heading: ['IF SCAFFOLDING', 'WERE TREES'],
+    role: 'Designer, Developer',
+    mediums: 'MapLibre, deck.gl, NYC Open Data, web',
+    tags: ['experiment', 'web', 'unfeatured'],
+    description: [
+      'A satellite map of Manhattan and Brooklyn in which every active sidewalk shed has been replaced by a row of street trees. Toggle between the sheds as they stand and the trees they could be, and scrub the years forward to watch the canopy grow. Double-click anywhere to drop to a 3D ground view of the street beside the nearest shed.',
+      'The sheds come from NYC Department of Buildings permits, placed along the city\u2019s building footprints and street centerlines, and the trees are drawn at true scale. The change is almost invisible from above the whole island and vivid at street level, and the piece says so rather than exaggerating it.',
+      '[Open the map](https://mkskitka.github.io/if-scaffolding-were-trees/)',
+    ],
+  },
+  {
+    slug: 'ink-echo',
+    date: '2026',
+    title: 'Ink Echo',
+    heading: ['INK', 'ECHO'],
+    role: 'Designer, Developer',
+    mediums: 'Computer vision, contour matching, The Met Open Access, web, iPad + Apple Pencil',
+    tags: ['experiment', 'web', 'interactive', 'unfeatured'],
+    description: [
+      'Draw a line with a finger or Apple Pencil, and ink paintings and calligraphy from The Met\u2019s Asian Art collection answer it. As you draw, the app finds the passage of a painting whose contours best match your line and places that painting so its brushstrokes sit on yours.',
+      'It is a series of experiments in learning an art form through the hand: some versions simulate the brush and xuan paper, one has you copy a model stroke and then meet a master\u2019s stroke of the same subject, another gives every stroke a different painter. All images and data come from The Met Collection API (Open Access, CC0).',
+      '[Try it](https://mkskitka.github.io/ink-echo/)',
+    ],
+  },
+  {
+    slug: 'inotfound',
+    date: '2026',
+    title: 'iNotFound',
+    heading: ['iNotFound'],
+    // Written as cased here everywhere (title, write-up heading, tile), not in capitals.
+    keepCase: true,
+    status: 'In development',
+    role: 'Artist, Developer',
+    mediums: 'iPhone, Swift, ARKit, CoreMotion, Python, image generation',
+    tags: ['experiment', 'in-development'],
+    // Four upright photos side by side, stepped; the wide one (04) is in the gallery.
+    featured: [
+      tile('01.jpg', { width: '21.5vw', aspect: '3 / 4', top: '8vh', left: '4vw', alt: 'A phone lying on a book cover, its screen completing the portrait printed underneath' }),
+      tile('02.jpg', { width: '21.5vw', aspect: '3 / 4', top: '20vh', left: '27.5vw', alt: 'A phone standing in a shower caddy, showing the orange loofah and sponge behind it' }),
+      tile('03.jpg', { width: '21.5vw', aspect: '3 / 4', top: '8vh', left: '51vw', alt: 'A phone standing on a table in front of a glass bottle, showing the bottle through itself' }),
+      tile('05.jpg', { width: '21.5vw', aspect: '3 / 4', top: '20vh', left: '74.5vw', alt: 'A phone lying on a slatted wooden shower bench, showing the slats beneath it' }),
+    ],
+    gallery: [
+      { src: '01.jpg', alt: 'Lying on a book cover' },
+      { src: '04.jpg', alt: 'On a velvet cushion' },
+      { src: '02.jpg', alt: 'Standing in front of a loofah and sponge' },
+      { src: '03.jpg', alt: 'Standing in front of a glass bottle' },
+      { src: '05.jpg', alt: 'On a wooden shower bench' },
+    ],
+    description: [
+      'An iPhone piece where the phone tries to disappear. It remembers what its camera sees while I carry it, and when I put it down the screen shows whatever it is covering, at true size, as if the phone were a sheet of glass.',
+      'It started because I wanted to see what would happen if I gave my phone the agency to evade me. I think of it here as its own entity, separate from whoever is carrying it. We call phones tools, but mine goes everywhere I go, and I\u2019m not sure which of us depends on the other more.',
+      'It never matches perfectly. What you see is the phone\u2019s memory of the surface from a moment before, with a guess wherever the camera never looked.',
+      'These photos are from the first tests around my apartment. Still in development.',
     ],
   },
 ]

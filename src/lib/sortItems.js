@@ -42,6 +42,7 @@ export const SUBSETS = {
     { id: 'ai', label: 'AI', tag: 'ai' },
     { id: 'web', label: 'Web', tag: 'web' },
     { id: 'installation', label: 'Installation', tag: 'installation' },
+    { id: 'experiments', label: 'Experiments', tag: 'experiment' },
   ],
   // Visuals' tags are in src/data/visuals-tags.json.
   visuals: [

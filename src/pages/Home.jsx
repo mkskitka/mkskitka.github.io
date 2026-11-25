@@ -466,9 +466,10 @@ export default function Home() {
           open={!!project && !isVisual}
           align="right"
           anchor="bottom"
-          heading={project?.title}
+          heading={project?.keepCase ? <span style={{ textTransform: 'none' }}>{project.title}</span> : project?.title}
           lines={[
             { label: 'Date', value: project?.date },
+            { label: 'Status', value: project?.status },
             { label: 'Role', value: project?.role },
             { label: 'Mediums', value: project?.mediums },
           ]}
