@@ -529,9 +529,9 @@ const projectList = [
       { src: '05.jpg', alt: 'On a wooden shower bench' },
     ],
     description: [
-      'An iPhone piece where the phone tries to disappear. It remembers what its camera sees while I carry it, and when I put it down the screen shows whatever it is covering, at true size, as if the phone were a sheet of glass.',
-      'It started because I wanted to see what would happen if I gave my phone the agency to evade me. I think of it here as its own entity, separate from whoever is carrying it. We call phones tools, but mine goes everywhere I go, and I\u2019m not sure which of us depends on the other more.',
-      'It never matches perfectly. What you see is the phone\u2019s memory of the surface from a moment before, with a guess wherever the camera never looked.',
+      'An iPhone art piece in which the phone tries to disappear. While it is carried, it remembers what its camera sees. When it comes to rest, lying on a book, a cushion or a bench, or standing in front of a bottle, its screen shows whatever it is hiding, at true size, as though the phone were a sheet of glass.',
+      'It began with a simple desire to see what would happen if I gave my phone the agency to evade me. The piece treats the phone as an entity in its own right, separate from the person who carries it. A phone is usually thought of as a tool, yet it goes everywhere its owner goes, and each has come to depend on the other. Here it is given one small will of its own, which is to look at wherever it has been put down and hide there. Whether that makes it a tool, a companion or a co-dependent is the question the piece leaves open.',
+      'It is never perfect, and that is part of the piece. The picture is a memory of the surface from a moment earlier, stitched from several glances, with the parts the camera never saw filled in by guesswork. The work is in what makes the illusion hold, which means knowing exactly where the phone landed, drawing at 1:1 scale, and matching the screen\u2019s brightness and colour to the light in the room.',
       'These photos are from the first tests around my apartment. Still in development.',
     ],
   },
